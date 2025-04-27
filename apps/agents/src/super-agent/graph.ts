@@ -7,7 +7,6 @@ import { createLLM } from "./llm.js";
 import { SystemMessage } from "@langchain/core/messages";
 import { MemoryPrompt } from "./tools/memory.js";
 import { createExpert } from "src/create_expert/index.js";
-import { createSupervisor } from "@langchain/langgraph-supervisor";
 const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<ConfigurationState>>(
     {
         npm: {
@@ -25,7 +24,7 @@ const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<Configuration
         const normalTools = initializeTools(state, config);
 
         const tools = [...normalTools, ...mcpTools];
-        const llm = await createLLM("gpt-4.1-mini");
+        const llm = await createLLM("gemini-2.5-flash-preview-04-17");
         const agent = createExpert({
             plannerConfig: {
                 llm,
