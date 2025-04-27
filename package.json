@@ -1,0 +1,25 @@
+{
+  "name": "agent-chat-app",
+  "author": "Your Name",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev --filter=agents",
+    "build": "turbo build",
+    "turbo:command": "turbo",
+    "format": "turbo format",
+    "lint": "turbo lint",
+    "lint:fix": "turbo lint:fix"
+  },
+  "devDependencies": {
+    "turbo": "latest",
+    "tsx": "^4.19.1",
+    "typescript": "^5",
+    "concurrently": "^9.1.2",
+    "@tsconfig/recommended": "^1.0.8",
+    "prettier": "^3.3.3"
+  },
+  "resolutions": {
+    "@langchain/core": "^0.3.42"
+  },
+  "packageManager": "pnpm@10.6.3"
+}

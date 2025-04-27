@@ -1,0 +1,8 @@
+
+env file
+
+```sh
+RAGFLOW_BASE_URL=
+RAGFLOW_TOKEN=
+FIRE_CRAWL_API_KEY=
+```
