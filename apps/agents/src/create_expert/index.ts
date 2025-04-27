@@ -1,11 +1,13 @@
 import { LanguageModelLike } from "@langchain/core/language_models/base";
-import { AIMessage, SystemMessage } from "@langchain/core/messages";
+import { SystemMessage } from "@langchain/core/messages";
 import { StructuredToolInterface } from "@langchain/core/tools";
-import { Annotation, AnnotationRoot, END, MessagesAnnotation, START, StateGraph } from "@langchain/langgraph";
+import { Annotation, AnnotationRoot } from "@langchain/langgraph";
 import { createReactAgent, createReactAgentAnnotation } from "@langchain/langgraph/prebuilt";
-
+import { createHandoffTool, createSwarm, SwarmState } from "@langchain/langgraph-swarm";
+import { BaseMessage } from "@langchain/core/messages";
 export const ExpertState = Annotation.Root({
     ...createReactAgentAnnotation().spec,
+    ...SwarmState.spec,
     need_plan: Annotation<Boolean>({
         reducer: (a) => a,
         default: () => false,
@@ -15,31 +17,21 @@ export type ExpertState = typeof ExpertState.State;
 
 export const createPlanNode = <T>(config: CreateNodeConfig<T>) => {
     const { llm, tools, stateModifier } = config.plannerConfig;
-    return async (state: ExpertState) => {
-        const agent = createReactAgent({
-            llm,
-            tools,
-            prompt: stateModifier,
-        });
-        const res = await agent.invoke({
-            messages: state.messages,
-        });
-        return { messages: [...res.messages, new AIMessage("计划已完毕")] };
-    };
+    return createReactAgent({
+        name: "planner",
+        llm,
+        tools: [...tools, createHandoffTool({ agentName: "executor", description: "执行任务" })],
+        prompt: stateModifier,
+    });
 };
 export const createExecuteNode = <T>(config: CreateNodeConfig<T>) => {
     const { llm, tools, stateModifier } = config.executorConfig;
-    return async (state: ExpertState) => {
-        const agent = createReactAgent({
-            llm,
-            tools,
-            prompt: stateModifier,
-        });
-        const res = await agent.invoke({
-            messages: state.messages,
-        });
-        return { messages: res.messages };
-    };
+    return createReactAgent({
+        name: "executor",
+        llm,
+        tools: [...tools, createHandoffTool({ agentName: "planner", description: "制定计划" })],
+        prompt: stateModifier,
+    });
 };
 
 export interface SubConfig {
@@ -54,16 +46,12 @@ export interface CreateNodeConfig<T> {
     executorConfig: SubConfig;
 }
 
-export const createExpert = <T extends AnnotationRoot<any>>(config: CreateNodeConfig<T>) => {
-    const builder = new StateGraph(ExpertState, config.configSchema);
-    builder
-        .addNode("plan", createPlanNode(config))
-        .addNode("execute", createExecuteNode(config))
-        .addConditionalEdges(START, (state) => {
-            return state.need_plan ? "plan" : "execute";
-        })
-        .addEdge("plan", "execute")
-        .addEdge("execute", END);
-
-    return builder.compile();
+export const createExpert = <T extends AnnotationRoot<any>>(
+    config: CreateNodeConfig<T>
+): ReturnType<ReturnType<typeof createSwarm>["compile"]> => {
+    return createSwarm({
+        agents: [createExecuteNode(config), createPlanNode(config)],
+        defaultActiveAgent: "executor",
+        stateSchema: config.stateSchema || ExpertState,
+    }).compile();
 };

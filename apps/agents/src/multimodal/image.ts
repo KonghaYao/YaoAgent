@@ -1,4 +1,4 @@
-import { AIMessage, BaseMessage, ToolMessage } from "@langchain/core/messages";
+import { AIMessage, BaseMessage } from "@langchain/core/messages";
 import { tool } from "@langchain/core/tools";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
 import { randomUUID } from "crypto";
@@ -6,7 +6,51 @@ import OpenAI from "openai";
 import { GraphState } from "src/super-agent/state.js";
 import { z } from "zod";
 
-export const simpleImageRecognition = async (state: GraphState) => {
+/** 创建一个图像信息抽取工具, 可以识别图片中更加丰富的内容 */
+export const createImageExtractTool = (
+    prompt: string,
+    modelName: string,
+    {
+        name = "image_recognition",
+        description = "图像信息抽取工具，可以识别图片中更加丰富的内容",
+    }: { name?: string; description?: string } = {}
+) => {
+    return tool(
+        async ({ url }) => {
+            const openai = new OpenAI();
+            const response = await openai.chat.completions.create({
+                model: modelName,
+                messages: [
+                    {
+                        role: "user",
+                        content: [
+                            { type: "image_url", image_url: { url } },
+                            {
+                                text: prompt,
+                                type: "text",
+                            },
+                        ],
+                    },
+                ],
+            });
+            return response.choices[0].message.content;
+        },
+        {
+            name,
+            description,
+            schema: z.object({
+                url: z.string().describe("图片URL"),
+            }),
+        }
+    );
+};
+export const simpleImageRecognitionTool = createImageExtractTool(
+    "识别图片类型并提取主要内容，简明回复不超过50字。若检测到运单图片，请明确告知用户需使用专业运单识别工具获取详细信息。请描述图片中可见的关键元素和整体内容。",
+    "gemini-2.5-flash"
+);
+
+/** 部分没有图片识别能力的模型，可以通过这个工具来识别图片信息 */
+export const preImageRecognitionNode = async (state: GraphState) => {
     const messages = state.messages;
     const newMessages: BaseMessage[] = [];
     for (const message of messages) {
@@ -36,38 +80,3 @@ export const simpleImageRecognition = async (state: GraphState) => {
     }
     return { messages: newMessages };
 };
-export const simpleImageRecognitionTool = tool(
-    async ({ url, model }) => {
-        const openai = new OpenAI();
-        const response = await openai.chat.completions.create({
-            model,
-            messages: [
-                {
-                    role: "user",
-                    content: [
-                        {
-                            type: "text",
-                            text: "识别图片类型并提取主要内容，简明回复不超过50字。若检测到运单图片，请明确告知用户需使用专业运单识别工具获取详细信息。请描述图片中可见的关键元素和整体内容。",
-                        },
-                        {
-                            type: "image_url",
-                            image_url: { url },
-                        },
-                    ],
-                },
-            ],
-            temperature: 0.1,
-        });
-
-        const content = `${response.choices[0].message.content}\n> 图片 URL: ${url}`;
-        return content;
-    },
-    {
-        name: "notebook",
-        description: "管理笔记的工具，支持写入、读取和删除操作",
-        schema: z.object({
-            url: z.string().describe("图片URL"),
-            model: z.string().describe("模型").default("gemini-2.5-flash"),
-        }),
-    }
-);

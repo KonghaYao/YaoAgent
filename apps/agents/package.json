@@ -14,18 +14,17 @@
         "lint:fix": "eslint src --fix"
     },
     "dependencies": {
-        "@langchain/cohere": "^0.3.3",
         "@langchain/community": "^0.3.41",
         "@langchain/core": "^0.3.49",
         "@langchain/langgraph": "^0.2.67",
         "@langchain/langgraph-checkpoint": "^0.0.16",
+        "@langchain/langgraph-supervisor": "^0.0.11",
+        "@langchain/langgraph-swarm": "^0.0.3",
         "@langchain/mcp-adapters": "^0.4.2",
         "@langchain/openai": "^0.5.7",
         "dotenv": "^16.5.0",
         "eventsource": "^3.0.6",
         "langchain": "^0.3.24",
-        "langfuse": "^3.37.2",
-        "langfuse-langchain": "^3.37.2",
         "openai": "^4.96.0",
         "uuid": "^10.0.0",
         "zod": "^3.24.3"

@@ -11,12 +11,12 @@
     "lint:fix": "turbo lint:fix"
   },
   "devDependencies": {
-    "turbo": "latest",
-    "tsx": "^4.19.1",
-    "typescript": "^5",
-    "concurrently": "^9.1.2",
     "@tsconfig/recommended": "^1.0.8",
-    "prettier": "^3.3.3"
+    "concurrently": "^9.1.2",
+    "prettier": "^3.5.3",
+    "tsx": "^4.19.3",
+    "turbo": "latest",
+    "typescript": "^5.8.3"
   },
   "resolutions": {
     "@langchain/core": "^0.3.42"
