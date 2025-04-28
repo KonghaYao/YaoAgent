@@ -1,8 +1,17 @@
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import { ChatOpenAI } from "@langchain/openai";
+import { ModelState } from "./states.js";
 
+export const modelGuard = (state: ModelState, model_type: keyof ModelState) => {
+    const modelName = state[model_type];
+    if (!modelName) {
+        throw new Error(`Model ${String(model_type)} not found in state`);
+    }
+    return modelName;
+};
 export async function createLLM(
-    model_name: string,
+    state: ModelState,
+    model_type: keyof ModelState,
     params: {
         temperature?: number;
         maxTokens?: number;
@@ -14,8 +23,9 @@ export async function createLLM(
         streaming?: boolean;
     } = {}
 ): Promise<BaseChatModel> {
+    const modelName = modelGuard(state, model_type);
     return new ChatOpenAI({
-        modelName: model_name,
+        modelName,
         ...params,
         configuration: {
             /** @ts-ignore */

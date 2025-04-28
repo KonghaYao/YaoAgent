@@ -1,0 +1,7 @@
+export const stylePrompt = `
+回复使用 Markdown 标准格式，保证内容清晰。
+表格需要注意列的数量，防止用户阅读困难。
+
+请使用 markdown 脚注标记每个文段的信息来源，保证来源的可靠性。
+
+`;

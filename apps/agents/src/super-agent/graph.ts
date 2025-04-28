@@ -1,34 +1,38 @@
 // Main graph
-import { START, StateGraph, END, LangGraphRunnableConfig } from "@langchain/langgraph";
+import { START, StateGraph, END, LangGraphRunnableConfig, addMessages } from "@langchain/langgraph";
 import { createMCPNode } from "./tools/mcp.js";
 import { initializeTools } from "./tools/index.js";
 import { GraphState, ConfigurationState } from "./state.js";
-import { createLLM } from "./llm.js";
-import { SystemMessage } from "@langchain/core/messages";
+import { createLLM } from "../model/index.js";
+import { AIMessage, SystemMessage } from "@langchain/core/messages";
 import { MemoryPrompt } from "./tools/memory.js";
-import { createExpert } from "src/create_expert/index.js";
+import { createExpert } from "src/create-expert/index.js";
+import { SequentialThinkingTool } from "./tools/sequential-thinking.js";
+import { planGetterNode } from "./prompt/plan-getter.js";
+import { stylePrompt } from "./prompt/style.js";
+import { MemoryNode } from "src/create-expert/short-term-memory.js";
+
 const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<ConfigurationState>>(
     {
-        npm: {
+        // npm: {
+        //     transport: "sse",
+        //     url: "http://0.0.0.0:6798/npm_bot/sse",
+        //     useNodeEventSource: true,
+        // },
+        "zhipu-web-search-sse": {
             transport: "sse",
-            url: "http://0.0.0.0:6798/npm_bot/sse",
-            useNodeEventSource: true,
-        },
-        thinking_tools: {
-            transport: "sse",
-            url: "http://0.0.0.0:6798/thinking_tools/sse",
-            useNodeEventSource: true,
+            url: "https://open.bigmodel.cn/api/mcp/web_search/sse?Authorization=" + process.env.ZHIPU_API_KEY,
         },
     },
     async (state, config, mcpTools) => {
         const normalTools = initializeTools(state, config);
 
         const tools = [...normalTools, ...mcpTools];
-        const llm = await createLLM("gemini-2.5-flash-preview-04-17");
+        const llm = await createLLM(state, "main_model");
         const agent = createExpert({
             plannerConfig: {
                 llm,
-                tools,
+                tools: [...tools, SequentialThinkingTool],
                 stateModifier: new SystemMessage(`你是一个战略型AI规划师，负责分析问题并设计执行方案。
 作为规划者，你的职责是分析用户需求，设计解决方案框架，并为执行者提供清晰的指导。
 
@@ -38,6 +42,7 @@ const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<Configuration
 3. 为每个子任务指定适当的工具和资源需求
 4. 预测可能的执行障碍并设计备选方案
 5. 设定明确的成功标准和验证方法
+6. 你的职责里面没有执行规划，你只需要与用户对话修正规划文档，然后交给执行者执行
 
 规划流程：
 - 问题分析：识别核心需求、约束条件和关键上下文
@@ -56,6 +61,8 @@ const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<Configuration
 3. 协调指南：说明子任务间的依赖关系和交接点
 
 注意：你的规划将直接传递给执行者，因此必须清晰、具体且可执行。始终考虑执行者的视角，确保指令可以被准确理解和高效执行。
+
+${stylePrompt}
 
 ${MemoryPrompt}`),
             },
@@ -89,9 +96,12 @@ ${MemoryPrompt}`),
 
 注意：保持与规划者的紧密协作，确保执行符合原始意图。在输出中清晰区分事实信息和推断内容，保持专业性和可读性。
 
+${stylePrompt}
+
 ${MemoryPrompt}`),
             },
         });
+
         const response = await agent.invoke({
             messages: state.messages,
         });
@@ -102,8 +112,10 @@ ${MemoryPrompt}`),
 
 export const builder = new StateGraph(GraphState, ConfigurationState)
     .addNode("main", mainNode)
+    .addNode("memory", MemoryNode)
     .addEdge(START, "main")
-    .addEdge("main", END);
+    .addEdge("main", "memory")
+    .addEdge("memory", END);
 
 export const graph = builder.compile();
 graph.name = "MemoryAgent";
