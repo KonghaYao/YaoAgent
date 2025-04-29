@@ -61,25 +61,8 @@ interface SearchPayload {
     f?: string;
 }
 
-/**
- * HTTP错误类
- */
-class HTTPError extends Error {
-    constructor(message: string) {
-        super(message);
-        this.name = "HTTPError";
-    }
-}
-
 /** 用于移除HTML标签的正则表达式 */
 const REGEX_STRIP_TAGS = /<[^>]*>/g;
-
-/**
- * 延迟执行
- * @param ms 延迟时间（毫秒）
- */
-const sleep = (ms: number): Promise<void> => 
-    new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * 转义HTML实体

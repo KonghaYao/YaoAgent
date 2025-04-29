@@ -1,16 +1,16 @@
 // Main graph
-import { START, StateGraph, END, LangGraphRunnableConfig, addMessages } from "@langchain/langgraph";
+import { START, StateGraph, END, LangGraphRunnableConfig } from "@langchain/langgraph";
 import { createMCPNode } from "./tools/mcp.js";
 import { initializeTools } from "./tools/index.js";
 import { GraphState, ConfigurationState } from "./state.js";
 import { createLLM } from "../model/index.js";
-import { AIMessage, SystemMessage } from "@langchain/core/messages";
+import { SystemMessage } from "@langchain/core/messages";
 import { MemoryPrompt } from "./tools/memory.js";
 import { createExpert } from "src/create-expert/index.js";
 import { SequentialThinkingTool } from "./tools/sequential-thinking.js";
-import { planGetterNode } from "./prompt/plan-getter.js";
-import { stylePrompt } from "./prompt/style.js";
+
 import { MemoryNode } from "src/create-expert/short-term-memory.js";
+import { getPrompt } from "src/model/prompt-getter.js";
 
 const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<ConfigurationState>>(
     {
@@ -25,6 +25,7 @@ const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<Configuration
         },
     },
     async (state, config, mcpTools) => {
+        const stylePrompt = await getPrompt("./src/prompt/style.md");
         const normalTools = initializeTools(state, config);
 
         const tools = [...normalTools, ...mcpTools];
