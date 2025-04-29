@@ -7,7 +7,6 @@ import crawlAgent from "./crawlAgent.js";
 import FileSystem from "./filesystem.js";
 import npmBot from "./npmAgent.js";
 import openSourceBot from "./opensource.js";
-import SequentialThinking from "./thinking/sequential-thinking.js";
 import "dotenv/config";
 import { context } from "./context.js";
 const app = express();
@@ -18,7 +17,6 @@ const appMap = new Map<string, McpServer | Server>([
     ["filesystem_bot", FileSystem],
     ["npm_bot", npmBot],
     ["opensource_bot", openSourceBot],
-    ["thinking_tools", SequentialThinking],
 ]);
 
 app.get(`/:name/sse`, async (req, res) => {
