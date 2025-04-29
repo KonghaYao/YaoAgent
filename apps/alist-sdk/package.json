@@ -21,12 +21,9 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/KonghaYao/YaoAgent/apps/alist-sdk.git"
+        "url": "https://github.com/KonghaYao/YaoAgent.git"
     },
-    "bugs": {
-        "url": "https://github.com/KonghaYao/YaoAgent/apps/alist-sdk/issues"
-    },
-    "homepage": "https://github.com/KonghaYao/YaoAgent/apps/alist-sdk#readme",
+    "homepage": "https://github.com/KonghaYao/YaoAgent/tree/main/apps/alist-sdk",
     "dependencies": {},
     "devDependencies": {
         "typescript": "^5.0.0",
