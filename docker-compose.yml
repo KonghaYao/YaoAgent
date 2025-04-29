@@ -1,0 +1,17 @@
+version: "3.3"
+services:
+    alist:
+        image: "docker-0.unsee.tech/xhofe/alist:latest"
+        container_name: alist
+        volumes:
+            - ".docker/etc/alist:/opt/alist/data"
+            - ".docker/etc/local:/opt/local"
+        ports:
+            - "5244:5244"
+        environment:
+            - PUID=0
+            - PGID=0
+            - UMASK=022
+            - INSTALL_FFMPEG=false
+            - INSTALL_ARIA2=false
+        restart: unless-stopped

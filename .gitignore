@@ -47,3 +47,4 @@ credentials.json
 .langgraph_api
 
 build
+.docker

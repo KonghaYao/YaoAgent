@@ -1,0 +1,45 @@
+{
+    "name": "alist-sdk",
+    "version": "1.0.0",
+    "description": "A TypeScript SDK for interacting with AList API",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "prepublish": "npm run build"
+    },
+    "keywords": [
+        "alist",
+        "sdk",
+        "typescript",
+        "file-manager",
+        "api-client"
+    ],
+    "author": "KonghaYao <3446798488@qq.com>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/KonghaYao/YaoAgent/apps/alist-sdk.git"
+    },
+    "bugs": {
+        "url": "https://github.com/KonghaYao/YaoAgent/apps/alist-sdk/issues"
+    },
+    "homepage": "https://github.com/KonghaYao/YaoAgent/apps/alist-sdk#readme",
+    "dependencies": {},
+    "devDependencies": {
+        "typescript": "^5.0.0",
+        "@types/node": "^20.0.0",
+        "dotenv": "^16.5.0",
+        "vitest": "^1.6.1"
+    },
+    "engines": {
+        "node": ">=16.0.0"
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ]
+}
