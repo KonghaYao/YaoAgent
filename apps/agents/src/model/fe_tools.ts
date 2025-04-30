@@ -1,4 +1,4 @@
-import { Annotation, interrupt } from "@langchain/langgraph";
+import { Annotation } from "@langchain/langgraph";
 import { createDefaultAnnotation } from "../utils/index.js";
 import { DynamicStructuredTool } from "@langchain/core/tools";
 
