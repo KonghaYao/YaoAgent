@@ -6,7 +6,7 @@ import { createDefaultAnnotation } from "src/utils/index.js";
 
 export const MemoryState = Annotation.Root({
     ...ModelState.spec,
-    max_memory_count: createDefaultAnnotation(() => 7),
+    max_memory_count: createDefaultAnnotation(() => 12),
 });
 export type MemoryState = typeof MemoryState.State;
 
@@ -18,7 +18,7 @@ export const MemoryNode = async (state: MemoryState) => {
     if (messages.filter((msg) => msg instanceof HumanMessage).length > maxLoop) {
         const history = await trimMessages(messages, {
             strategy: "first",
-            maxTokens: maxLoop * 4,
+            maxTokens: maxLoop / 2,
             includeSystem: false,
             tokenCounter: (message) => {
                 return message.length;

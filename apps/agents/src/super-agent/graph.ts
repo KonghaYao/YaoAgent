@@ -11,7 +11,7 @@ import { SequentialThinkingTool } from "./tools/sequential-thinking.js";
 
 import { MemoryNode } from "src/create-expert/short-term-memory.js";
 import { getPrompt } from "src/model/prompt-getter.js";
-
+import { createFeTools } from "src/model/fe_tools.js";
 const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<ConfigurationState>>(
     {
         // npm: {
@@ -25,14 +25,16 @@ const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<Configuration
         },
     },
     async (state, config, mcpTools) => {
+        const feTools = createFeTools(state.fe_tools);
         const stylePrompt = await getPrompt("./src/prompt/style.md");
         const plannerPrompt = await getPrompt("./src/prompt/planner.md");
         const executorPrompt = await getPrompt("./src/prompt/executor.md");
+        const summaryPrompt = await getPrompt("./src/prompt/summary.md");
         const normalTools = initializeTools(state, config);
 
-        const tools = [...normalTools, ...mcpTools];
+        const tools = [...normalTools, ...mcpTools, ...feTools];
         const llm = await createLLM(state, "main_model");
-        
+
         const agent = createExpert({
             plannerConfig: {
                 llm,
@@ -51,6 +53,14 @@ ${MemoryPrompt}`),
 ${stylePrompt}
 
 ${MemoryPrompt}`),
+            },
+            summaryConfig: {
+                llm,
+                tools,
+                stateModifier: new SystemMessage(`${summaryPrompt}
+
+${stylePrompt}
+`),
             },
         });
 

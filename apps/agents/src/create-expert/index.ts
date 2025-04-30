@@ -18,7 +18,11 @@ export const createPlanNode = <T>(config: CreateNodeConfig<T>) => {
     return createReactAgent({
         name: "planner",
         llm,
-        tools: [...tools, createHandoffTool({ agentName: "executor", description: "执行任务" })],
+        tools: [
+            ...tools,
+            createHandoffTool({ agentName: "executor", description: "执行任务" }),
+            createHandoffTool({ agentName: "summary", description: "总结任务" }),
+        ],
         prompt: stateModifier,
     });
 };
@@ -27,7 +31,21 @@ export const createExecuteNode = <T>(config: CreateNodeConfig<T>) => {
     return createReactAgent({
         name: "executor",
         llm,
-        tools: [...tools, createHandoffTool({ agentName: "planner", description: "制定计划" })],
+        tools: [
+            ...tools,
+            createHandoffTool({ agentName: "planner", description: "制定计划" }),
+            createHandoffTool({ agentName: "summary", description: "总结任务" }),
+        ],
+        prompt: stateModifier,
+    });
+};
+
+export const createSummaryNode = <T>(config: CreateNodeConfig<T>) => {
+    const { llm, tools, stateModifier } = config.summaryConfig;
+    return createReactAgent({
+        name: "summary",
+        llm,
+        tools: [...tools],
         prompt: stateModifier,
     });
 };
@@ -42,14 +60,15 @@ export interface CreateNodeConfig<T> {
     configSchema?: T;
     plannerConfig: SubConfig;
     executorConfig: SubConfig;
+    summaryConfig: SubConfig;
 }
 
 export const createExpert = <T extends AnnotationRoot<any>>(
     config: CreateNodeConfig<T>
 ): ReturnType<ReturnType<typeof createSwarm>["compile"]> => {
     return createSwarm({
-        agents: [createExecuteNode(config), createPlanNode(config)],
-        defaultActiveAgent: "executor",
+        agents: [createExecuteNode(config), createPlanNode(config), createSummaryNode(config)],
+        defaultActiveAgent: "planner",
         stateSchema: config.stateSchema || ExpertState,
     }).compile();
 };

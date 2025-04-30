@@ -1,9 +1,8 @@
-import { LangGraphRunnableConfig } from "@langchain/langgraph";
+import { GraphBubbleUp, LangGraphRunnableConfig } from "@langchain/langgraph";
 import { StructuredToolInterface } from "@langchain/core/tools";
 import { MultiServerMCPClient } from "@langchain/mcp-adapters";
 
 // Create client and connect to server
-
 export const createMCPNode = <State, Config = LangGraphRunnableConfig, Output = unknown>(
     config: ConstructorParameters<typeof MultiServerMCPClient>[0]["mcpServers"],
     nodeFn: (state: State, config: Config, tools: StructuredToolInterface[]) => Output
@@ -21,6 +20,9 @@ export const createMCPNode = <State, Config = LangGraphRunnableConfig, Output = 
             await MCPTools.close();
             return answer;
         } catch (e) {
+            if (e instanceof GraphBubbleUp) {
+                throw e;
+            }
             console.error(e as any);
             return nodeFn(state, Config, []);
         }

@@ -27,7 +27,6 @@ export async function createLLM(
     } = {}
 ): Promise<BaseChatModel> {
     const modelName = modelGuard(state, model_type);
-    console.log("modelName", modelName);
     return new ChatOpenAI({
         modelName,
         ...params,
