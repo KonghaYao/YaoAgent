@@ -17,8 +17,9 @@ const main = async () => {
             streamResponse: JSON.parse(testResponse),
         },
     });
-    console.log(messages);
+    console.log(client.graphMessages);
     console.log(client.renderMessage);
+    console.log(client.tokenCounter);
 };
 
 // 声明全局类型
@@ -53,7 +54,7 @@ function renderMessage(message: RenderMessage) {
                 /** @ts-ignore */
                 message.name || ""
             }</span>
-            ${renderTokenUsage(message.response_metadata?.usage)}
+            ${renderTokenUsage(message.usage_metadata)}
         </div>
         <p class="message-body">
         
@@ -84,13 +85,13 @@ function getRoleName(type: string): string {
     }
 }
 
-function renderTokenUsage(usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number }) {
+function renderTokenUsage(usage?: { input_tokens?: number; output_tokens?: number; total_tokens?: number }) {
     if (!usage) return "";
 
     return `
         <div class="token-usage">
-            ${usage.prompt_tokens ? `<span class="token-count">Prompt: ${usage.prompt_tokens}</span>` : ""}
-            ${usage.completion_tokens ? `<span class="token-count">Completion: ${usage.completion_tokens}</span>` : ""}
+            ${usage.input_tokens ? `<span class="token-count">Input: ${usage.input_tokens}</span>` : ""}
+            ${usage.output_tokens ? `<span class="token-count">Output: ${usage.output_tokens}</span>` : ""}
             ${usage.total_tokens ? `<span class="token-count">Total: ${usage.total_tokens}</span>` : ""}
         </div>
     `;

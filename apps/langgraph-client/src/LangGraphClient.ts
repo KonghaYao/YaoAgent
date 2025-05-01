@@ -10,6 +10,11 @@ export type RenderMessage = Message & {
             };
         }[];
     };
+    usage_metadata?: {
+        total_tokens: number;
+        input_tokens: number;
+        output_tokens: number;
+    };
     response_metadata?: {
         usage: {
             completion_tokens: number;
@@ -107,9 +112,9 @@ export class LangGraphClient extends Client {
         }
     }
 
-    streamingMessage: Message[] = [];
+    streamingMessage: RenderMessage[] = [];
     /** 图发过来的更新信息 */
-    graphMessages: Message[] = [];
+    graphMessages: RenderMessage[] = [];
     cloneMessage(message: Message): Message {
         return JSON.parse(JSON.stringify(message));
     }
@@ -188,23 +193,46 @@ export class LangGraphClient extends Client {
     composeToolMessages(messages: RenderMessage[]): RenderMessage[] {
         const result: RenderMessage[] = [];
         const assistantToolMessages = new Map<string, { args: string }>();
+        const toolParentMessage = new Map<string, RenderMessage>();
         for (const message of messages) {
             if (StreamingMessageType.isToolAssistant(message)) {
                 /** @ts-ignore 只有 tool_call_chunks 的 args 才是文本 */
                 message.tool_call_chunks?.forEach((element) => {
                     assistantToolMessages.set(element.id!, element);
+                    toolParentMessage.set(element.id!, message);
                 });
                 continue;
             }
             if (StreamingMessageType.isTool(message) && !message.tool_input) {
                 const assistantToolMessage = assistantToolMessages.get(message.tool_call_id!);
+                const parentMessage = toolParentMessage.get(message.tool_call_id!);
                 if (assistantToolMessage) {
                     message.tool_input = assistantToolMessage.args;
+                }
+                if (parentMessage) {
+                    message.usage_metadata = parentMessage.usage_metadata;
                 }
             }
             result.push(message);
         }
         return result;
+    }
+    get tokenCounter() {
+        return this.graphMessages.reduce(
+            (acc, message) => {
+                if (message.usage_metadata) {
+                    acc.total_tokens += message.usage_metadata?.total_tokens || 0;
+                    acc.input_tokens += message.usage_metadata?.input_tokens || 0;
+                    acc.output_tokens += message.usage_metadata?.output_tokens || 0;
+                }
+                return acc;
+            },
+            {
+                total_tokens: 0,
+                input_tokens: 0,
+                output_tokens: 0,
+            }
+        );
     }
     onStreamingUpdate(callback: StreamingUpdateCallback) {
         this.streamingCallbacks.add(callback);
@@ -254,7 +282,7 @@ export class LangGraphClient extends Client {
             if (chunk.event.startsWith("values")) {
                 const data = chunk.data as { messages: Message[] };
                 if (data.messages) {
-                    this.graphMessages = data.messages;
+                    this.graphMessages = data.messages as RenderMessage[];
                     this.emitStreamingUpdate({
                         type: "value",
                         data: chunk,
