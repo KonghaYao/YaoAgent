@@ -14,7 +14,7 @@ const main = async () => {
     });
     const messages = await client.sendMessage("思考一下自己的诞生", {
         _debug: {
-            streamResponse: JSON.parse(testResponse),
+            // streamResponse: JSON.parse(testResponse),
         },
     });
     console.log(client.graphMessages);
@@ -30,7 +30,7 @@ declare global {
 }
 
 window.main = main;
-main();
+// main();
 
 function getMessageType(message: RenderMessage): string {
     if ("type" in message) {

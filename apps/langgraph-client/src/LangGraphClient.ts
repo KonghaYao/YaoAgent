@@ -15,21 +15,6 @@ export type RenderMessage = Message & {
         input_tokens: number;
         output_tokens: number;
     };
-    response_metadata?: {
-        usage: {
-            completion_tokens: number;
-            completion_tokens_details: {
-                audio_tokens: number;
-                reasoning_tokens: number;
-            };
-            prompt_tokens: number;
-            prompt_tokens_details: {
-                audio_tokens: number;
-                cached_tokens: number;
-            };
-            total_tokens: number;
-        };
-    };
 };
 
 export interface LangGraphClientConfig {
@@ -40,7 +25,7 @@ export interface LangGraphClientConfig {
     defaultHeaders?: Record<string, string | null | undefined>;
 }
 
-class StreamingMessageType {
+export class StreamingMessageType {
     static isUser(m: Message) {
         return m.type === "human";
     }
@@ -201,7 +186,7 @@ export class LangGraphClient extends Client {
                     assistantToolMessages.set(element.id!, element);
                     toolParentMessage.set(element.id!, message);
                 });
-                continue;
+                if (!message.content) continue;
             }
             if (StreamingMessageType.isTool(message) && !message.tool_input) {
                 const assistantToolMessage = assistantToolMessages.get(message.tool_call_id!);
@@ -245,7 +230,7 @@ export class LangGraphClient extends Client {
         this.streamingCallbacks.forEach((callback) => callback(event));
     }
     graphState: any = {};
-    async sendMessage(input: string | Message[], { _debug }: { _debug?: { streamResponse: any } } = {}) {
+    async sendMessage(input: string | Message[], { _debug }: { _debug?: { streamResponse?: any } } = {}) {
         if (!this.currentThread || !this.currentAssistant) {
             throw new Error("Thread or Assistant not initialized");
         }
@@ -261,7 +246,7 @@ export class LangGraphClient extends Client {
         const streamResponse =
             _debug?.streamResponse ||
             this.runs.stream(this.currentThread.thread_id, this.currentAssistant.assistant_id, {
-                input: { messages: messagesToSend },
+                input: { ...this.graphState, messages: messagesToSend },
                 streamMode: ["messages", "values", "updates"],
                 streamSubgraphs: true,
             });
