@@ -1,7 +1,7 @@
 import { LangGraphClient, RenderMessage } from "../src/LangGraphClient";
 /** @ts-ignore */
 import testResponse from "../test/testResponse.json?raw";
-
+import { createTools } from "./tool";
 const main = async () => {
     const client = new LangGraphClient({
         defaultHeaders: {},
@@ -12,7 +12,8 @@ const main = async () => {
     client.onStreamingUpdate((event) => {
         updateMessages(client.renderMessage);
     });
-    const messages = await client.sendMessage("思考一下自己的诞生", {
+    client.tools.bindTools(createTools());
+    const messages = await client.sendMessage("你有什么工具", {
         _debug: {
             // streamResponse: JSON.parse(testResponse),
         },

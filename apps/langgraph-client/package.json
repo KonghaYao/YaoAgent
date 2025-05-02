@@ -2,20 +2,24 @@
     "name": "@langgraph-js/sdk",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
+    "main": "dist/index.js",
+    "type": "module",
     "publishConfig": {
         "registry": "https://registry.npmjs.org/",
         "access": "public"
     },
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "build": "tsc",
+        "prepublish": "pnpm build"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "packageManager": "pnpm@10.6.3",
     "dependencies": {
-        "@langchain/langgraph-sdk": "^0.0.74"
+        "@langchain/langgraph-sdk": "^0.0.74",
+        "zod": "^3.24.3",
+        "zod-to-json-schema": "^3.24.3"
     },
     "devDependencies": {
         "vite": "^6.3.4"

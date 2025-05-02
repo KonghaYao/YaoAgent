@@ -1,4 +1,5 @@
 import { Client, Thread, Message, Assistant, HumanMessage, AIMessage, ToolMessage } from "@langchain/langgraph-sdk";
+import { ToolManager } from "./ToolManager";
 
 export type RenderMessage = Message & {
     /** 工具入参 */
@@ -53,6 +54,7 @@ export class LangGraphClient extends Client {
     private currentThread: Thread | null = null;
     private messages: Message[] = [];
     private streamingCallbacks: Set<StreamingUpdateCallback> = new Set();
+    tools: ToolManager = new ToolManager();
 
     constructor(config: LangGraphClientConfig) {
         super(config);
@@ -116,7 +118,7 @@ export class LangGraphClient extends Client {
         return message;
     }
 
-    /** 流式渲染中的消息 */
+    /** 用于 UI 中的流式渲染中的消息 */
     get renderMessage() {
         const previousMessage = new Map<string, Message>();
         const result: Message[] = [];
@@ -246,7 +248,7 @@ export class LangGraphClient extends Client {
         const streamResponse =
             _debug?.streamResponse ||
             this.runs.stream(this.currentThread.thread_id, this.currentAssistant.assistant_id, {
-                input: { ...this.graphState, messages: messagesToSend },
+                input: { ...this.graphState, messages: messagesToSend, fe_tools: this.tools.toJSON() },
                 streamMode: ["messages", "values", "updates"],
                 streamSubgraphs: true,
             });
