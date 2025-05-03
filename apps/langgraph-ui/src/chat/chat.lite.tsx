@@ -4,7 +4,7 @@ import "./chat.css";
 import MessageHuman from "./components/MessageHuman.lite";
 import MessageAI from "./components/MessageAI.lite";
 import MessageTool from "./components/MessageTool.lite";
-import { fileTool } from "./tools";
+import { askUserTool, fileTool } from "./tools";
 export default function Chat() {
     const state = useStore({
         client: null as LangGraphClient | null,
@@ -46,7 +46,7 @@ export default function Chat() {
                 state.messages = newClient.renderMessage;
                 console.log(newClient.renderMessage);
             });
-            newClient.tools.bindTools([fileTool]);
+            newClient.tools.bindTools([fileTool, askUserTool]);
             newClient.graphState = {
                 // mcp 开关配置
                 // mcpServers: {
@@ -101,6 +101,7 @@ export default function Chat() {
                             <MessageTool
                                 key={message.unique_id}
                                 message={message}
+                                client={state.client!}
                                 getMessageContent={state.getMessageContent}
                                 formatTokens={state.formatTokens}
                                 isCollapsed={state.collapsedTools.includes(message.id!)}

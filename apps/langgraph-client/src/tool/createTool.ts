@@ -8,7 +8,7 @@ export interface UnionTool<Args extends ZodRawShape> {
     parameters: Args;
     execute: ToolCallback<Args>;
 }
-export type ToolCallback<Args extends ZodRawShape> = (args: z.objectOutputType<Args, ZodTypeAny>) => CallToolResult | Promise<CallToolResult>;
+export type ToolCallback<Args extends ZodRawShape> = (args: z.objectOutputType<Args, ZodTypeAny>, context?: any) => CallToolResult | Promise<CallToolResult>;
 
 export type CallToolResult = string | { type: "text"; text: string }[];
 
@@ -25,9 +25,9 @@ export const createFETool = <const T extends Parameter[], Args extends ZodRawSha
         name: tool.name,
         description: tool.description || "",
         parameters: convertJsonSchemaToZodRawShape(actionParametersToJsonSchema(tool.parameters || [])) as any,
-        async execute(args) {
+        async execute(args, context) {
             try {
-                const result = await tool.handler?.(args);
+                const result = await tool.handler?.(args, context);
                 if (typeof result === "string") {
                     return [{ type: "text", text: result }];
                 }

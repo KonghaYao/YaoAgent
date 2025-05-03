@@ -65,5 +65,5 @@ export type Action<T extends Parameter[] | [] = []> = {
     name: string;
     description?: string;
     parameters?: T;
-    handler?: T extends [] ? () => any | Promise<any> : (args: MappedParameterTypes<T>) => any | Promise<any>;
+    handler?: T extends [] ? () => any | Promise<any> : (args: MappedParameterTypes<T>, context?: any) => any | Promise<any>;
 };

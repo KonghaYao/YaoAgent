@@ -1,4 +1,5 @@
 import { createFETool } from "@langgraph-js/sdk";
+import { ToolManager } from "@langgraph-js/sdk/src/ToolManager";
 
 // 文件操作工具
 export const fileTool = createFETool({
@@ -12,6 +13,20 @@ export const fileTool = createFETool({
         },
     ],
     async handler(args) {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
         return [{ type: "text", text: "执行文件操作 " + args.filePath }];
     },
+});
+
+export const askUserTool = createFETool({
+    name: "ask_user",
+    description: "询问用户",
+    parameters: [
+        {
+            name: "question",
+            type: "string",
+            description: "问题",
+        },
+    ],
+    handler: ToolManager.waitForUIDone,
 });

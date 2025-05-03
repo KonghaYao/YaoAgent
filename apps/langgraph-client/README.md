@@ -9,11 +9,13 @@
     - [ ] Duplicate Tool Aggregation
     - [ ] Remove Message Reverse
     - [ ] Custom Reasoning Content
-- [ ] **Frontend Actions:**
+    - [ ] Stop Graph Progress
+- [x] **Frontend Actions:**
     - [x] Definition of Union Tools
     - [x] Frontend Function As Tool
-        - [ ] Custom Response Text
-    - [ ] Human-in-the-Loop Interaction
+        - [x] Custom Response Text
+    - [x] Human-in-the-Loop Interaction
+    - [ ] interrupt mode
 - [x] MCP Control
     - [x] Switch on frontend
 - [ ] **Authorization:**

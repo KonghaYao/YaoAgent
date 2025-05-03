@@ -6,6 +6,7 @@ export type RenderMessage = Message & {
     /** 工具入参 */
     tool_input?: string;
     additional_kwargs?: {
+        done?: boolean;
         tool_calls?: {
             function: {
                 arguments: string;
@@ -315,8 +316,11 @@ export class LangGraphClient extends Client {
         }
     }
     async callFETool(message: ToolMessage, args: any) {
-        const result = await this.tools.callTool(message.name!, args);
-        return await this.sendMessage([{ type: "tool", content: result, id: message.id, tool_call_id: message.tool_call_id } as ToolMessage], {
+        const that = this; // 防止 this 被错误解析
+        const result = await this.tools.callTool(message.name!, args, { client: that, message });
+        const newMessage = { ...message, content: result };
+        newMessage.additional_kwargs && (newMessage.additional_kwargs.done = true);
+        return await this.sendMessage([newMessage], {
             extraParams: {
                 no_response: true,
             },
