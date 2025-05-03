@@ -54,6 +54,13 @@ export class ToolManager {
     clearTools() {
         this.tools.clear();
     }
+    async callTool(name: string, args: any) {
+        const tool = this.getTool(name);
+        if (!tool) {
+            throw new Error(`Tool with name ${name} not found`);
+        }
+        return await tool.execute(args);
+    }
     toJSON() {
         return Array.from(this.tools.values()).map((i) => createJSONDefineTool(i));
     }

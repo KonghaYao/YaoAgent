@@ -4,14 +4,14 @@ import "./chat.css";
 import MessageHuman from "./components/MessageHuman.lite";
 import MessageAI from "./components/MessageAI.lite";
 import MessageTool from "./components/MessageTool.lite";
-
+import { fileTool } from "./tools";
 export default function Chat() {
     const state = useStore({
         client: null as LangGraphClient | null,
         messages: [] as RenderMessage[],
         input: "",
         loading: false,
-        collapsedTools: new Set<string>(),
+        collapsedTools: [] as string[],
 
         formatTime(date: Date) {
             return date.toLocaleTimeString("en-US");
@@ -46,6 +46,8 @@ export default function Chat() {
                 state.messages = newClient.renderMessage;
                 console.log(newClient.renderMessage);
             });
+            newClient.tools.bindTools([fileTool]);
+            console.log(newClient);
             state.client = newClient;
         },
 
@@ -71,10 +73,10 @@ export default function Chat() {
         },
 
         toggleToolCollapse(toolId: string) {
-            if (state.collapsedTools.has(toolId)) {
-                state.collapsedTools.delete(toolId);
+            if (state.collapsedTools.includes(toolId)) {
+                state.collapsedTools = state.collapsedTools.filter((i) => i !== toolId);
             } else {
-                state.collapsedTools.add(toolId);
+                state.collapsedTools = state.collapsedTools.concat(toolId);
             }
         },
     });
@@ -95,7 +97,7 @@ export default function Chat() {
                                 message={message}
                                 getMessageContent={state.getMessageContent}
                                 formatTokens={state.formatTokens}
-                                isCollapsed={state.collapsedTools.has(message.id!)}
+                                isCollapsed={state.collapsedTools.includes(message.id!)}
                                 onToggleCollapse={() => state.toggleToolCollapse(message.id!)}
                             />
                         ) : (

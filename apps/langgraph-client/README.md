@@ -7,9 +7,12 @@
     - [x] Token Counter
     - [x] Spend Time
     - [ ] Duplicate Tool Aggregation
+    - [ ] Remove Message Reverse
     - [ ] Custom Reasoning Content
 - [ ] **Frontend Actions:**
     - [x] Definition of Union Tools
+    - [x] Frontend Function As Tool
+        - [ ] Custom Response Text
     - [ ] Human-in-the-Loop Interaction
 - [ ] MCP Control
     - [ ] Switch on frontend

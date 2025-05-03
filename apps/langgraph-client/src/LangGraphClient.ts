@@ -250,7 +250,7 @@ export class LangGraphClient extends Client {
         this.streamingCallbacks.forEach((callback) => callback(event));
     }
     graphState: any = {};
-    async sendMessage(input: string | Message[], { _debug }: { _debug?: { streamResponse?: any } } = {}) {
+    async sendMessage(input: string | Message[], { extraParams, _debug }: { extraParams?: Record<string, any>; _debug?: { streamResponse?: any } } = {}) {
         if (!this.currentThread || !this.currentAssistant) {
             throw new Error("Thread or Assistant not initialized");
         }
@@ -266,8 +266,8 @@ export class LangGraphClient extends Client {
         const streamResponse =
             _debug?.streamResponse ||
             this.runs.stream(this.currentThread.thread_id, this.currentAssistant.assistant_id, {
-                input: { ...this.graphState, messages: messagesToSend, fe_tools: this.tools.toJSON() },
-                streamMode: ["messages", "values", "updates"],
+                input: { ...this.graphState, ...(extraParams || {}), messages: messagesToSend, fe_tools: this.tools.toJSON() },
+                streamMode: ["messages", "values"],
                 streamSubgraphs: true,
             });
         const streamRecord: any[] = [];
@@ -300,7 +300,27 @@ export class LangGraphClient extends Client {
             }
         }
         this.streamingMessage = [];
+        const data = await this.checkFECallTool();
+        if (data) streamRecord.push(...data);
         return streamRecord;
+    }
+    checkFECallTool() {
+        const data = this.renderMessage;
+        const lastMessage = data[data.length - 1];
+        if (lastMessage.type === "tool") {
+            if (this.tools.getTool(lastMessage.name!)) {
+                // json 校验
+                return this.callFETool(lastMessage, JSON.parse(lastMessage.tool_input!));
+            }
+        }
+    }
+    async callFETool(message: ToolMessage, args: any) {
+        const result = await this.tools.callTool(message.name!, args);
+        return await this.sendMessage([{ type: "tool", content: result, id: message.id, tool_call_id: message.tool_call_id } as ToolMessage], {
+            extraParams: {
+                no_response: true,
+            },
+        });
     }
 
     getCurrentThread() {
