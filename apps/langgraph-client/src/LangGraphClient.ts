@@ -1,5 +1,6 @@
 import { Client, Thread, Message, Assistant, HumanMessage, AIMessage, ToolMessage } from "@langchain/langgraph-sdk";
 import { ToolManager } from "./ToolManager";
+import { SpendTime } from "./SpendTime";
 
 export type RenderMessage = Message & {
     /** 工具入参 */
@@ -16,6 +17,10 @@ export type RenderMessage = Message & {
         input_tokens: number;
         output_tokens: number;
     };
+    /** 耗时 */
+    spend_time?: number;
+    /** 渲染时的唯一 id */
+    unique_id?: string;
 };
 
 export interface LangGraphClientConfig {
@@ -55,6 +60,7 @@ export class LangGraphClient extends Client {
     private messages: Message[] = [];
     private streamingCallbacks: Set<StreamingUpdateCallback> = new Set();
     tools: ToolManager = new ToolManager();
+    spendTime = new SpendTime();
 
     constructor(config: LangGraphClientConfig) {
         super(config);
@@ -175,7 +181,19 @@ export class LangGraphClient extends Client {
             }
         }
 
-        return this.composeToolMessages(result as RenderMessage[]);
+        return this.attachUniqueId(this.attachSpendTime(this.composeToolMessages(result as RenderMessage[])));
+    }
+    attachUniqueId(result: RenderMessage[]) {
+        for (const message of result) {
+            message.unique_id = message.id! + this.spendTime.getEndTime(message.id!).getTime();
+        }
+        return result;
+    }
+    attachSpendTime(result: RenderMessage[]) {
+        for (const message of result) {
+            message.spend_time = this.spendTime.getSpendTime(message.id!);
+        }
+        return result;
     }
     composeToolMessages(messages: RenderMessage[]): RenderMessage[] {
         const result: RenderMessage[] = [];
@@ -258,6 +276,7 @@ export class LangGraphClient extends Client {
             if (chunk.event === "messages/partial") {
                 for (const message of chunk.data) {
                     this.streamingMessage.push(message);
+                    this.spendTime.setSpendTime(message.id);
                 }
                 this.emitStreamingUpdate({
                     type: "message",
