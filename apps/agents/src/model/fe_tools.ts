@@ -50,5 +50,6 @@ export const actionToTool = (tool: FETool): DynamicStructuredTool => {
         schema,
         func: callTool,
         returnDirect: true,
+        responseFormat: "content_and_artifact",
     });
 };

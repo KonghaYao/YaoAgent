@@ -68,7 +68,9 @@ ${stylePrompt}
             messages: state.messages,
         });
 
-        return { messages: response.messages };
+        return {
+            messages: response.messages,
+        };
     }
 );
 

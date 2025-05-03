@@ -14,8 +14,8 @@
     - [x] Frontend Function As Tool
         - [ ] Custom Response Text
     - [ ] Human-in-the-Loop Interaction
-- [ ] MCP Control
-    - [ ] Switch on frontend
+- [x] MCP Control
+    - [x] Switch on frontend
 - [ ] **Authorization:**
     - [ ] OAuth2 Support
     - [ ] Cookie-Based Authentication

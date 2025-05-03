@@ -47,6 +47,12 @@ export default function Chat() {
                 console.log(newClient.renderMessage);
             });
             newClient.tools.bindTools([fileTool]);
+            newClient.graphState = {
+                // mcp 开关配置
+                // mcpServers: {
+                //     "zhipu-web-search-sse": false,
+                // },
+            };
             console.log(newClient);
             state.client = newClient;
         },
