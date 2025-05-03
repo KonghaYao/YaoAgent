@@ -1,3 +1,4 @@
+import { Message } from "@langchain/langgraph-sdk";
 /**
  * copy and modify from copilotkit
  * https://github.com/copilotkit/copilotkit
@@ -66,4 +67,6 @@ export type Action<T extends Parameter[] | [] = []> = {
     description?: string;
     parameters?: T;
     handler?: T extends [] ? () => any | Promise<any> : (args: MappedParameterTypes<T>, context?: any) => any | Promise<any>;
+    returnDirect?: boolean;
+    callbackMessage?: () => Message;
 };

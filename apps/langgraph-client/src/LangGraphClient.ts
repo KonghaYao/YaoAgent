@@ -308,6 +308,7 @@ export class LangGraphClient extends Client {
     checkFECallTool() {
         const data = this.renderMessage;
         const lastMessage = data[data.length - 1];
+        // 如果最后一条消息是前端工具消息，则调用工具
         if (lastMessage.type === "tool") {
             if (this.tools.getTool(lastMessage.name!)) {
                 // json 校验
@@ -317,14 +318,36 @@ export class LangGraphClient extends Client {
     }
     async callFETool(message: ToolMessage, args: any) {
         const that = this; // 防止 this 被错误解析
+        const tool = this.tools.getTool(message.name!);
         const result = await this.tools.callTool(message.name!, args, { client: that, message });
         const newMessage = { ...message, content: result };
         newMessage.additional_kwargs && (newMessage.additional_kwargs.done = true);
-        return await this.sendMessage([newMessage], {
-            extraParams: {
-                no_response: true,
-            },
-        });
+        const returnDirect = tool?.returnDirect;
+        if (returnDirect) {
+            const messages: Message[] = [newMessage];
+            if (typeof tool.callbackMessage === "function") {
+                messages.push(tool.callbackMessage(result));
+            }
+            await this.threads.updateState(this.currentThread!.thread_id, {
+                values: {
+                    messages,
+                },
+            });
+            this.graphState = (await this.threads.getState(this.currentThread!.thread_id)).values;
+            this.graphMessages = this.graphState.messages;
+            this.emitStreamingUpdate({
+                type: "value",
+                data: {
+                    event: "messages/partial",
+                    data: {
+                        messages,
+                    },
+                },
+            });
+            return messages;
+        } else {
+            return await this.sendMessage([newMessage]);
+        }
     }
 
     getCurrentThread() {

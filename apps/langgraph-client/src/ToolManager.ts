@@ -85,6 +85,7 @@ export class ToolManager {
         return promise;
     }
     static waitForUIDone<T>(_: T, context: { client: LangGraphClient; message: ToolMessage }) {
+        // console.log(context.message);
         return context.client.tools.waitForDone(context.message.id!);
     }
 }

@@ -2,11 +2,17 @@ import { actionParametersToJsonSchema, convertJsonSchemaToZodRawShape } from "./
 import { z, ZodRawShape, ZodTypeAny } from "zod";
 import { Action, Parameter } from "./copilotkit-actions";
 import { zodToJsonSchema } from "zod-to-json-schema";
+import { Message } from "@langchain/langgraph-sdk";
+
 export interface UnionTool<Args extends ZodRawShape> {
     name: string;
     description: string;
     parameters: Args;
+    /** 是否直接返回工具结果，而不是通过消息返回 */
+    returnDirect?: boolean;
     execute: ToolCallback<Args>;
+    /** 工具执行成功后触发的附加消息 */
+    callbackMessage?: (result: CallToolResult) => Message;
 }
 export type ToolCallback<Args extends ZodRawShape> = (args: z.objectOutputType<Args, ZodTypeAny>, context?: any) => CallToolResult | Promise<CallToolResult>;
 
@@ -25,6 +31,8 @@ export const createFETool = <const T extends Parameter[], Args extends ZodRawSha
         name: tool.name,
         description: tool.description || "",
         parameters: convertJsonSchemaToZodRawShape(actionParametersToJsonSchema(tool.parameters || [])) as any,
+        returnDirect: tool.returnDirect,
+        callbackMessage: tool.callbackMessage,
         async execute(args, context) {
             try {
                 const result = await tool.handler?.(args, context);

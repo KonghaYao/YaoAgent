@@ -12,6 +12,8 @@ export const fileTool = createFETool({
             description: "文件的完整路径",
         },
     ],
+    returnDirect: true,
+    callbackMessage: () => ({ type: "ai", content: "工作完成" }),
     async handler(args) {
         await new Promise((resolve) => setTimeout(resolve, 3000));
         return [{ type: "text", text: "执行文件操作 " + args.filePath }];

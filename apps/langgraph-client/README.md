@@ -14,6 +14,7 @@
     - [x] Definition of Union Tools
     - [x] Frontend Function As Tool
         - [x] Custom Response Text
+        - [x] No Response Support
     - [x] Human-in-the-Loop Interaction
     - [ ] interrupt mode
 - [x] MCP Control

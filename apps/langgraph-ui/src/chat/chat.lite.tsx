@@ -112,6 +112,7 @@ export default function Chat() {
                         )
                     }
                 </For>
+                {state.loading && <div class="loading-indicator">正在思考中...</div>}
             </div>
 
             <div class="chat-input">
