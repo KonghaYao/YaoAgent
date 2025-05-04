@@ -6,10 +6,10 @@
     - [x] Custom Tool Messages
     - [x] Token Counter
     - [x] Spend Time
+    - [x] Stop Graph Progress
     - [ ] Duplicate Tool Aggregation
     - [ ] Remove Message Reverse
     - [ ] Custom Reasoning Content
-    - [ ] Stop Graph Progress
 - [x] **Frontend Actions:**
     - [x] Definition of Union Tools
     - [x] Frontend Function As Tool

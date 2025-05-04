@@ -178,7 +178,7 @@
     border-radius: 8px;
     cursor: pointer;
     font-weight: 500;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
 }
 
 .send-button:hover {
@@ -188,6 +188,14 @@
 .send-button:disabled {
     background-color: #93c5fd;
     cursor: not-allowed;
+}
+
+.send-button.interrupt {
+    background-color: #ef4444;
+}
+
+.send-button.interrupt:hover {
+    background-color: #dc2626;
 }
 
 .collapsed .tool-content {
@@ -211,6 +219,25 @@
     font-size: 14px;
     text-align: center;
     animation: pulse 1.5s infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.interrupt-button {
+    padding: 4px 12px;
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.2s;
+}
+
+.interrupt-button:hover {
+    background-color: #dc2626;
 }
 
 @keyframes pulse {
@@ -223,4 +250,15 @@
     100% {
         opacity: 0.6;
     }
+}
+
+.error-message {
+    padding: 12px 16px;
+    margin: 8px 0;
+    background-color: #fee2e2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    color: #dc2626;
+    font-size: 14px;
+    text-align: center;
 }

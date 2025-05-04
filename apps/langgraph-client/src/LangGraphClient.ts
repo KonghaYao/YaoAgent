@@ -49,7 +49,7 @@ export class StreamingMessageType {
 }
 
 type StreamingUpdateEvent = {
-    type: "message" | "value" | "update";
+    type: "message" | "value" | "update" | "error";
     data: any;
 };
 
@@ -62,6 +62,7 @@ export class LangGraphClient extends Client {
     private streamingCallbacks: Set<StreamingUpdateCallback> = new Set();
     tools: ToolManager = new ToolManager();
     spendTime = new SpendTime();
+    stopController: AbortController | null = null;
 
     constructor(config: LangGraphClientConfig) {
         super(config);
@@ -251,6 +252,12 @@ export class LangGraphClient extends Client {
         this.streamingCallbacks.forEach((callback) => callback(event));
     }
     graphState: any = {};
+    currentRun?: { run_id: string };
+    cancelRun() {
+        if (this.currentThread?.thread_id && this.currentRun?.run_id) {
+            this.runs.cancel(this.currentThread!.thread_id, this.currentRun.run_id);
+        }
+    }
     async sendMessage(input: string | Message[], { extraParams, _debug }: { extraParams?: Record<string, any>; _debug?: { streamResponse?: any } } = {}) {
         if (!this.currentThread || !this.currentAssistant) {
             throw new Error("Thread or Assistant not initialized");
@@ -274,7 +281,14 @@ export class LangGraphClient extends Client {
         const streamRecord: any[] = [];
         for await (const chunk of streamResponse) {
             streamRecord.push(chunk);
-            if (chunk.event === "messages/partial") {
+            if (chunk.event === "metadata") {
+                this.currentRun = chunk.data;
+            } else if (chunk.event === "error") {
+                this.emitStreamingUpdate({
+                    type: "error",
+                    data: chunk,
+                });
+            } else if (chunk.event === "messages/partial") {
                 for (const message of chunk.data) {
                     this.streamingMessage.push(message);
                     this.spendTime.setSpendTime(message.id);
@@ -284,9 +298,7 @@ export class LangGraphClient extends Client {
                     data: chunk,
                 });
                 continue;
-            }
-
-            if (chunk.event.startsWith("values")) {
+            } else if (chunk.event.startsWith("values")) {
                 const data = chunk.data as { messages: Message[] };
                 if (data.messages) {
                     this.graphMessages = data.messages as RenderMessage[];

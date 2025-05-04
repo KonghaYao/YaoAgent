@@ -18,6 +18,7 @@
         "@langchain/core": "^0.3.49",
         "@langchain/langgraph": "^0.2.67",
         "@langchain/langgraph-checkpoint": "^0.0.17",
+        "@langchain/langgraph-sdk": "^0.0.74",
         "@langchain/langgraph-supervisor": "^0.0.11",
         "@langchain/langgraph-swarm": "^0.0.3",
         "@langchain/mcp-adapters": "^0.4.2",

@@ -12,6 +12,7 @@ export default function Chat() {
         input: "",
         loading: false,
         collapsedTools: [] as string[],
+        error: null as string | null,
 
         formatTime(date: Date) {
             return date.toLocaleTimeString("en-US");
@@ -43,6 +44,10 @@ export default function Chat() {
             await newClient.initAssistant("agent");
             await newClient.createThread();
             newClient.onStreamingUpdate((event) => {
+                if (event.type === "error") {
+                    state.loading = false;
+                    state.error = event.data?.message || "发生错误";
+                }
                 state.messages = newClient.renderMessage;
                 console.log(newClient.renderMessage);
             });
@@ -61,14 +66,15 @@ export default function Chat() {
             if (!state.input.trim() || state.loading) return;
 
             state.loading = true;
-            try {
-                await state.client?.sendMessage(state.input);
-                state.input = "";
-            } catch (error) {
-                console.error("发送消息失败:", error);
-            } finally {
-                state.loading = false;
-            }
+            state.error = null;
+
+            await state.client?.sendMessage(state.input);
+            state.input = "";
+            state.loading = false;
+        },
+
+        interruptMessage() {
+            state.client?.cancelRun();
         },
 
         handleKeyPress(event: KeyboardEvent) {
@@ -113,6 +119,7 @@ export default function Chat() {
                     }
                 </For>
                 {state.loading && <div class="loading-indicator">正在思考中...</div>}
+                {state.error && <div class="error-message">{state.error}</div>}
             </div>
 
             <div class="chat-input">
@@ -126,8 +133,12 @@ export default function Chat() {
                         placeholder="输入消息..."
                         disabled={state.loading}
                     />
-                    <button class="send-button" onClick={() => state.sendMessage()} disabled={state.loading || !state.input.trim()}>
-                        {state.loading ? "发送中..." : "发送"}
+                    <button
+                        class={`send-button ${state.loading ? "interrupt" : ""}`}
+                        onClick={() => (state.loading ? state.interruptMessage() : state.sendMessage())}
+                        disabled={!state.loading && !state.input.trim()}
+                    >
+                        {state.loading ? "中断" : "发送"}
                     </button>
                 </div>
             </div>
