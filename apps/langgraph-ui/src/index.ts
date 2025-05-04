@@ -1,2 +1,1 @@
-
-export { default as Chat } from "./chat/chat.lite";
+export { default as Chat } from "./chat/Chat";

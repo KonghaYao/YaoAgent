@@ -1,6 +1,7 @@
 import { Client, Thread, Message, Assistant, HumanMessage, AIMessage, ToolMessage } from "@langchain/langgraph-sdk";
 import { ToolManager } from "./ToolManager";
 import { SpendTime } from "./SpendTime";
+import { AssistantsClient } from "@langchain/langgraph-sdk/dist/client";
 
 export type RenderMessage = Message & {
     /** 工具入参 */
@@ -58,7 +59,6 @@ type StreamingUpdateCallback = (event: StreamingUpdateEvent) => void;
 export class LangGraphClient extends Client {
     private currentAssistant: Assistant | null = null;
     private currentThread: Thread | null = null;
-    private messages: Message[] = [];
     private streamingCallbacks: Set<StreamingUpdateCallback> = new Set();
     tools: ToolManager = new ToolManager();
     spendTime = new SpendTime();
@@ -67,15 +67,18 @@ export class LangGraphClient extends Client {
     constructor(config: LangGraphClientConfig) {
         super(config);
     }
-
+    availableAssistants: Assistant[] = [];
+    private listAssistants() {
+        return this.assistants.search({
+            metadata: null,
+            offset: 0,
+            limit: 100,
+        });
+    }
     async initAssistant(agentName: string) {
         try {
-            const assistants = await this.assistants.search({
-                metadata: null,
-                offset: 0,
-                limit: 10,
-            });
-
+            const assistants = await this.listAssistants();
+            this.availableAssistants = assistants;
             if (assistants.length > 0) {
                 this.currentAssistant = assistants.find((assistant) => assistant.name === agentName) || null;
                 if (!this.currentAssistant) {
@@ -99,12 +102,32 @@ export class LangGraphClient extends Client {
             this.currentThread = await this.threads.create({
                 threadId,
             });
-            this.messages = [];
             return this.currentThread;
         } catch (error) {
             console.error("Failed to create new thread:", error);
             throw error;
         }
+    }
+    async listThreads() {
+        return this.threads.search({
+            sortOrder: "desc",
+        });
+    }
+    /** 从历史中恢复数据 */
+    async resetThread(agent: string, threadId: string) {
+        await this.initAssistant(agent);
+        this.currentThread = await this.threads.get(threadId);
+        this.graphState = this.currentThread.values;
+        this.graphMessages = this.graphState.messages;
+        this.emitStreamingUpdate({
+            type: "value",
+            data: {
+                event: "messages/partial",
+                data: {
+                    messages: this.graphMessages,
+                },
+            },
+        });
     }
 
     streamingMessage: RenderMessage[] = [];
@@ -259,8 +282,11 @@ export class LangGraphClient extends Client {
         }
     }
     async sendMessage(input: string | Message[], { extraParams, _debug }: { extraParams?: Record<string, any>; _debug?: { streamResponse?: any } } = {}) {
-        if (!this.currentThread || !this.currentAssistant) {
+        if (!this.currentAssistant) {
             throw new Error("Thread or Assistant not initialized");
+        }
+        if (!this.currentThread) {
+            await this.createThread();
         }
 
         const messagesToSend = Array.isArray(input)
@@ -273,7 +299,7 @@ export class LangGraphClient extends Client {
               ];
         const streamResponse =
             _debug?.streamResponse ||
-            this.runs.stream(this.currentThread.thread_id, this.currentAssistant.assistant_id, {
+            this.runs.stream(this.currentThread!.thread_id, this.currentAssistant.assistant_id, {
                 input: { ...this.graphState, ...(extraParams || {}), messages: messagesToSend, fe_tools: this.tools.toJSON() },
                 streamMode: ["messages", "values"],
                 streamSubgraphs: true,
@@ -370,12 +396,7 @@ export class LangGraphClient extends Client {
         return this.currentAssistant;
     }
 
-    getMessages() {
-        return [...this.messages];
-    }
-
     async reset() {
         this.currentThread = null;
-        this.messages = [];
     }
 }

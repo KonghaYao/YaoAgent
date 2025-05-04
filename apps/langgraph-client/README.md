@@ -25,7 +25,6 @@
     - [ ] Custom Token Authentication
 - [ ] **Sub-Generation:**
     - [ ] Suggestions
-    - [ ] Chat Metadata
-- [ ] **Persistence:**
-    - [ ] History Message Persistence
-    - [ ] Thread Records
+    - [ ] Chat Title Auto Generation
+- [x] **Persistence:**
+    - [x] History Message Persistence

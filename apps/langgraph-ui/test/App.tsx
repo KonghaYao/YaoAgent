@@ -1,5 +1,4 @@
-import "../src/chat/chat.css";
-import { Chat } from "../dist/react/src/index";
+import Chat from "../src/chat/Chat";
 
 function App() {
     return <Chat />;
