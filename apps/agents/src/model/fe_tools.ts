@@ -40,7 +40,6 @@ export const createFeTools = (tools: FETool[]): DynamicStructuredTool[] => {
 export const actionToTool = (tool: FETool): DynamicStructuredTool => {
     const callTool = async (args: Record<string, any>): Promise<ContentAndArtifact> => {
         const data = interrupt(JSON.stringify(args));
-        console.log(data);
         return [data, null];
     };
 

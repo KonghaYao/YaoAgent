@@ -212,6 +212,7 @@ export class LangGraphClient extends Client {
     }
     attachInfoForMessage(result: RenderMessage[]) {
         for (const message of result) {
+            // ! 这里需要优化，时间是没有记录到的，不稳定
             message.unique_id = message.id! + this.spendTime.getEndTime(message.id!).getTime();
             message.spend_time = this.spendTime.getSpendTime(message.id!);
             if (!message.usage_metadata && (message as AIMessage).response_metadata?.usage) {
@@ -353,12 +354,18 @@ export class LangGraphClient extends Client {
                 continue;
             } else if (chunk.event.startsWith("values")) {
                 const data = chunk.data as { messages: Message[] };
+
                 if (data.messages) {
-                    this.graphMessages = data.messages as RenderMessage[];
-                    this.emitStreamingUpdate({
-                        type: "value",
-                        data: chunk,
-                    });
+                    const isResume = !!command?.resume;
+                    const isLongerThanLocal = data.messages.length >= this.graphMessages.length;
+                    // resume 情况下，长度低于前端 message 的统统不接受
+                    if (!isResume || (isResume && isLongerThanLocal)) {
+                        this.graphMessages = data.messages as RenderMessage[];
+                        this.emitStreamingUpdate({
+                            type: "value",
+                            data: chunk,
+                        });
+                    }
                 }
                 this.graphState = chunk.data;
                 this.streamingMessage = [];

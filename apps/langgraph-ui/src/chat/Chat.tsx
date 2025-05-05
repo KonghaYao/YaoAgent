@@ -1,5 +1,4 @@
 import React from "react";
-import { LangGraphClient, type RenderMessage } from "@langgraph-js/sdk";
 import "./chat.css";
 import MessageHuman from "./components/MessageHuman";
 import MessageAI from "./components/MessageAI";
@@ -57,7 +56,7 @@ const ChatInput: React.FC = () => {
                 <UsageMetadata usage_metadata={client?.tokenCounter || {}} />
             </div>
             <div className="input-container">
-                <textarea className="input-textarea" rows={2} value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={handleKeyPress} placeholder="输入消息..." disabled={loading} />
+                <textarea className="input-textarea" rows={2} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyPress} placeholder="输入消息..." disabled={loading} />
                 <button className={`send-button ${loading ? "interrupt" : ""}`} onClick={() => (loading ? interruptMessage() : sendMessage())} disabled={!loading && !input.trim()}>
                     {loading ? "中断" : "发送"}
                 </button>

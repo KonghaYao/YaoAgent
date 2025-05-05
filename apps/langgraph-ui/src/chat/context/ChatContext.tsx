@@ -83,6 +83,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
                 setLoading(false);
                 setError(event.data?.message || "发生错误");
             }
+
             setMessages(newClient.renderMessage);
         });
         newClient.tools.bindTools([fileTool, askUserTool]);
