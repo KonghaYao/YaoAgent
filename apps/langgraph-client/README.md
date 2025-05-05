@@ -7,18 +7,18 @@
     - [x] Token Counter
     - [x] Spend Time
     - [x] Stop Graph Progress
+    - [x] Interrupt Handing
     - [ ] Duplicate Tool Aggregation
     - [ ] Remove Message Reverse
     - [ ] Custom Reasoning Content
     - [ ] Error Handling
-    - [ ] Interrupt Handing
 - [x] **Frontend Actions:**
     - [x] Definition of Union Tools
     - [x] Frontend Function As Tool
         - [x] Custom Response Text
         - [x] No Response Support
     - [x] Human-in-the-Loop Interaction
-    - [ ] interrupt mode
+    - [x] interrupt mode
 - [x] MCP Control
     - [x] Switch on frontend
 - [ ] **Authorization:**

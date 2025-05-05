@@ -1,6 +1,6 @@
-import { Annotation } from "@langchain/langgraph";
+import { Annotation, interrupt } from "@langchain/langgraph";
 import { createDefaultAnnotation } from "../utils/index.js";
-import { DynamicStructuredTool } from "@langchain/core/tools";
+import { ContentAndArtifact, DynamicStructuredTool } from "@langchain/core/tools";
 
 export type FEToolsState = typeof FEToolsState.State;
 export const FEToolsState = Annotation.Root({
@@ -38,8 +38,10 @@ export const createFeTools = (tools: FETool[]): DynamicStructuredTool[] => {
 };
 
 export const actionToTool = (tool: FETool): DynamicStructuredTool => {
-    const callTool = async (args: Record<string, any>): Promise<[string | string[], null]> => {
-        return ["执行中，请求已经触发", null];
+    const callTool = async (args: Record<string, any>): Promise<ContentAndArtifact> => {
+        const data = interrupt(JSON.stringify(args));
+        console.log(data);
+        return [data, null];
     };
 
     const schema = tool.parameters as any;
@@ -49,7 +51,6 @@ export const actionToTool = (tool: FETool): DynamicStructuredTool => {
         description: tool.description || "",
         schema,
         func: callTool,
-        returnDirect: true,
         responseFormat: "content_and_artifact",
     });
 };

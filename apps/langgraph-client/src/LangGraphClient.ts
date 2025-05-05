@@ -1,7 +1,8 @@
-import { Client, Thread, Message, Assistant, HumanMessage, AIMessage, ToolMessage } from "@langchain/langgraph-sdk";
+import { Client, Thread, Message, Assistant, HumanMessage, AIMessage, ToolMessage, Command } from "@langchain/langgraph-sdk";
 import { ToolManager } from "./ToolManager";
 import { SpendTime } from "./SpendTime";
 import { AssistantsClient } from "@langchain/langgraph-sdk/dist/client";
+import { CallToolResult } from "./tool";
 
 export type RenderMessage = Message & {
     /** 工具入参 */
@@ -119,6 +120,7 @@ export class LangGraphClient extends Client {
         this.currentThread = await this.threads.get(threadId);
         this.graphState = this.currentThread.values;
         this.graphMessages = this.graphState.messages;
+        console.log(this.renderMessage);
         this.emitStreamingUpdate({
             type: "value",
             data: {
@@ -245,6 +247,13 @@ export class LangGraphClient extends Client {
                 const parentMessage = toolParentMessage.get(message.tool_call_id!);
                 if (assistantToolMessage) {
                     message.tool_input = assistantToolMessage.args;
+                    if (message.additional_kwargs) {
+                        message.additional_kwargs.done = true;
+                    } else {
+                        message.additional_kwargs = {
+                            done: true,
+                        };
+                    }
                 }
                 if (parentMessage) {
                     message.usage_metadata = parentMessage.usage_metadata;
@@ -298,7 +307,7 @@ export class LangGraphClient extends Client {
             this.runs.cancel(this.currentThread!.thread_id, this.currentRun.run_id);
         }
     }
-    async sendMessage(input: string | Message[], { extraParams, _debug }: { extraParams?: Record<string, any>; _debug?: { streamResponse?: any } } = {}) {
+    async sendMessage(input: string | Message[], { extraParams, _debug, command }: { extraParams?: Record<string, any>; _debug?: { streamResponse?: any }; command?: Command } = {}) {
         if (!this.currentAssistant) {
             throw new Error("Thread or Assistant not initialized");
         }
@@ -320,6 +329,7 @@ export class LangGraphClient extends Client {
                 input: { ...this.graphState, ...(extraParams || {}), messages: messagesToSend, fe_tools: this.tools.toJSON() },
                 streamMode: ["messages", "values"],
                 streamSubgraphs: true,
+                command,
             });
         const streamRecord: any[] = [];
         for await (const chunk of streamResponse) {
@@ -356,52 +366,49 @@ export class LangGraphClient extends Client {
             }
         }
         this.streamingMessage = [];
-        const data = await this.checkFECallTool();
+        const data = await this.runFETool();
         if (data) streamRecord.push(...data);
         return streamRecord;
     }
-    checkFECallTool() {
-        const data = this.renderMessage;
+    private runFETool() {
+        const data = this.graphMessages;
         const lastMessage = data[data.length - 1];
         // 如果最后一条消息是前端工具消息，则调用工具
-        if (lastMessage.type === "tool") {
-            if (this.tools.getTool(lastMessage.name!)) {
-                // json 校验
-                return this.callFETool(lastMessage, JSON.parse(lastMessage.tool_input!));
-            }
+        if (lastMessage.type === "ai" && lastMessage.tool_calls?.length) {
+            const result = lastMessage.tool_calls.map((tool) => {
+                if (this.tools.getTool(tool.name!)) {
+                    const toolMessage: ToolMessage = {
+                        ...tool,
+                        tool_call_id: tool.id!,
+                        /** @ts-ignore */
+                        tool_input: JSON.stringify(tool.args),
+                        additional_kwargs: {},
+                    };
+                    // json 校验
+                    return this.callFETool(toolMessage, tool.args);
+                }
+            });
+            return Promise.all(result);
         }
     }
-    async callFETool(message: ToolMessage, args: any) {
+    private async callFETool(message: ToolMessage, args: any) {
         const that = this; // 防止 this 被错误解析
-        const tool = this.tools.getTool(message.name!);
         const result = await this.tools.callTool(message.name!, args, { client: that, message });
-        const newMessage = { ...message, content: result };
-        newMessage.additional_kwargs && (newMessage.additional_kwargs.done = true);
-        const returnDirect = tool?.returnDirect;
-        if (returnDirect) {
-            const messages: Message[] = [newMessage];
-            if (typeof tool.callbackMessage === "function") {
-                messages.push(tool.callbackMessage(result));
-            }
-            await this.threads.updateState(this.currentThread!.thread_id, {
-                values: {
-                    messages,
-                },
-            });
-            this.graphState = (await this.threads.getState(this.currentThread!.thread_id)).values;
-            this.graphMessages = this.graphState.messages;
-            this.emitStreamingUpdate({
-                type: "value",
-                data: {
-                    event: "messages/partial",
-                    data: {
-                        messages,
-                    },
-                },
-            });
-            return messages;
-        } else {
-            return await this.sendMessage([newMessage]);
+        return this.resume(result);
+    }
+    /** 恢复消息，当中断流时使用 */
+    resume(result: CallToolResult) {
+        return this.sendMessage([], {
+            command: {
+                resume: result,
+            },
+        });
+    }
+    /** 完成工具等待 */
+    doneFEToolWaiting(id: string, result: CallToolResult) {
+        const done = this.tools.doneWaiting(id, result);
+        if (!done && this.currentThread?.status === "interrupted") {
+            this.resume(result);
         }
     }
 

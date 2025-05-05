@@ -1,6 +1,6 @@
 import { ToolMessage } from "@langchain/langgraph-sdk";
 import { LangGraphClient } from "./LangGraphClient";
-import { createJSONDefineTool, UnionTool } from "./tool/createTool";
+import { CallToolResult, createJSONDefineTool, UnionTool } from "./tool/createTool";
 
 export class ToolManager {
     private tools: Map<string, UnionTool<any>> = new Map();
@@ -68,11 +68,15 @@ export class ToolManager {
     }
 
     // === 专门为前端设计的异步触发结构
-    waitingMap: Map<string, (value: any) => void> = new Map();
-    doneWaiting(id: string, value: any) {
+    private waitingMap: Map<string, (value: CallToolResult) => void> = new Map();
+    doneWaiting(id: string, value: CallToolResult) {
         if (this.waitingMap.has(id)) {
             this.waitingMap.get(id)!(value);
             this.waitingMap.delete(id);
+            return true;
+        } else {
+            console.warn(`Waiting for tool ${id} not found`);
+            return false;
         }
     }
     waitForDone(id: string) {
@@ -84,6 +88,11 @@ export class ToolManager {
         });
         return promise;
     }
+    /** 等待用户输入
+     * @example
+     * // 继续 chat 流
+     * client.tools.doneWaiting(message.id!, (e.target as any).value);
+     */
     static waitForUIDone<T>(_: T, context: { client: LangGraphClient; message: ToolMessage }) {
         // console.log(context.message);
         return context.client.tools.waitForDone(context.message.id!);

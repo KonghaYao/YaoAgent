@@ -13,10 +13,24 @@ interface MessageToolProps {
 const MessageTool: React.FC<MessageToolProps> = ({ message, client, getMessageContent, formatTokens, isCollapsed, onToggleCollapse }) => {
     return (
         <div className="message tool">
+            {message.name === "ask_user" && !message.additional_kwargs?.done && (
+                <div>
+                    <div>询问 {message.tool_input}</div>
+                    <input
+                        type="text"
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                client.doneFEToolWaiting(message.id!, (e.target as any).value);
+                            }
+                        }}
+                    />
+                </div>
+            )}
             <div className="tool-message">
                 <div className="tool-header" onClick={onToggleCollapse}>
                     <div className="tool-title">{message.name}</div>
                 </div>
+
                 {!isCollapsed && (
                     <div className="tool-content">
                         <div className="tool-input">{message.tool_input}</div>
