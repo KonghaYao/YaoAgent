@@ -10,6 +10,8 @@
     - [ ] Duplicate Tool Aggregation
     - [ ] Remove Message Reverse
     - [ ] Custom Reasoning Content
+    - [ ] Error Handling
+    - [ ] Interrupt Handing
 - [x] **Frontend Actions:**
     - [x] Definition of Union Tools
     - [x] Frontend Function As Tool

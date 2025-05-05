@@ -108,8 +108,8 @@ export class LangGraphClient extends Client {
             throw error;
         }
     }
-    async listThreads() {
-        return this.threads.search({
+    async listThreads<T>() {
+        return this.threads.search<T>({
             sortOrder: "desc",
         });
     }
@@ -206,17 +206,24 @@ export class LangGraphClient extends Client {
             }
         }
 
-        return this.attachUniqueId(this.attachSpendTime(this.composeToolMessages(result as RenderMessage[])));
+        return this.attachInfoForMessage(this.composeToolMessages(result as RenderMessage[]));
     }
-    attachUniqueId(result: RenderMessage[]) {
+    attachInfoForMessage(result: RenderMessage[]) {
         for (const message of result) {
             message.unique_id = message.id! + this.spendTime.getEndTime(message.id!).getTime();
-        }
-        return result;
-    }
-    attachSpendTime(result: RenderMessage[]) {
-        for (const message of result) {
             message.spend_time = this.spendTime.getSpendTime(message.id!);
+            if (!message.usage_metadata && (message as AIMessage).response_metadata?.usage) {
+                const usage = (message as AIMessage).response_metadata!.usage as {
+                    prompt_tokens: number;
+                    completion_tokens: number;
+                    total_tokens: number;
+                };
+                message.usage_metadata = {
+                    input_tokens: usage.prompt_tokens,
+                    output_tokens: usage.completion_tokens,
+                    total_tokens: usage.total_tokens,
+                };
+            }
         }
         return result;
     }
@@ -254,7 +261,17 @@ export class LangGraphClient extends Client {
                     acc.total_tokens += message.usage_metadata?.total_tokens || 0;
                     acc.input_tokens += message.usage_metadata?.input_tokens || 0;
                     acc.output_tokens += message.usage_metadata?.output_tokens || 0;
+                } else if ((message as AIMessage).response_metadata?.usage) {
+                    const usage = (message as AIMessage).response_metadata?.usage as {
+                        prompt_tokens: number;
+                        completion_tokens: number;
+                        total_tokens: number;
+                    };
+                    acc.total_tokens += usage.total_tokens || 0;
+                    acc.input_tokens += usage.prompt_tokens || 0;
+                    acc.output_tokens += usage.completion_tokens || 0;
                 }
+
                 return acc;
             },
             {
@@ -397,6 +414,17 @@ export class LangGraphClient extends Client {
     }
 
     async reset() {
+        await this.initAssistant(this.currentAssistant?.name!);
         this.currentThread = null;
+        this.graphState = {};
+        this.graphMessages = [];
+        this.streamingMessage = [];
+        this.currentRun = undefined;
+        this.emitStreamingUpdate({
+            type: "value",
+            data: {
+                event: "messages/partial",
+            },
+        });
     }
 }
