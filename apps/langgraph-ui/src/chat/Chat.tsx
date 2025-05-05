@@ -7,6 +7,7 @@ import MessageTool from "./components/MessageTool";
 import HistoryList from "./components/HistoryList";
 import { ChatProvider, useChat } from "./context/ChatContext";
 import { HistoryProvider } from "./context/HistoryContext";
+import { UsageMetadata } from "./components/UsageMetadata";
 
 const ChatMessages: React.FC = () => {
     const { messages, loading, error, client, collapsedTools, toggleToolCollapse, getMessageContent, formatTokens } = useChat();
@@ -27,7 +28,7 @@ const ChatMessages: React.FC = () => {
                         onToggleCollapse={() => toggleToolCollapse(message.id!)}
                     />
                 ) : (
-                    <MessageAI key={message.unique_id} message={message} getMessageContent={getMessageContent} formatTokens={formatTokens} />
+                    <MessageAI key={message.unique_id} message={message} getMessageContent={getMessageContent} />
                 )
             )}
             {loading && <div className="loading-indicator">正在思考中...</div>}
@@ -47,15 +48,16 @@ const ChatInput: React.FC = () => {
 
     return (
         <div className="chat-input">
-            <div>
+            <div className="chat-input-header">
                 <select value={currentAgent} onChange={(e) => setCurrentAgent(e.target.value)}>
                     {client?.availableAssistants.map((i) => {
                         return <option value={i.assistant_id}>{i.name}</option>;
                     })}
                 </select>
+                <UsageMetadata usage_metadata={client?.tokenCounter || {}} />
             </div>
             <div className="input-container">
-                <textarea className="input-textarea" rows={3} value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={handleKeyPress} placeholder="输入消息..." disabled={loading} />
+                <textarea className="input-textarea" rows={2} value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={handleKeyPress} placeholder="输入消息..." disabled={loading} />
                 <button className={`send-button ${loading ? "interrupt" : ""}`} onClick={() => (loading ? interruptMessage() : sendMessage())} disabled={!loading && !input.trim()}>
                     {loading ? "中断" : "发送"}
                 </button>
