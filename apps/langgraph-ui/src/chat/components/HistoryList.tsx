@@ -1,6 +1,6 @@
 import React from "react";
-import { useHistory } from "../context/HistoryContext";
 import { useChat } from "../context/ChatContext";
+import { Thread, Message } from "@langgraph-js/sdk";
 
 interface HistoryListProps {
     onClose: () => void;
@@ -8,15 +8,14 @@ interface HistoryListProps {
 }
 
 const HistoryList: React.FC<HistoryListProps> = ({ onClose, formatTime }) => {
-    const { threads, currentChatId, refreshThreads } = useHistory();
-    const { client } = useChat();
+    const { historyList, currentChatId, refreshHistoryList, createNewChat, deleteHistoryChat, toHistoryChat } = useChat();
 
     return (
         <div className="history-list">
             <div className="history-header">
                 <div className="header-left">
                     <h3>历史记录</h3>
-                    <button className="refresh-button" onClick={refreshThreads} title="刷新列表">
+                    <button className="refresh-button" onClick={refreshHistoryList} title="刷新列表">
                         🔁
                     </button>
                 </div>
@@ -28,18 +27,18 @@ const HistoryList: React.FC<HistoryListProps> = ({ onClose, formatTime }) => {
                 <div
                     className="history-items"
                     onClick={() => {
-                        client?.reset();
+                        createNewChat();
                     }}
                 >
                     <div className="history-item">
                         <div className="history-title"> New Chat</div>
                     </div>
                 </div>
-                {threads.length === 0 ? (
+                {historyList.length === 0 ? (
                     <div className="empty-history">暂无历史记录</div>
                 ) : (
                     <div className="history-items">
-                        {threads
+                        {historyList
                             .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
                             .map((thread) => (
                                 <div className={`history-item ${thread.thread_id === currentChatId ? "active" : ""}`} key={thread.thread_id}>
@@ -54,7 +53,7 @@ const HistoryList: React.FC<HistoryListProps> = ({ onClose, formatTime }) => {
                                         <button
                                             className="action-button"
                                             onClick={() => {
-                                                client?.resetThread(thread.metadata?.graph_id as string, thread.thread_id);
+                                                toHistoryChat(thread);
                                             }}
                                             title="恢复对话"
                                         >
@@ -63,8 +62,7 @@ const HistoryList: React.FC<HistoryListProps> = ({ onClose, formatTime }) => {
                                         <button
                                             className="action-button"
                                             onClick={async () => {
-                                                await client?.threads.delete(thread.thread_id);
-                                                await refreshThreads();
+                                                await deleteHistoryChat(thread);
                                             }}
                                             title="删除对话"
                                         >

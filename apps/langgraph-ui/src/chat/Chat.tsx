@@ -5,15 +5,15 @@ import MessageAI from "./components/MessageAI";
 import MessageTool from "./components/MessageTool";
 import HistoryList from "./components/HistoryList";
 import { ChatProvider, useChat } from "./context/ChatContext";
-import { HistoryProvider } from "./context/HistoryContext";
 import { UsageMetadata } from "./components/UsageMetadata";
+import { formatTime, formatTokens, getMessageContent } from "./store/chatStore";
 
 const ChatMessages: React.FC = () => {
-    const { messages, loading, error, client, collapsedTools, toggleToolCollapse, getMessageContent, formatTokens } = useChat();
+    const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse } = useChat();
 
     return (
         <div className="chat-messages">
-            {messages.map((message) =>
+            {renderMessages.map((message) =>
                 message.type === "human" ? (
                     <MessageHuman content={message.content} key={message.unique_id} />
                 ) : message.type === "tool" ? (
@@ -27,17 +27,17 @@ const ChatMessages: React.FC = () => {
                         onToggleCollapse={() => toggleToolCollapse(message.id!)}
                     />
                 ) : (
-                    <MessageAI key={message.unique_id} message={message} getMessageContent={getMessageContent} />
+                    <MessageAI key={message.unique_id} message={message} />
                 )
             )}
             {loading && <div className="loading-indicator">正在思考中...</div>}
-            {error && <div className="error-message">{error}</div>}
+            {inChatError && <div className="error-message">{inChatError}</div>}
         </div>
     );
 };
 
 const ChatInput: React.FC = () => {
-    const { input, setInput, loading, sendMessage, interruptMessage, currentAgent, setCurrentAgent, client } = useChat();
+    const { userInput, setUserInput, loading, sendMessage, interruptMessage, currentAgent, setCurrentAgent, client } = useChat();
     const handleKeyPress = (event: React.KeyboardEvent) => {
         if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
@@ -56,8 +56,16 @@ const ChatInput: React.FC = () => {
                 <UsageMetadata usage_metadata={client?.tokenCounter || {}} />
             </div>
             <div className="input-container">
-                <textarea className="input-textarea" rows={2} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyPress} placeholder="输入消息..." disabled={loading} />
-                <button className={`send-button ${loading ? "interrupt" : ""}`} onClick={() => (loading ? interruptMessage() : sendMessage())} disabled={!loading && !input.trim()}>
+                <textarea
+                    className="input-textarea"
+                    rows={2}
+                    value={userInput}
+                    onChange={(e) => setUserInput(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                    placeholder="输入消息..."
+                    disabled={loading}
+                />
+                <button className={`send-button ${loading ? "interrupt" : ""}`} onClick={() => (loading ? interruptMessage() : sendMessage())} disabled={!loading && !userInput.trim()}>
                     {loading ? "中断" : "发送"}
                 </button>
             </div>
@@ -66,14 +74,14 @@ const ChatInput: React.FC = () => {
 };
 
 const Chat: React.FC = () => {
-    const { showHistory, toggleHistory, formatTime } = useChat();
+    const { showHistory, toggleHistoryVisible } = useChat();
 
     return (
         <div className="chat-container">
-            {showHistory && <HistoryList onClose={() => toggleHistory()} formatTime={formatTime} />}
+            {showHistory && <HistoryList onClose={() => toggleHistoryVisible()} formatTime={formatTime} />}
             <div className="chat-main">
                 <div className="chat-header">
-                    <button className="history-button" onClick={() => toggleHistory()}>
+                    <button className="history-button" onClick={() => toggleHistoryVisible()}>
                         历史记录
                     </button>
                 </div>
@@ -87,9 +95,7 @@ const Chat: React.FC = () => {
 const ChatWrapper: React.FC = () => {
     return (
         <ChatProvider>
-            <HistoryProvider>
-                <Chat />
-            </HistoryProvider>
+            <Chat />
         </ChatProvider>
     );
 };

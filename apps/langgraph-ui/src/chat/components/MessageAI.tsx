@@ -1,12 +1,12 @@
 import React from "react";
 import { RenderMessage } from "@langgraph-js/sdk";
 import { UsageMetadata } from "./UsageMetadata";
+import { getMessageContent } from "../store/chatStore";
 interface MessageAIProps {
     message: RenderMessage;
-    getMessageContent: (content: any) => string;
 }
 
-const MessageAI: React.FC<MessageAIProps> = ({ message, getMessageContent }) => {
+const MessageAI: React.FC<MessageAIProps> = ({ message }) => {
     return (
         <div className="message ai">
             <div className="message-content">
