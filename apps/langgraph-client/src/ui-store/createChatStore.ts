@@ -1,5 +1,6 @@
-import { LangGraphClient, Message, RenderMessage, Thread } from "@langgraph-js/sdk";
 import { atom } from "nanostores";
+import { LangGraphClient, LangGraphClientConfig, RenderMessage } from "../LangGraphClient";
+import { Message, Thread } from "@langchain/langgraph-sdk";
 export const formatTime = (date: Date) => {
     return date.toLocaleTimeString("en-US");
 };
@@ -21,7 +22,7 @@ export const getMessageContent = (content: any) => {
     }
     return JSON.stringify(content);
 };
-export const createChatStore = (initClientName: string) => {
+export const createChatStore = (initClientName: string, config: LangGraphClientConfig) => {
     const client = atom<LangGraphClient | null>(null);
     const renderMessages = atom<RenderMessage[]>([]);
     const userInput = atom<string>("");
@@ -33,9 +34,7 @@ export const createChatStore = (initClientName: string) => {
     const currentChatId = atom<string | null>(null);
 
     const initClient = async () => {
-        const newClient = new LangGraphClient({
-            apiUrl: "http://localhost:8123",
-        });
+        const newClient = new LangGraphClient(config);
         await newClient.initAssistant(currentAgent.get());
         // 不再需要创建，sendMessage 会自动创建
         // await newClient.createThread();
@@ -45,7 +44,7 @@ export const createChatStore = (initClientName: string) => {
                 loading.set(false);
                 inChatError.set(event.data?.message || "发生错误");
             }
-
+            console.log(newClient.renderMessage);
             renderMessages.set(newClient.renderMessage);
         });
         // newClient.tools.bindTools([fileTool, askUserTool]);

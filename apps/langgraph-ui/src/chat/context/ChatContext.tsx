@@ -15,9 +15,10 @@ interface ChatProviderProps {
     children: ReactNode;
 }
 import { globalChatStore } from "../store";
-import { UnionStore, useUnionStore } from "../store/react";
+import { UnionStore, useUnionStore } from "@langgraph-js/sdk";
+import { useStore } from "@nanostores/react";
 export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
-    const store = useUnionStore(globalChatStore);
+    const store = useUnionStore(globalChatStore, useStore);
     useEffect(() => {
         store.initClient().then((res) => {
             store.refreshHistoryList();

@@ -1,7 +1,5 @@
 import { Client, Thread, Message, Assistant, HumanMessage, AIMessage, ToolMessage, Command } from "@langchain/langgraph-sdk";
 import { ToolManager } from "./ToolManager";
-import { SpendTime } from "./SpendTime";
-import { AssistantsClient } from "@langchain/langgraph-sdk/dist/client";
 import { CallToolResult } from "./tool";
 
 export type RenderMessage = Message & {
@@ -65,7 +63,6 @@ export class LangGraphClient extends Client {
     private currentThread: Thread | null = null;
     private streamingCallbacks: Set<StreamingUpdateCallback> = new Set();
     tools: ToolManager = new ToolManager();
-    spendTime = new SpendTime();
     stopController: AbortController | null = null;
 
     constructor(config: LangGraphClientConfig) {
@@ -350,7 +347,6 @@ export class LangGraphClient extends Client {
             } else if (chunk.event === "messages/partial") {
                 for (const message of chunk.data) {
                     this.streamingMessage.push(message);
-                    this.spendTime.setSpendTime(message.id);
                 }
                 this.emitStreamingUpdate({
                     type: "message",
