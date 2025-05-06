@@ -1,25 +1,29 @@
 {
-  "name": "agent-chat-app",
-  "author": "Your Name",
-  "private": true,
-  "scripts": {
-    "dev": "turbo dev --filter=agents",
-    "build": "turbo build",
-    "turbo:command": "turbo",
-    "format": "turbo format",
-    "lint": "turbo lint",
-    "lint:fix": "turbo lint:fix"
-  },
-  "devDependencies": {
-    "@tsconfig/recommended": "^1.0.8",
-    "concurrently": "^9.1.2",
-    "prettier": "^3.5.3",
-    "tsx": "^4.19.3",
-    "turbo": "latest",
-    "typescript": "^5.8.3"
-  },
-  "resolutions": {
-    "@langchain/core": "^0.3.42"
-  },
-  "packageManager": "pnpm@10.6.3"
+    "name": "agent-chat-app",
+    "author": "Your Name",
+    "private": true,
+    "scripts": {
+        "preinstall": "node patch_deps.mjs",
+        "dev": "turbo dev --filter=agents",
+        "build": "turbo build",
+        "turbo:command": "turbo",
+        "format": "turbo format",
+        "lint": "turbo lint",
+        "lint:fix": "turbo lint:fix"
+    },
+    "devDependencies": {
+        "@tsconfig/recommended": "^1.0.8",
+        "concurrently": "^9.1.2",
+        "prettier": "^3.5.3",
+        "tsx": "^4.19.3",
+        "turbo": "latest",
+        "typescript": "^5.8.3"
+    },
+    "resolutions": {
+        "@langchain/core": "^0.3.42"
+    },
+    "packageManager": "pnpm@10.10.0",
+    "dependencies": {
+        "@langchain/core": "^0.3.49"
+    }
 }

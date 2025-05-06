@@ -5,7 +5,7 @@ import { AssistantsClient } from "@langchain/langgraph-sdk/dist/client";
 import { CallToolResult } from "./tool";
 
 export type RenderMessage = Message & {
-    /** 工具入参 */
+    /** 工具入参 ，聚合而来*/
     tool_input?: string;
     additional_kwargs?: {
         done?: boolean;
@@ -20,9 +20,12 @@ export type RenderMessage = Message & {
         input_tokens: number;
         output_tokens: number;
     };
+    response_metadata?: {
+        create_time: string;
+    };
     /** 耗时 */
     spend_time?: number;
-    /** 渲染时的唯一 id */
+    /** 渲染时的唯一 id，聚合而来*/
     unique_id?: string;
 };
 
@@ -120,7 +123,6 @@ export class LangGraphClient extends Client {
         this.currentThread = await this.threads.get(threadId);
         this.graphState = this.currentThread.values;
         this.graphMessages = this.graphState.messages;
-        console.log(this.renderMessage);
         this.emitStreamingUpdate({
             type: "value",
             data: {
@@ -211,10 +213,12 @@ export class LangGraphClient extends Client {
         return this.attachInfoForMessage(this.composeToolMessages(result as RenderMessage[]));
     }
     attachInfoForMessage(result: RenderMessage[]) {
+        let lastMessage: RenderMessage | null = null;
         for (const message of result) {
-            // ! 这里需要优化，时间是没有记录到的，不稳定
-            message.unique_id = message.id! + this.spendTime.getEndTime(message.id!).getTime();
-            message.spend_time = this.spendTime.getSpendTime(message.id!);
+            const createTime = message.response_metadata?.create_time || "";
+            // 用长度作为渲染 id，长度变了就要重新渲染
+            message.unique_id = message.id! + JSON.stringify(message.content).length;
+            message.spend_time = new Date(createTime).getTime() - new Date(lastMessage?.response_metadata?.create_time || createTime).getTime();
             if (!message.usage_metadata && (message as AIMessage).response_metadata?.usage) {
                 const usage = (message as AIMessage).response_metadata!.usage as {
                     prompt_tokens: number;
@@ -227,6 +231,7 @@ export class LangGraphClient extends Client {
                     total_tokens: usage.total_tokens,
                 };
             }
+            lastMessage = message;
         }
         return result;
     }

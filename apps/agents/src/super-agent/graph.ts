@@ -4,11 +4,10 @@ import { createMCPNode } from "./tools/mcp.js";
 import { initializeTools } from "./tools/index.js";
 import { GraphState, ConfigurationState } from "./state.js";
 import { createLLM } from "../model/index.js";
-import { SystemMessage } from "@langchain/core/messages";
+import { AIMessage, BaseMessage, SystemMessage } from "@langchain/core/messages";
 import { MemoryPrompt } from "./tools/memory.js";
 import { createExpert } from "src/create-expert/index.js";
 import { SequentialThinkingTool } from "./tools/sequential-thinking.js";
-
 import { MemoryNode } from "src/create-expert/short-term-memory.js";
 import { getPrompt } from "src/model/prompt-getter.js";
 import { createFeTools } from "src/model/fe_tools.js";
@@ -19,12 +18,13 @@ const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<Configuration
         //     url: "http://0.0.0.0:6798/npm_bot/sse",
         //     useNodeEventSource: true,
         // },
-        "zhipu-web-search-sse": {
-            transport: "sse",
-            url: "https://open.bigmodel.cn/api/mcp/web_search/sse?Authorization=" + process.env.ZHIPU_API_KEY,
-        },
+        // "zhipu-web-search-sse": {
+        //     transport: "sse",
+        //     url: "https://open.bigmodel.cn/api/mcp/web_search/sse?Authorization=" + process.env.ZHIPU_API_KEY,
+        // },
     },
     async (state, config, mcpTools) => {
+        console.log(new AIMessage(""));
         const feTools = createFeTools(state.fe_tools);
         const stylePrompt = await getPrompt("./src/prompt/style.md");
         const plannerPrompt = await getPrompt("./src/prompt/planner.md");
