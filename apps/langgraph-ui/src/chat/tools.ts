@@ -1,5 +1,4 @@
-import { createFETool } from "@langgraph-js/sdk";
-import { ToolManager } from "@langgraph-js/sdk/src/ToolManager";
+import { createFETool, ToolManager } from "@langgraph-js/sdk";
 
 // 文件操作工具
 export const fileTool = createFETool({
@@ -13,7 +12,7 @@ export const fileTool = createFETool({
         },
     ],
     returnDirect: true,
-    callbackMessage: () => ({ type: "ai", content: "工作完成" }),
+    callbackMessage: () => [{ type: "ai", content: "工作完成" }],
     async handler(args) {
         await new Promise((resolve) => setTimeout(resolve, 3000));
         return [{ type: "text", text: "执行文件操作 " + args.filePath }];

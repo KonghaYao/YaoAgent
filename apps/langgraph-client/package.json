@@ -1,7 +1,7 @@
 {
     "name": "@langgraph-js/sdk",
-    "version": "1.0.0",
-    "description": "",
+    "version": "1.1.0",
+    "description": "The UI SDK for LangGraph - seamlessly integrate your AI agents with frontend interfaces",
     "main": "src/index.ts",
     "type": "module",
     "publishConfig": {
@@ -12,10 +12,27 @@
         "build": "tsc",
         "prepublish": "pnpm build"
     },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
+    "keywords": [
+        "langgraph",
+        "ui",
+        "sdk",
+        "frontend",
+        "ai",
+        "agents",
+        "langchain",
+        "react"
+    ],
+    "author": "LangGraph Team",
+    "license": "Apache-2.0",
     "packageManager": "pnpm@10.6.3",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/KonghaYao/YaoAgent.git"
+    },
+    "homepage": "https://github.com/KonghaYao/YaoAgent/tree/main/apps/langgraph-client",
+    "bugs": {
+        "url": "https://github.com/KonghaYao/YaoAgent/issues"
+    },
     "dependencies": {
         "@langchain/langgraph-sdk": "^0.0.74",
         "nanostores": "^1.0.1",

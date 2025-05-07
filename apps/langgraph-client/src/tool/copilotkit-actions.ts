@@ -68,5 +68,5 @@ export type Action<T extends Parameter[] | [] = []> = {
     parameters?: T;
     handler?: T extends [] ? () => any | Promise<any> : (args: MappedParameterTypes<T>, context?: any) => any | Promise<any>;
     returnDirect?: boolean;
-    callbackMessage?: () => Message;
+    callbackMessage?: () => Message[];
 };

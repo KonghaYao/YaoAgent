@@ -12,7 +12,7 @@ export interface UnionTool<Args extends ZodRawShape> {
     returnDirect?: boolean;
     execute: ToolCallback<Args>;
     /** 工具执行成功后触发的附加消息 */
-    callbackMessage?: (result: CallToolResult) => Message;
+    callbackMessage?: (result: CallToolResult) => Message[];
 }
 export type ToolCallback<Args extends ZodRawShape> = (args: z.objectOutputType<Args, ZodTypeAny>, context?: any) => CallToolResult | Promise<CallToolResult>;
 

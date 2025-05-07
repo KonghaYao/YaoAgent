@@ -12,7 +12,7 @@
 /coverage
 
 # next.js
-/.next/
+.next/
 /out/
 
 # production
@@ -48,3 +48,4 @@ credentials.json
 
 build
 .docker
+cache

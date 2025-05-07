@@ -1,6 +1,5 @@
 import React from "react";
 import { useChat } from "../context/ChatContext";
-import { Thread, Message } from "@langgraph-js/sdk";
 
 interface HistoryListProps {
     onClose: () => void;
