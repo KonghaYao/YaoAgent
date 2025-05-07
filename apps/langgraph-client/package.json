@@ -29,7 +29,7 @@
         "type": "git",
         "url": "git+https://github.com/KonghaYao/YaoAgent.git"
     },
-    "homepage": "https://github.com/KonghaYao/YaoAgent/tree/main/apps/langgraph-client",
+    "homepage": "https://langgraph-js.netlify.app",
     "bugs": {
         "url": "https://github.com/KonghaYao/YaoAgent/issues"
     },

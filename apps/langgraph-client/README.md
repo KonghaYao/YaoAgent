@@ -14,6 +14,8 @@ Building AI agent applications is complex, especially when you need to bridge th
 - **Handles edge cases automatically** - interruptions, errors, token management and more
 - **Offers a rich set of UI components** - ready-to-use elements to display agent interactions
 
+[DOCS](https://langgraph-js.netlify.app)
+
 ## Installation
 
 ```bash
@@ -150,7 +152,7 @@ function ChatComp() {
 
 ## Documentation
 
-For complete documentation, visit our [official docs](https://your-docs-url.com).
+For complete documentation, visit our [official docs](https://langgraph-js.netlify.app).
 
 ## Contributing
 

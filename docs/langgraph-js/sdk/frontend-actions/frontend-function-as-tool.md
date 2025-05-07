@@ -2,7 +2,7 @@
 
 FFT (Frontend Function as Tools) 是一个非常好用的工具协议，能够让你的前端函数作为 LangGraph 的 Tool。你只需要编写你的过程函数，像是 MCP 一样，大模型会直接调用你的函数，函数执行的结果也会完美的返回到 LangGraph 后端，继续执行。
 
-> 整个 FFT 是基于 LangGraph 的 interrupt 和 resume 去进行的，你可以访问 [这里]() 查看更多
+> 整个 FFT 是基于 LangGraph 的 interrupt 和 resume 去进行的，你可以访问 [这里](https://langchain-ai.github.io/langgraph/concepts/human_in_the_loop/) 查看更多
 > FFT 实现依赖于后端，需要后端支持，可以查看 [后端声明](./backend-declare)
 
 ## 编写前端工具
