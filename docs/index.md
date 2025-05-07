@@ -9,10 +9,7 @@ hero:
   actions:
     - theme: brand
       text: 快速上手
-      link: /guides/getting-started
-    - theme: alt
-      text: 查看API
-      link: /api/
+      link: /langgraph-js/sdk/index
 
 features:
   - title: 生成式UI支持

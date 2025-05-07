@@ -60,5 +60,8 @@ export default defineConfig({
             },
         ],
         socialLinks: [{ icon: "github", link: "https://github.com/KonghaYao/YaoAgent/tree/main/apps/langgraph-client" }],
+        search: {
+            provider: "local",
+        },
     },
 });
