@@ -6,7 +6,7 @@ import MessageTool from "./components/MessageTool";
 import HistoryList from "./components/HistoryList";
 import { ChatProvider, useChat } from "./context/ChatContext";
 import { UsageMetadata } from "./components/UsageMetadata";
-import { formatTime, formatTokens, getMessageContent } from "./store/chatStore";
+import { formatTime, formatTokens, getMessageContent } from "@langgraph-js/sdk";
 
 const ChatMessages: React.FC = () => {
     const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse } = useChat();
@@ -83,6 +83,15 @@ const Chat: React.FC = () => {
                 <div className="chat-header">
                     <button className="history-button" onClick={() => toggleHistoryVisible()}>
                         历史记录
+                    </button>
+                    <button
+                        className="history-button"
+                        onClick={() => {
+                            localStorage.setItem("code", "");
+                            location.reload();
+                        }}
+                    >
+                        退出登陆
                     </button>
                 </div>
                 <ChatMessages />

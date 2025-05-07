@@ -1,7 +1,7 @@
 import React from "react";
 import { RenderMessage } from "@langgraph-js/sdk";
 import { UsageMetadata } from "./UsageMetadata";
-import { getMessageContent } from "../store/chatStore";
+import { getMessageContent } from "@langgraph-js/sdk";
 interface MessageAIProps {
     message: RenderMessage;
 }

@@ -1,6 +1,7 @@
 import { Client, Thread, Message, Assistant, HumanMessage, AIMessage, ToolMessage, Command } from "@langchain/langgraph-sdk";
 import { ToolManager } from "./ToolManager";
 import { CallToolResult } from "./tool";
+import { AsyncCallerParams } from "@langchain/langgraph-sdk/dist/utils/async_caller";
 
 export type RenderMessage = Message & {
     /** 工具入参 ，聚合而来*/
@@ -30,7 +31,7 @@ export type RenderMessage = Message & {
 export interface LangGraphClientConfig {
     apiUrl?: string;
     apiKey?: string;
-    // callerOptions?: AsyncCallerParams;
+    callerOptions?: AsyncCallerParams;
     timeoutMs?: number;
     defaultHeaders?: Record<string, string | null | undefined>;
 }
@@ -52,7 +53,7 @@ export class StreamingMessageType {
 }
 
 type StreamingUpdateEvent = {
-    type: "message" | "value" | "update" | "error";
+    type: "message" | "value" | "update" | "error" | "thread" | "done";
     data: any;
 };
 
@@ -316,6 +317,15 @@ export class LangGraphClient extends Client {
         }
         if (!this.currentThread) {
             await this.createThread();
+            this.emitStreamingUpdate({
+                type: "thread",
+                data: {
+                    event: "thread/create",
+                    data: {
+                        thread: this.currentThread,
+                    },
+                },
+            });
         }
 
         const messagesToSend = Array.isArray(input)
@@ -376,6 +386,12 @@ export class LangGraphClient extends Client {
         this.streamingMessage = [];
         const data = await this.runFETool();
         if (data) streamRecord.push(...data);
+        this.emitStreamingUpdate({
+            type: "done",
+            data: {
+                event: "done",
+            },
+        });
         return streamRecord;
     }
     private runFETool() {

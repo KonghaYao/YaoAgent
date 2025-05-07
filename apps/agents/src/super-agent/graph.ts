@@ -24,7 +24,6 @@ const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<Configuration
         // },
     },
     async (state, config, mcpTools) => {
-        console.log(new AIMessage(""));
         const feTools = createFeTools(state.fe_tools);
         const stylePrompt = await getPrompt("./src/prompt/style.md");
         const plannerPrompt = await getPrompt("./src/prompt/planner.md");

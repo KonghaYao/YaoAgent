@@ -10,7 +10,8 @@
     "dependencies": {
         "@langgraph-js/sdk": "workspace:*",
         "@nanostores/react": "^1.0.0",
-        "nanostores": "^1.0.1"
+        "nanostores": "^1.0.1",
+        "oauth4webapi": "^3.5.1"
     },
     "devDependencies": {
         "@types/react": "^19.0.10",

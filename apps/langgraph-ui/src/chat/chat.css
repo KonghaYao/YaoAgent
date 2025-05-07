@@ -82,6 +82,7 @@
     border-bottom: 1px solid #e0e0e0;
     display: flex;
     justify-content: flex-end;
+    gap: 0.5rem;
 }
 
 .history-button {

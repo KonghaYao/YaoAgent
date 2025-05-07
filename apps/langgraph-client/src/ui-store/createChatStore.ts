@@ -22,7 +22,13 @@ export const getMessageContent = (content: any) => {
     }
     return JSON.stringify(content);
 };
-export const createChatStore = (initClientName: string, config: LangGraphClientConfig) => {
+export const createChatStore = (
+    initClientName: string,
+    config: LangGraphClientConfig,
+    context: {
+        onInit?: (client: LangGraphClient) => void;
+    } = {}
+) => {
     const client = atom<LangGraphClient | null>(null);
     const renderMessages = atom<RenderMessage[]>([]);
     const userInput = atom<string>("");
@@ -40,6 +46,11 @@ export const createChatStore = (initClientName: string, config: LangGraphClientC
         // await newClient.createThread();
 
         newClient.onStreamingUpdate((event) => {
+            if (event.type === "thread" || event.type === "done") {
+                // console.log(event.data);
+                // 创建新会话时，需要自动刷新历史面板
+                return refreshHistoryList();
+            }
             if (event.type === "error") {
                 loading.set(false);
                 inChatError.set(event.data?.message || "发生错误");
@@ -47,6 +58,7 @@ export const createChatStore = (initClientName: string, config: LangGraphClientC
             console.log(newClient.renderMessage);
             renderMessages.set(newClient.renderMessage);
         });
+        context.onInit?.(newClient);
         // newClient.tools.bindTools([fileTool, askUserTool]);
         newClient.graphState = {};
         client.set(newClient);
@@ -118,6 +130,9 @@ export const createChatStore = (initClientName: string, config: LangGraphClientC
             },
             setCurrentAgent(agent: string) {
                 currentAgent.set(agent);
+                return initClient().then(() => {
+                    refreshHistoryList();
+                });
             },
             createNewChat() {
                 client.get()?.reset();

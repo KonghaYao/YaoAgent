@@ -4,5 +4,8 @@
     "graphs": {
         "agent": "./apps/agents/src/super-agent/graph.ts:graph"
     },
-    "env": ".env"
+    "env": ".env",
+    "auth": {
+        "path": "./apps/agents/src/auth.ts:auth"
+    }
 }

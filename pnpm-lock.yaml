@@ -152,9 +152,15 @@ importers:
       '@nanostores/react':
         specifier: ^1.0.0
         version: 1.0.0(nanostores@1.0.1)(react@19.1.0)
+      '@poppinss/oauth-client':
+        specifier: ^7.0.0
+        version: 7.0.0
       nanostores:
         specifier: ^1.0.1
         version: 1.0.1
+      oauth4webapi:
+        specifier: ^3.5.1
+        version: 3.5.1
     devDependencies:
       '@types/react':
         specifier: ^19.0.10
@@ -1484,6 +1490,14 @@ packages:
     resolution: {integrity: sha512-uh6W7sb55hl7D6vsAeA+V2p5JnlAqzhqFyF0VcJkKZXkgnFcVG9PziERRHQfPLfNGx1C292a4JqbWzhR8L4R1g==}
     engines: {node: '>=18'}
     hasBin: true
+
+  '@poppinss/exception@1.2.1':
+    resolution: {integrity: sha512-aQypoot0HPSJa6gDPEPTntc1GT6QINrSbgRlRhadGW2WaYqUK3tK4Bw9SBMZXhmxd3GeAlZjVcODHgiu+THY7A==}
+    engines: {node: '>=18'}
+
+  '@poppinss/oauth-client@7.0.0':
+    resolution: {integrity: sha512-oBWcbLDJxh+WSlSfM093u3Usw6qCa8HKAd1kFqNKY2LdK+4l5iqv6w2iTaSsiQFbACNgIS3VNIB1yQcmI1FI6w==}
+    engines: {node: '>=18.16.0'}
 
   '@rollup/rollup-android-arm-eabi@4.40.1':
     resolution: {integrity: sha512-kxz0YeeCrRUHz3zyqvd7n+TVRlNyTifBsmnmNPtk3hQURUyG9eAB+usz6DAwagMusjx/zb3AjvDUvhFGDAexGw==}
@@ -3049,6 +3063,10 @@ packages:
   kuler@2.0.0:
     resolution: {integrity: sha512-Xq9nH7KlWZmXAtodXDDRE7vs6DU1gTU8zYDHDiWLSip45Egwq3plLHzPn27NgvzL2r1LMPC1vdqh98sQxtqj4A==}
 
+  ky@1.8.1:
+    resolution: {integrity: sha512-7Bp3TpsE+L+TARSnnDpk3xg8Idi8RwSLdj6CMbNWoOARIrGrbuLGusV0dYwbZOm4bB3jHNxSw8Wk/ByDqJEnDw==}
+    engines: {node: '>=18'}
+
   langchain@0.3.24:
     resolution: {integrity: sha512-BTjiYkUCpWFAmufK8J5zMqc5aUs4eEnAXPWtPe2+R4ZPP+U7bXJSBHAcrB40rQ3VeTdRgMvgDjekOOgCMWut6Q==}
     engines: {node: '>=18'}
@@ -3416,6 +3434,9 @@ packages:
   npm-run-path@6.0.0:
     resolution: {integrity: sha512-9qny7Z9DsQU8Ou39ERsPU4OZQlSTP47ShQzuKZ6PRXpYLtIFgl/DEBYEXKlvcEa+9tHVcK8CF81Y2V72qaZhWA==}
     engines: {node: '>=18'}
+
+  oauth4webapi@3.5.1:
+    resolution: {integrity: sha512-txg/jZQwcbaF7PMJgY7aoxc9QuCxHVFMiEkDIJ60DwDz3PbtXPQnrzo+3X4IRYGChIwWLabRBRpf1k9hO9+xrQ==}
 
   object-assign@4.1.1:
     resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
@@ -5694,6 +5715,13 @@ snapshots:
     dependencies:
       playwright: 1.52.0
 
+  '@poppinss/exception@1.2.1': {}
+
+  '@poppinss/oauth-client@7.0.0':
+    dependencies:
+      '@poppinss/exception': 1.2.1
+      ky: 1.8.1
+
   '@rollup/rollup-android-arm-eabi@4.40.1':
     optional: true
 
@@ -7567,6 +7595,8 @@ snapshots:
 
   kuler@2.0.0: {}
 
+  ky@1.8.1: {}
+
   langchain@0.3.24(@langchain/anthropic@0.3.19(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/cohere@0.3.3(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(axios@1.9.0)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(ws@8.18.1):
     dependencies:
       '@langchain/core': 0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))
@@ -7814,6 +7844,8 @@ snapshots:
     dependencies:
       path-key: 4.0.0
       unicorn-magic: 0.3.0
+
+  oauth4webapi@3.5.1: {}
 
   object-assign@4.1.1: {}
 
