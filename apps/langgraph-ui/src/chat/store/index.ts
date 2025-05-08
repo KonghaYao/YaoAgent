@@ -9,7 +9,7 @@ const F =
 export const globalChatStore = createChatStore(
     "agent",
     {
-        apiUrl: "http://localhost:8123",
+        apiUrl: localStorage.getItem("apiUrl") || "http://localhost:8123",
         defaultHeaders: JSON.parse(localStorage.getItem("code") || "{}"),
         callerOptions: {
             // 携带 cookie 的写法

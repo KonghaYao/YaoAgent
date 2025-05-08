@@ -1,13 +1,17 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import basicSsl from "@vitejs/plugin-basic-ssl";
 
 // https://vitejs.dev/config/
-export default defineConfig({
-    plugins: [react()],
-    optimizeDeps: {
-        exclude: ["@langgraph-js/ui", "@langgraph-js/sdk"],
-    },
-    server: {
-        port: 1111,
-    },
+export default defineConfig(({ mode }) => {
+    const isHttps = mode === "https";
+    return {
+        plugins: [react(), isHttps ? basicSsl() : undefined],
+        optimizeDeps: {
+            exclude: ["@langgraph-js/ui", "@langgraph-js/sdk"],
+        },
+        server: {
+            port: 1111,
+        },
+    };
 });

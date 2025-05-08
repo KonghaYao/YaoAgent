@@ -8,7 +8,8 @@ interface HeaderConfig {
 
 const Login: React.FC = () => {
     const [headers, setHeaders] = useState<HeaderConfig[]>([{ key: "authorization", value: "" }]);
-    const [withCredentials, setWithCredentials] = useState<boolean>(false);
+    const [withCredentials, setWithCredentials] = useState<boolean>(localStorage.getItem("withCredentials") === "true");
+    const [apiUrl, setApiUrl] = useState<string>(localStorage.getItem("apiUrl") || "");
 
     const addHeader = () => {
         setHeaders([...headers, { key: "", value: "" }]);
@@ -29,6 +30,7 @@ const Login: React.FC = () => {
 
         localStorage.setItem("code", JSON.stringify(headerObject));
         localStorage.setItem("withCredentials", JSON.stringify(withCredentials));
+        localStorage.setItem("apiUrl", apiUrl);
         location.reload();
     };
 
@@ -42,6 +44,12 @@ const Login: React.FC = () => {
             >
                 <h2>LangGraph UI</h2>
                 <p>登录，自定义请求头配置</p>
+
+                <div className="form-group api-url-group">
+                    <label htmlFor="api-url">API URL</label>
+                    <input type="text" id="api-url" value={apiUrl} onChange={(e) => setApiUrl(e.target.value)} placeholder="例如: http://localhost:8123" />
+                </div>
+
                 {headers.map((header, index) => (
                     <div key={index} className="header-group">
                         <div className="form-group">
