@@ -8,7 +8,7 @@
 import { useChat } from "@langgraph-js/sdk";
 
 const ChatInput: React.FC = () => {
-    const { sendMessage, interruptMessage, loading } = useChat();
+    const { sendMessage, stopGeneration, loading } = useChat();
 
     return (
         <div className="chat-input">
@@ -17,7 +17,7 @@ const ChatInput: React.FC = () => {
                 disabled={loading}
             />
             <button 
-                onClick={() => (loading ? interruptMessage() : sendMessage())} 
+                onClick={() => (loading ? stopGeneration() : sendMessage())} 
                 disabled={!loading}
             >
                 {loading ? "中断" : "发送"}

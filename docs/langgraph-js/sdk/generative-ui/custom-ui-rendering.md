@@ -125,14 +125,14 @@ const ChatMessages: React.FC = () => {
 
 `sendMessage` 函数将 `userInput` 发送给 Langgraph 进行处理。
 
-`interruptMessage` 函数可以中断当前正在进行的 AI 生成任务。
+`stopGeneration` 函数可以中断当前正在进行的 AI 生成任务。
 
 ```tsx
 // ChatInput 组件示例
 // 处理用户输入和交互操作
 const ChatInput: React.FC = () => {
     // 从 useChat 钩子获取数据和方法
-    const { userInput, setUserInput, loading, sendMessage, interruptMessage } = useChat();
+    const { userInput, setUserInput, loading, sendMessage, stopGeneration } = useChat();
     
     // 处理键盘事件，支持回车发送消息
     const handleKeyPress = (event: React.KeyboardEvent) => {
@@ -158,7 +158,7 @@ const ChatInput: React.FC = () => {
                 {/* 发送/中断按钮：根据loading状态切换功能 */}
                 <button 
                     className={`send-button ${loading ? "interrupt" : ""}`} 
-                    onClick={() => (loading ? interruptMessage() : sendMessage())} 
+                    onClick={() => (loading ? stopGeneration() : sendMessage())} 
                     disabled={!loading && !userInput.trim()}
                 >
                     {loading ? "中断" : "发送"}

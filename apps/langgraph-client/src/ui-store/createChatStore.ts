@@ -1,5 +1,5 @@
 import { atom } from "nanostores";
-import { LangGraphClient, LangGraphClientConfig, RenderMessage } from "../LangGraphClient";
+import { LangGraphClient, LangGraphClientConfig, RenderMessage, SendMessageOptions } from "../LangGraphClient";
 import { Message, Thread } from "@langchain/langgraph-sdk";
 export const formatTime = (date: Date) => {
     return date.toLocaleTimeString("en-US");
@@ -64,19 +64,19 @@ export const createChatStore = (
         client.set(newClient);
     };
 
-    const sendMessage = async () => {
-        if (!userInput.get().trim() || loading.get() || !client.get()) return;
+    const sendMessage = async (message?: Message[], extraData?: SendMessageOptions) => {
+        if ((!userInput.get().trim() && !message?.length) || loading.get() || !client.get()) return;
 
         loading.set(true);
         inChatError.set(null);
 
-        await client.get()?.sendMessage(userInput.get());
+        await client.get()?.sendMessage(message || userInput.get(), extraData);
 
         userInput.set("");
         loading.set(false);
     };
 
-    const interruptMessage = () => {
+    const stopGeneration = () => {
         client.get()?.cancelRun();
     };
 
@@ -120,7 +120,7 @@ export const createChatStore = (
         mutations: {
             initClient,
             sendMessage,
-            interruptMessage,
+            stopGeneration,
             toggleToolCollapse,
             toggleHistoryVisible,
             refreshHistoryList,

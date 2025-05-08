@@ -27,7 +27,11 @@ export type RenderMessage = Message & {
     /** 渲染时的唯一 id，聚合而来*/
     unique_id?: string;
 };
-
+export type SendMessageOptions = {
+    extraParams?: Record<string, any>;
+    _debug?: { streamResponse?: any };
+    command?: Command;
+};
 export interface LangGraphClientConfig {
     apiUrl?: string;
     apiKey?: string;
@@ -311,7 +315,7 @@ export class LangGraphClient extends Client {
             this.runs.cancel(this.currentThread!.thread_id, this.currentRun.run_id);
         }
     }
-    async sendMessage(input: string | Message[], { extraParams, _debug, command }: { extraParams?: Record<string, any>; _debug?: { streamResponse?: any }; command?: Command } = {}) {
+    async sendMessage(input: string | Message[], { extraParams, _debug, command }: SendMessageOptions = {}) {
         if (!this.currentAssistant) {
             throw new Error("Thread or Assistant not initialized");
         }

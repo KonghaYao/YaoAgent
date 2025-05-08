@@ -37,7 +37,7 @@ const ChatMessages: React.FC = () => {
 };
 
 const ChatInput: React.FC = () => {
-    const { userInput, setUserInput, loading, sendMessage, interruptMessage, currentAgent, setCurrentAgent, client } = useChat();
+    const { userInput, setUserInput, loading, sendMessage, stopGeneration, currentAgent, setCurrentAgent, client } = useChat();
     const handleKeyPress = (event: React.KeyboardEvent) => {
         if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
@@ -65,7 +65,7 @@ const ChatInput: React.FC = () => {
                     placeholder="输入消息..."
                     disabled={loading}
                 />
-                <button className={`send-button ${loading ? "interrupt" : ""}`} onClick={() => (loading ? interruptMessage() : sendMessage())} disabled={!loading && !userInput.trim()}>
+                <button className={`send-button ${loading ? "interrupt" : ""}`} onClick={() => (loading ? stopGeneration() : sendMessage())} disabled={!loading && !userInput.trim()}>
                     {loading ? "中断" : "发送"}
                 </button>
             </div>
