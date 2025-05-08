@@ -5,7 +5,8 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "npx @langchain/langgraph-cli dev --port 8123 --config ../../langgraph.json --no-browser",
+        "dev": "npx @langchain/langgraph-cli dev --port 8123 --config ./langgraph.json --no-browser",
+        "build:docker": "npx @langchain/langgraph-cli dockerfile ./Dockerfile",
         "build": "turbo build:internal --filter=agents",
         "build:internal": "pnpm run clean && tsc",
         "clean": "rm -rf ./dist .turbo || true",

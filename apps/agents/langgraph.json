@@ -2,10 +2,10 @@
     "node_version": "20",
     "dependencies": ["."],
     "graphs": {
-        "agent": "./apps/agents/src/super-agent/graph.ts:graph"
+        "agent": "./src/super-agent/graph.ts:graph"
     },
     "env": ".env",
     "auth": {
-        "path": "./apps/agents/src/auth.ts:auth"
+        "path": "./src/auth.ts:auth"
     }
 }
