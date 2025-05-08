@@ -258,7 +258,7 @@ export class LangGraphClient extends Client {
                 const assistantToolMessage = assistantToolMessages.get(message.tool_call_id!);
                 const parentMessage = toolParentMessage.get(message.tool_call_id!);
                 if (assistantToolMessage) {
-                    message.tool_input = typeof assistantToolMessage.args !== "object" ? JSON.stringify(assistantToolMessage.args) : assistantToolMessage.args;
+                    message.tool_input = typeof assistantToolMessage.args !== "string" ? JSON.stringify(assistantToolMessage.args) : assistantToolMessage.args;
                     if (message.additional_kwargs) {
                         message.additional_kwargs.done = true;
                     } else {

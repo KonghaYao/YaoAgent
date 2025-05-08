@@ -11,6 +11,7 @@ interface MessageToolProps {
 }
 
 const MessageTool: React.FC<MessageToolProps> = ({ message, client, getMessageContent, formatTokens, isCollapsed, onToggleCollapse }) => {
+    console.log(message)
     return (
         <div className="message tool">
             {message.name === "ask_user" && !message.additional_kwargs?.done && (
