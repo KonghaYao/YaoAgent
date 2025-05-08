@@ -3,7 +3,7 @@
     "scripts": {
         "start": "watch \"npm run build\" ./src",
         "dev": "vite",
-        "build": "mitosis build --c mitosis.config.cjs"
+        "build": "vite build"
     },
     "main": "./dist/react/src/index.js",
     "type": "module",

@@ -8,6 +8,7 @@ interface HeaderConfig {
 
 const Login: React.FC = () => {
     const [headers, setHeaders] = useState<HeaderConfig[]>([{ key: "authorization", value: "" }]);
+    const [withCredentials, setWithCredentials] = useState<boolean>(false);
 
     const addHeader = () => {
         setHeaders([...headers, { key: "", value: "" }]);
@@ -27,6 +28,7 @@ const Login: React.FC = () => {
         const headerObject = Object.fromEntries(headers.map((k) => [k.key, k.value]));
 
         localStorage.setItem("code", JSON.stringify(headerObject));
+        localStorage.setItem("withCredentials", JSON.stringify(withCredentials));
         location.reload();
     };
 
@@ -38,7 +40,8 @@ const Login: React.FC = () => {
                     handleLogin();
                 }}
             >
-                <p>登录测试，自定义请求头配置</p>
+                <h2>LangGraph UI</h2>
+                <p>登录，自定义请求头配置</p>
                 {headers.map((header, index) => (
                     <div key={index} className="header-group">
                         <div className="form-group">
@@ -50,7 +53,7 @@ const Login: React.FC = () => {
                                 id={`header-value-${index}`}
                                 value={header.value}
                                 onChange={(e) => updateHeader(index, "value", e.target.value)}
-                                placeholder="例如: Bearer token"
+                                placeholder="例如: Bearer token；无则填 1"
                                 required
                             />
                         </div>
@@ -61,6 +64,12 @@ const Login: React.FC = () => {
                         )}
                     </div>
                 ))}
+                <div className="with-credentials-option">
+                    <label>
+                        <input type="checkbox" checked={withCredentials} onChange={(e) => setWithCredentials(e.target.checked)} />
+                        启用 withCredentials（跨域请求时发送 Cookie）
+                    </label>
+                </div>
                 <div className="button-group">
                     <button type="button" onClick={addHeader}>
                         添加请求头

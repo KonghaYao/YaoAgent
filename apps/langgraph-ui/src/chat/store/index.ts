@@ -1,4 +1,11 @@
 import { createChatStore } from "@langgraph-js/sdk";
+const F =
+    localStorage.getItem("withCredentials") === "true"
+        ? (url: string, options: RequestInit) => {
+              options.credentials = "include";
+              return fetch(url, options);
+          }
+        : fetch;
 export const globalChatStore = createChatStore(
     "agent",
     {
@@ -6,10 +13,7 @@ export const globalChatStore = createChatStore(
         defaultHeaders: JSON.parse(localStorage.getItem("code") || "{}"),
         callerOptions: {
             // 携带 cookie 的写法
-            // fetch(url: string, options: RequestInit) {
-            //     options.credentials = "include";
-            //     return fetch(url, options);
-            // },
+            fetch: F,
         },
     },
     {
