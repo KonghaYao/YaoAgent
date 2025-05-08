@@ -218,8 +218,12 @@ export class LangGraphClient extends Client {
         let lastMessage: RenderMessage | null = null;
         for (const message of result) {
             const createTime = message.response_metadata?.create_time || "";
-            // 用长度作为渲染 id，长度变了就要重新渲染
-            message.unique_id = message.id! + JSON.stringify(message.content).length;
+            try {
+                // 用长度作为渲染 id，长度变了就要重新渲染
+                message.unique_id = message.id! + JSON.stringify(message.content).length;
+            } catch (e) {
+                message.unique_id = message.id!;
+            }
             message.spend_time = new Date(createTime).getTime() - new Date(lastMessage?.response_metadata?.create_time || createTime).getTime();
             if (!message.usage_metadata && (message as AIMessage).response_metadata?.usage) {
                 const usage = (message as AIMessage).response_metadata!.usage as {
@@ -244,7 +248,7 @@ export class LangGraphClient extends Client {
         for (const message of messages) {
             if (StreamingMessageType.isToolAssistant(message)) {
                 /** @ts-ignore 只有 tool_call_chunks 的 args 才是文本 */
-                message.tool_call_chunks?.forEach((element) => {
+                (message.tool_calls || message.tool_call_chunks)?.forEach((element) => {
                     assistantToolMessages.set(element.id!, element);
                     toolParentMessage.set(element.id!, message);
                 });
@@ -254,7 +258,7 @@ export class LangGraphClient extends Client {
                 const assistantToolMessage = assistantToolMessages.get(message.tool_call_id!);
                 const parentMessage = toolParentMessage.get(message.tool_call_id!);
                 if (assistantToolMessage) {
-                    message.tool_input = assistantToolMessage.args;
+                    message.tool_input = typeof assistantToolMessage.args !== "object" ? JSON.stringify(assistantToolMessage.args) : assistantToolMessage.args;
                     if (message.additional_kwargs) {
                         message.additional_kwargs.done = true;
                     } else {

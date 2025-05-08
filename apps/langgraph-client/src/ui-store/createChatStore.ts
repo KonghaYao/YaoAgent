@@ -55,7 +55,7 @@ export const createChatStore = (
                 loading.set(false);
                 inChatError.set(event.data?.message || "发生错误");
             }
-            console.log(newClient.renderMessage);
+            // console.log(newClient.renderMessage);
             renderMessages.set(newClient.renderMessage);
         });
         context.onInit?.(newClient);
