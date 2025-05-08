@@ -86,9 +86,9 @@ export class LangGraphClient extends Client {
             const assistants = await this.listAssistants();
             this.availableAssistants = assistants;
             if (assistants.length > 0) {
-                this.currentAssistant = assistants.find((assistant) => assistant.name === agentName) || null;
+                this.currentAssistant = assistants.find((assistant) => assistant.graph_id === agentName) || null;
                 if (!this.currentAssistant) {
-                    throw new Error("Agent not found");
+                    throw new Error("Agent not found: " + agentName);
                 }
             } else {
                 throw new Error("No assistants found");

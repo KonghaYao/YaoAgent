@@ -50,7 +50,7 @@ const ChatInput: React.FC = () => {
             <div className="chat-input-header">
                 <select value={currentAgent} onChange={(e) => setCurrentAgent(e.target.value)}>
                     {client?.availableAssistants.map((i) => {
-                        return <option value={i.assistant_id}>{i.name}</option>;
+                        return <option value={i.graph_id}>{i.name}</option>;
                     })}
                 </select>
                 <UsageMetadata usage_metadata={client?.tokenCounter || {}} />
