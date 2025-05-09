@@ -22,6 +22,20 @@ export const getMessageContent = (content: any) => {
     }
     return JSON.stringify(content);
 };
+export const getHistoryContent = (thread: Thread) => {
+    const content = (thread?.values as any)?.messages?.[0]?.content;
+    if (content && Array.isArray(content)) {
+        return content.map((item: any) => {
+            if (item.type === "text") {
+                return item.text;
+            }
+        });
+    } else if (typeof content === "string") {
+        return content;
+    } else {
+        return "";
+    }
+};
 export const createChatStore = (
     initClientName: string,
     config: LangGraphClientConfig,

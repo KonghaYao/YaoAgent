@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./chat.css";
 import MessageHuman from "./components/MessageHuman";
 import MessageAI from "./components/MessageAI";
@@ -6,7 +6,8 @@ import MessageTool from "./components/MessageTool";
 import HistoryList from "./components/HistoryList";
 import { ChatProvider, useChat } from "./context/ChatContext";
 import { UsageMetadata } from "./components/UsageMetadata";
-import { formatTime, formatTokens, getMessageContent } from "@langgraph-js/sdk";
+import { formatTime, formatTokens, getMessageContent, Message } from "@langgraph-js/sdk";
+import FileList from "./components/FileList";
 
 const ChatMessages: React.FC = () => {
     const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse } = useChat();
@@ -38,15 +39,48 @@ const ChatMessages: React.FC = () => {
 
 const ChatInput: React.FC = () => {
     const { userInput, setUserInput, loading, sendMessage, stopGeneration, currentAgent, setCurrentAgent, client } = useChat();
+    const [extraParams, setExtraParams] = useState({});
+    const [imageUrls, setImageUrls] = useState<string[]>([]);
+
+    const handleFileUploaded = (url: string) => {
+        setImageUrls((prev) => [...prev, url]);
+    };
+
+    const sendMultiModalMessage = () => {
+        const content: Message[] = [
+            {
+                type: "human",
+                content: [
+                    {
+                        type: "text",
+                        text: userInput,
+                    },
+                    ...imageUrls.map((url) => ({
+                        type: "image_url" as const,
+                        image_url: { url },
+                    })),
+                ],
+            },
+        ];
+
+        sendMessage(content, {
+            extraParams,
+        });
+
+        // 清空图片列表
+        setImageUrls([]);
+    };
+
     const handleKeyPress = (event: React.KeyboardEvent) => {
         if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
-            sendMessage();
+            sendMultiModalMessage();
         }
     };
 
     return (
         <div className="chat-input">
+            <FileList onFileUploaded={handleFileUploaded} />
             <div className="chat-input-header">
                 <select value={currentAgent} onChange={(e) => setCurrentAgent(e.target.value)}>
                     {client?.availableAssistants.map((i) => {
@@ -65,7 +99,11 @@ const ChatInput: React.FC = () => {
                     placeholder="输入消息..."
                     disabled={loading}
                 />
-                <button className={`send-button ${loading ? "interrupt" : ""}`} onClick={() => (loading ? stopGeneration() : sendMessage())} disabled={!loading && !userInput.trim()}>
+                <button
+                    className={`send-button ${loading ? "interrupt" : ""}`}
+                    onClick={() => (loading ? stopGeneration() : sendMultiModalMessage())}
+                    disabled={!loading && !userInput.trim() && imageUrls.length === 0}
+                >
                     {loading ? "中断" : "发送"}
                 </button>
             </div>

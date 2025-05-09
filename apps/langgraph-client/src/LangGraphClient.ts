@@ -188,7 +188,7 @@ export class LangGraphClient extends Client {
                             type: "tool",
                             additional_kwargs: {},
                             /** @ts-ignore */
-                            tool_input: m.additional_kwargs?.tool_calls[index].function.arguments,
+                            tool_input: m.additional_kwargs?.tool_calls?.[index]?.function?.arguments,
                             id: tool.id,
                             name: tool.name,
                             response_metadata: {},

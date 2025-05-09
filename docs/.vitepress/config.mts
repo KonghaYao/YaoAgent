@@ -21,6 +21,7 @@ export default defineConfig({
                         text: "🎨 生成式 UI",
                         items: [
                             { text: "🖌️ 自定义 UI 渲染", link: "/langgraph-js/sdk/generative-ui/custom-ui-rendering" },
+                            { text: "🖼️ 多模态", link: "/langgraph-js/sdk/generative-ui/multimodal" },
                             { text: "⏹️ 停止消息生成", link: "/langgraph-js/sdk/generative-ui/stop-message-generation" },
                             { text: "🔢 token 计数器", link: "/langgraph-js/sdk/generative-ui/token-counter" },
                             { text: "❌ 异常信息显示", link: "/langgraph-js/sdk/generative-ui/error-handling" },

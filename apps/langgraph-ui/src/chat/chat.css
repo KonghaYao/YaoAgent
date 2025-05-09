@@ -1,3 +1,5 @@
+@import url("https://unpkg.com/github-markdown-css/github-markdown.css");
+
 .chat-container {
     display: flex;
     height: 100vh;
@@ -128,10 +130,31 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    max-width: 100%;
 }
 
 .message-text {
     word-break: break-word;
+    line-height: 1.5;
+}
+
+.message-image {
+    margin: 0.5rem 0;
+}
+
+.message-image img {
+    max-width: 100%;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.message-audio {
+    margin: 0.5rem 0;
+}
+
+.message-audio audio {
+    width: 100%;
+    max-width: 300px;
 }
 
 .message-meta {
@@ -178,7 +201,6 @@
 }
 
 .message.ai .message-content {
-    background-color: #f3f4f6;
     color: #1f2937;
 }
 
@@ -359,3 +381,8 @@
     font-size: 14px;
     text-align: center;
 }
+
+.markdown-body p {
+    text-align: left;
+}
+

@@ -1,5 +1,6 @@
 import React from "react";
 import { useChat } from "../context/ChatContext";
+import { getHistoryContent } from "@langgraph-js/sdk";
 
 interface HistoryListProps {
     onClose: () => void;
@@ -8,7 +9,6 @@ interface HistoryListProps {
 
 const HistoryList: React.FC<HistoryListProps> = ({ onClose, formatTime }) => {
     const { historyList, currentChatId, refreshHistoryList, createNewChat, deleteHistoryChat, toHistoryChat } = useChat();
-
     return (
         <div className="history-list">
             <div className="history-header">
@@ -42,7 +42,7 @@ const HistoryList: React.FC<HistoryListProps> = ({ onClose, formatTime }) => {
                             .map((thread) => (
                                 <div className={`history-item ${thread.thread_id === currentChatId ? "active" : ""}`} key={thread.thread_id}>
                                     <div className="history-info">
-                                        <div className="history-title">{thread?.values?.messages?.[0]?.content as string}</div>
+                                        <div className="history-title">{getHistoryContent(thread)}</div>
                                         <div className="history-meta">
                                             <span className="history-time">{formatTime(new Date(thread.created_at))}</span>
                                             <span className="history-status">{thread.status}</span>
