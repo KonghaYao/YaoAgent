@@ -7,7 +7,7 @@ export const modelGuard = (state: ModelState, model_type: keyof typeof ModelAllo
     if (!modelName) {
         throw new Error(`Model ${String(model_type)} not found in state`);
     }
-    if (!((ModelAllow[model_type] as any as string[]).includes(modelName))) {
+    if (!(ModelAllow[model_type] as any as string[]).includes(modelName)) {
         throw new Error(`Not Allowed Model ${String(model_type)} `);
     }
     return modelName as string;
@@ -34,5 +34,7 @@ export async function createLLM(
             /** @ts-ignore */
             parallel_tool_calls: true,
         },
+        streamUsage: true,
+        streaming: true,
     });
 }

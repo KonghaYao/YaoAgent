@@ -4,10 +4,13 @@ interface UsageMetadataProps {
         output_tokens: number;
         total_tokens: number;
     }>;
+    response_metadata?:{
+        model_name?: string;
+    }
     spend_time?: number;
 }
 
-export const UsageMetadata: React.FC<UsageMetadataProps> = ({ usage_metadata, spend_time }) => {
+export const UsageMetadata: React.FC<UsageMetadataProps> = ({ usage_metadata, spend_time ,response_metadata}) => {
     const formatTokens = (tokens: number) => {
         return tokens.toString();
     };
@@ -27,6 +30,9 @@ export const UsageMetadata: React.FC<UsageMetadataProps> = ({ usage_metadata, sp
                     <span className="token-emoji">📊</span>
                     {formatTokens(usage_metadata.total_tokens || 0)}
                 </span>
+            </div>
+            <div>
+                {response_metadata?.model_name}
             </div>
             <span className="message-time">{spend_time ? `${(spend_time / 1000).toFixed(2)}s` : ""}</span>
         </div>

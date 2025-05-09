@@ -11,7 +11,7 @@ const MessageAI: React.FC<MessageAIProps> = ({ message }) => {
         <div className="message ai">
             <div className="message-content">
                 <div className="message-text">{getMessageContent(message.content)}</div>
-                {message.usage_metadata && <UsageMetadata usage_metadata={message.usage_metadata} spend_time={message.spend_time} />}
+                <UsageMetadata  response_metadata={message.response_metadata as any} usage_metadata={message.usage_metadata||{}} spend_time={message.spend_time} />
             </div>
         </div>
     );

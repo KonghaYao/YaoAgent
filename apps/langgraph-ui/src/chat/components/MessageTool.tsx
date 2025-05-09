@@ -11,7 +11,6 @@ interface MessageToolProps {
 }
 
 const MessageTool: React.FC<MessageToolProps> = ({ message, client, getMessageContent, formatTokens, isCollapsed, onToggleCollapse }) => {
-    console.log(message)
     return (
         <div className="message tool">
             {message.name === "ask_user" && !message.additional_kwargs?.done && (
@@ -36,7 +35,7 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, client, getMessageCo
                     <div className="tool-content">
                         <div className="tool-input">{message.tool_input}</div>
                         <div className="tool-output">{getMessageContent(message.content)}</div>
-                        {message.usage_metadata && <UsageMetadata usage_metadata={message.usage_metadata} spend_time={message.spend_time} />}
+                        <UsageMetadata response_metadata={message.response_metadata as any} usage_metadata={message.usage_metadata || {}} spend_time={message.spend_time} />
                     </div>
                 )}
             </div>
