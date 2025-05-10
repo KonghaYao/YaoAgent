@@ -40,6 +40,10 @@ export interface LangGraphClientConfig {
     defaultHeaders?: Record<string, string | null | undefined>;
 }
 
+/**
+ * @zh StreamingMessageType 类用于判断消息的类型。
+ * @en The StreamingMessageType class is used to determine the type of a message.
+ */
 export class StreamingMessageType {
     static isUser(m: Message) {
         return m.type === "human";
@@ -63,6 +67,10 @@ type StreamingUpdateEvent = {
 
 type StreamingUpdateCallback = (event: StreamingUpdateEvent) => void;
 
+/**
+ * @zh LangGraphClient 类是与 LangGraph 后端交互的主要客户端。
+ * @en The LangGraphClient class is the main client for interacting with the LangGraph backend.
+ */
 export class LangGraphClient extends Client {
     private currentAssistant: Assistant | null = null;
     private currentThread: Thread | null = null;
@@ -81,6 +89,10 @@ export class LangGraphClient extends Client {
             limit: 100,
         });
     }
+    /**
+     * @zh 初始化 Assistant。
+     * @en Initializes the Assistant.
+     */
     async initAssistant(agentName: string) {
         try {
             const assistants = await this.listAssistants();
@@ -99,6 +111,10 @@ export class LangGraphClient extends Client {
         }
     }
 
+    /**
+     * @zh 创建一个新的 Thread。
+     * @en Creates a new Thread.
+     */
     async createThread({
         threadId,
     }: {
@@ -114,12 +130,19 @@ export class LangGraphClient extends Client {
             throw error;
         }
     }
+    /**
+     * @zh 列出所有的 Thread。
+     * @en Lists all Threads.
+     */
     async listThreads<T>() {
         return this.threads.search<T>({
             sortOrder: "desc",
         });
     }
-    /** 从历史中恢复数据 */
+    /**
+     * @zh 从历史中恢复 Thread 数据。
+     * @en Resets the Thread data from history.
+     */
     async resetThread(agent: string, threadId: string) {
         await this.initAssistant(agent);
         this.currentThread = await this.threads.get(threadId);
@@ -155,7 +178,10 @@ export class LangGraphClient extends Client {
         return message;
     }
 
-    /** 用于 UI 中的流式渲染中的消息 */
+    /**
+     * @zh 用于 UI 中的流式渲染中的消息。
+     * @en Messages used for streaming rendering in the UI.
+     */
     get renderMessage() {
         const previousMessage = new Map<string, Message>();
         const result: Message[] = [];
@@ -214,7 +240,11 @@ export class LangGraphClient extends Client {
 
         return this.attachInfoForMessage(this.composeToolMessages(result as RenderMessage[]));
     }
-    attachInfoForMessage(result: RenderMessage[]) {
+    /**
+     * @zh 为消息附加额外的信息，如耗时、唯一 ID 等。
+     * @en Attaches additional information to messages, such as spend time, unique ID, etc.
+     */
+    private attachInfoForMessage(result: RenderMessage[]) {
         let lastMessage: RenderMessage | null = null;
         for (const message of result) {
             const createTime = message.response_metadata?.create_time || "";
@@ -241,7 +271,11 @@ export class LangGraphClient extends Client {
         }
         return result;
     }
-    composeToolMessages(messages: RenderMessage[]): RenderMessage[] {
+    /**
+     * @zh 组合工具消息，将 AI 的工具调用和工具的执行结果关联起来。
+     * @en Composes tool messages, associating AI tool calls with tool execution results.
+     */
+    private composeToolMessages(messages: RenderMessage[]): RenderMessage[] {
         const result: RenderMessage[] = [];
         const assistantToolMessages = new Map<string, { args: string }>();
         const toolParentMessage = new Map<string, RenderMessage>();
@@ -275,6 +309,10 @@ export class LangGraphClient extends Client {
         }
         return result;
     }
+    /**
+     * @zh 获取 Token 计数器信息。
+     * @en Gets the Token counter information.
+     */
     get tokenCounter() {
         return this.graphMessages.reduce(
             (acc, message) => {
@@ -302,6 +340,10 @@ export class LangGraphClient extends Client {
             }
         );
     }
+    /**
+     * @zh 注册流式更新的回调函数。
+     * @en Registers a callback function for streaming updates.
+     */
     onStreamingUpdate(callback: StreamingUpdateCallback) {
         this.streamingCallbacks.add(callback);
         return () => {
@@ -314,11 +356,19 @@ export class LangGraphClient extends Client {
     }
     graphState: any = {};
     currentRun?: { run_id: string };
+    /**
+     * @zh 取消当前的 Run。
+     * @en Cancels the current Run.
+     */
     cancelRun() {
         if (this.currentThread?.thread_id && this.currentRun?.run_id) {
             this.runs.cancel(this.currentThread!.thread_id, this.currentRun.run_id);
         }
     }
+    /**
+     * @zh 发送消息到 LangGraph 后端。
+     * @en Sends a message to the LangGraph backend.
+     */
     async sendMessage(input: string | Message[], { extraParams, _debug, command }: SendMessageOptions = {}) {
         if (!this.currentAssistant) {
             throw new Error("Thread or Assistant not initialized");
@@ -428,7 +478,10 @@ export class LangGraphClient extends Client {
         const result = await this.tools.callTool(message.name!, args, { client: that, message });
         return this.resume(result);
     }
-    /** 恢复消息，当中断流时使用 */
+    /**
+     * @zh 继续被前端工具中断的流程。
+     * @en Resumes a process interrupted by a frontend tool.
+     */
     resume(result: CallToolResult) {
         return this.sendMessage([], {
             command: {
@@ -436,7 +489,10 @@ export class LangGraphClient extends Client {
             },
         });
     }
-    /** 完成工具等待 */
+    /**
+     * @zh 标记前端工具等待已完成。
+     * @en Marks the frontend tool waiting as completed.
+     */
     doneFEToolWaiting(id: string, result: CallToolResult) {
         const done = this.tools.doneWaiting(id, result);
         if (!done && this.currentThread?.status === "interrupted") {
@@ -444,14 +500,26 @@ export class LangGraphClient extends Client {
         }
     }
 
+    /**
+     * @zh 获取当前的 Thread。
+     * @en Gets the current Thread.
+     */
     getCurrentThread() {
         return this.currentThread;
     }
 
+    /**
+     * @zh 获取当前的 Assistant。
+     * @en Gets the current Assistant.
+     */
     getCurrentAssistant() {
         return this.currentAssistant;
     }
 
+    /**
+     * @zh 重置客户端状态。
+     * @en Resets the client state.
+     */
     async reset() {
         await this.initAssistant(this.currentAssistant?.name!);
         this.currentThread = null;

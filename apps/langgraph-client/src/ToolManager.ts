@@ -2,12 +2,16 @@ import { ToolMessage } from "@langchain/langgraph-sdk";
 import { LangGraphClient } from "./LangGraphClient";
 import { CallToolResult, createJSONDefineTool, UnionTool } from "./tool/createTool";
 
+/**
+ * @zh ToolManager 类用于管理和执行工具。
+ * @en The ToolManager class is used to manage and execute tools.
+ */
 export class ToolManager {
     private tools: Map<string, UnionTool<any>> = new Map();
 
     /**
-     * 注册一个工具
-     * @param tool 要注册的工具
+     * @zh 注册一个工具。
+     * @en Registers a tool.
      */
     bindTool(tool: UnionTool<any>) {
         if (this.tools.has(tool.name)) {
@@ -17,45 +21,49 @@ export class ToolManager {
     }
 
     /**
-     * 注册多个工具
-     * @param tools 要注册的工具数组
+     * @zh 注册多个工具。
+     * @en Registers multiple tools.
      */
     bindTools(tools: UnionTool<any>[]) {
         tools.forEach((tool) => this.bindTool(tool));
     }
 
     /**
-     * 获取所有已注册的工具
-     * @returns 工具数组
+     * @zh 获取所有已注册的工具。
+     * @en Gets all registered tools.
      */
     getAllTools(): UnionTool<any>[] {
         return Array.from(this.tools.values());
     }
 
     /**
-     * 获取指定名称的工具
-     * @param name 工具名称
-     * @returns 工具实例或 undefined
+     * @zh 获取指定名称的工具。
+     * @en Gets the tool with the specified name.
      */
     getTool(name: string): UnionTool<any> | undefined {
         return this.tools.get(name);
     }
 
     /**
-     * 移除指定名称的工具
-     * @param name 工具名称
-     * @returns 是否成功移除
+     * @zh 移除指定名称的工具。
+     * @en Removes the tool with the specified name.
      */
     removeTool(name: string): boolean {
         return this.tools.delete(name);
     }
 
     /**
-     * 清空所有工具
+     * @zh 清空所有工具。
+     * @en Clears all tools.
      */
     clearTools() {
         this.tools.clear();
     }
+
+    /**
+     * @zh 调用指定名称的工具。
+     * @en Calls the tool with the specified name.
+     */
     async callTool(name: string, args: any, context: { client: LangGraphClient; message: ToolMessage }) {
         const tool = this.getTool(name);
         if (!tool) {
@@ -63,12 +71,22 @@ export class ToolManager {
         }
         return await tool.execute(args, context);
     }
+
+    /**
+     * @zh 将所有工具转换为 JSON 定义格式。
+     * @en Converts all tools to JSON definition format.
+     */
     toJSON() {
         return Array.from(this.tools.values()).map((i) => createJSONDefineTool(i));
     }
 
     // === 专门为前端设计的异步触发结构
     private waitingMap: Map<string, (value: CallToolResult) => void> = new Map();
+
+    /**
+     * @zh 标记指定 ID 的工具等待已完成，并传递结果。
+     * @en Marks the tool waiting with the specified ID as completed and passes the result.
+     */
     doneWaiting(id: string, value: CallToolResult) {
         if (this.waitingMap.has(id)) {
             this.waitingMap.get(id)!(value);
@@ -79,6 +97,11 @@ export class ToolManager {
             return false;
         }
     }
+
+    /**
+     * @zh 等待指定 ID 的工具完成。
+     * @en Waits for the tool with the specified ID to complete.
+     */
     waitForDone(id: string) {
         if (this.waitingMap.has(id)) {
             return this.waitingMap.get(id);
@@ -88,10 +111,10 @@ export class ToolManager {
         });
         return promise;
     }
-    /** 等待用户输入
-     * @example
-     * // 继续 chat 流
-     * client.tools.doneWaiting(message.id!, (e.target as any).value);
+
+    /**
+     * @zh 一个静态方法，用于在前端等待用户界面操作完成。
+     * @en A static method used in the frontend to wait for user interface operations to complete.
      */
     static waitForUIDone<T>(_: T, context: { client: LangGraphClient; message: ToolMessage }) {
         // console.log(context.message);
