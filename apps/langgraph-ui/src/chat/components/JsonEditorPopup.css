@@ -1,0 +1,81 @@
+.json-editor-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.json-editor-popup-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.json-editor-popup-content h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.json-editor-popup-content textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9rem;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.json-editor-popup-content .error-message {
+  color: red;
+  font-size: 0.8rem;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+  gap: 10px;
+}
+
+.popup-actions button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.popup-actions .save-button {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.popup-actions .save-button:hover {
+  background-color: #2563eb;
+}
+
+.popup-actions .cancel-button {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.popup-actions .cancel-button:hover {
+  background-color: #d1d5db;
+} 

@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./chat.css";
 import MessageHuman from "./components/MessageHuman";
 import MessageAI from "./components/MessageAI";
 import MessageTool from "./components/MessageTool";
 import HistoryList from "./components/HistoryList";
 import { ChatProvider, useChat } from "./context/ChatContext";
+import { ExtraParamsProvider, useExtraParams } from "./context/ExtraParamsContext";
 import { UsageMetadata } from "./components/UsageMetadata";
 import { formatTime, formatTokens, getMessageContent, Message } from "@langgraph-js/sdk";
 import FileList from "./components/FileList";
+import JsonEditorPopup from "./components/JsonEditorPopup";
 
 const ChatMessages: React.FC = () => {
     const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse } = useChat();
@@ -39,7 +41,7 @@ const ChatMessages: React.FC = () => {
 
 const ChatInput: React.FC = () => {
     const { userInput, setUserInput, loading, sendMessage, stopGeneration, currentAgent, setCurrentAgent, client } = useChat();
-    const [extraParams, setExtraParams] = useState({});
+    const { extraParams } = useExtraParams();
     const [imageUrls, setImageUrls] = useState<string[]>([]);
 
     const handleFileUploaded = (url: string) => {
@@ -85,7 +87,11 @@ const ChatInput: React.FC = () => {
                 <UsageMetadata usage_metadata={client?.tokenCounter || {}} />
                 <select value={currentAgent} onChange={(e) => setCurrentAgent(e.target.value)}>
                     {client?.availableAssistants.map((i) => {
-                        return <option value={i.graph_id}>{i.name}</option>;
+                        return (
+                            <option value={i.graph_id} key={i.graph_id}>
+                                {i.name}
+                            </option>
+                        );
                     })}
                 </select>
             </div>
@@ -112,13 +118,18 @@ const ChatInput: React.FC = () => {
 };
 
 const Chat: React.FC = () => {
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
     const { showHistory, toggleHistoryVisible } = useChat();
+    const { extraParams, setExtraParams } = useExtraParams();
 
     return (
         <div className="chat-container">
             {showHistory && <HistoryList onClose={() => toggleHistoryVisible()} formatTime={formatTime} />}
             <div className="chat-main">
                 <div className="chat-header">
+                    <button onClick={() => setIsPopupOpen(true)} className="edit-params-button">
+                        编辑参数
+                    </button>
                     <button className="history-button" onClick={() => toggleHistoryVisible()}>
                         历史记录
                     </button>
@@ -134,6 +145,7 @@ const Chat: React.FC = () => {
                 </div>
                 <ChatMessages />
                 <ChatInput />
+                <JsonEditorPopup isOpen={isPopupOpen} initialJson={extraParams} onClose={() => setIsPopupOpen(false)} onSave={setExtraParams} />
             </div>
         </div>
     );
@@ -142,7 +154,9 @@ const Chat: React.FC = () => {
 const ChatWrapper: React.FC = () => {
     return (
         <ChatProvider>
-            <Chat />
+            <ExtraParamsProvider>
+                <Chat />
+            </ExtraParamsProvider>
         </ChatProvider>
     );
 };

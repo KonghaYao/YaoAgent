@@ -260,13 +260,14 @@
 
 .chat-input {
     border-top: 1px solid #e5e7eb;
-    padding: 0 1rem 1rem 1rem;
+    padding: 0.5rem 1rem 1rem 1rem;
     background-color: #ffffff;
 }
 .chat-input-header {
     display: flex;
     align-items: center;
-    padding: 0.5rem 0;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
 }
 .input-container {
     display: flex;
@@ -383,5 +384,20 @@
 
 .markdown-body p {
     text-align: left;
+}
+
+.edit-params-button {
+    padding: 6px 12px;
+    background-color: #f0f0f0;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: #333;
+    white-space: nowrap;
+}
+
+.edit-params-button:hover {
+    background-color: #e0e0e0;
 }
 
