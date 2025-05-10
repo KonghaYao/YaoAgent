@@ -80,14 +80,14 @@ const ChatInput: React.FC = () => {
 
     return (
         <div className="chat-input">
-            <FileList onFileUploaded={handleFileUploaded} />
             <div className="chat-input-header">
+                <FileList onFileUploaded={handleFileUploaded} />
+                <UsageMetadata usage_metadata={client?.tokenCounter || {}} />
                 <select value={currentAgent} onChange={(e) => setCurrentAgent(e.target.value)}>
                     {client?.availableAssistants.map((i) => {
                         return <option value={i.graph_id}>{i.name}</option>;
                     })}
                 </select>
-                <UsageMetadata usage_metadata={client?.tokenCounter || {}} />
             </div>
             <div className="input-container">
                 <textarea

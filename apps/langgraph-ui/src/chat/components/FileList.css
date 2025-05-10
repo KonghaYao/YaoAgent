@@ -1,8 +1,8 @@
 .file-list {
-    padding: 0.5rem;
-    background-color: #f9fafb;
+    display: flex;
+    gap: 0.5rem;
     border-radius: 8px;
-    margin-bottom: 1rem;
+    flex:1;
 }
 
 .file-list-header {
@@ -15,16 +15,26 @@
     justify-content: center;
     width: 80px;
     height: 80px;
-    background-color: #3b82f6;
-    color: white;
+    color: #929292;
+    background-color: #ebebeb;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 2rem;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
 }
 
-.file-upload-button:hover {
-    background-color: #2563eb;
+.file-upload-button svg {
+    width: 32px;
+    height: 32px;
+}
+
+.file-upload-button.empty {
+    width: 32px;
+    height: 32px;
+}
+
+.file-upload-button.empty svg {
+    width: 20px;
+    height: 20px;
 }
 
 .file-list-content {
@@ -38,6 +48,10 @@
     width: 80px;
     height: 80px;
     border-radius: 6px;
+    overflow: hidden;
+}
+.file-item img{
+    border: 1px solid #e5e7eb;
     overflow: hidden;
 }
 
@@ -78,8 +92,7 @@
 }
 
 .upload-button {
-    background-color: #3b82f6;
-    color: white;
+    color: black;
 }
 
 .upload-button:hover {
