@@ -58,7 +58,7 @@ export const createChatStore = (
         await newClient.initAssistant(currentAgent.get());
         // 不再需要创建，sendMessage 会自动创建
         // await newClient.createThread();
-
+        inChatError.set(null);
         newClient.onStreamingUpdate((event) => {
             if (event.type === "thread" || event.type === "done") {
                 // console.log(event.data);
@@ -73,7 +73,6 @@ export const createChatStore = (
             renderMessages.set(newClient.renderMessage);
         });
         context.onInit?.(newClient);
-        // newClient.tools.bindTools([fileTool, askUserTool]);
         newClient.graphState = {};
         client.set(newClient);
     };
@@ -104,7 +103,7 @@ export const createChatStore = (
     };
     const historyList = atom<Thread<{ messages: Message[] }>[]>([]);
     const refreshHistoryList = async () => {
-        if (!client.get()) return;
+        if (!client.get() || !showHistory.get()) return;
         try {
             const response = await client.get()?.listThreads<{ messages: Message[] }>();
             historyList.set(response || []);
