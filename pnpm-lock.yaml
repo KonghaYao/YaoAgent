@@ -70,11 +70,8 @@ importers:
         specifier: ^0.1.36
         version: 0.1.36(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0))(@langchain/langgraph@0.2.71(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.3)))(@types/pg@8.11.14)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(typescript@5.8.3)
       '@langgraph-js/bundler':
-        specifier: ^1.0.1
-        version: 1.0.1(@langgraph-js/api@0.1.36(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0))(@langchain/langgraph@0.2.71(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.3)))(@types/pg@8.11.14)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(typescript@5.8.3))(@types/node@20.17.31)(lightningcss@1.29.2)(rollup@4.40.1)
-      dotenv:
-        specifier: ^16.5.0
-        version: 16.5.0
+        specifier: ^1.1.1
+        version: 1.1.1(@langgraph-js/api@0.1.36(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0))(@langchain/langgraph@0.2.71(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.3)))(@types/pg@8.11.14)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(typescript@5.8.3))(@types/node@20.17.31)(lightningcss@1.29.2)(rollup@4.40.1)
       eventsource:
         specifier: ^3.0.6
         version: 3.0.6
@@ -1558,8 +1555,8 @@ packages:
       '@langchain/langgraph-sdk':
         optional: true
 
-  '@langgraph-js/bundler@1.0.1':
-    resolution: {integrity: sha512-nvbwrwgPckpKNPPgu+matZgoEibDunEHjn+VrU/qD/Ic/Bq3vXl5q8aQAMka3GisnHyhjOEOvgYUm1B39tcsVw==}
+  '@langgraph-js/bundler@1.1.1':
+    resolution: {integrity: sha512-VQXQYLF2mg1aOKLCtixA9fSEB79DuS11uN5W6urJ8WpRR9k+LyAMXQ/8/YolFRAkdQUBiVJ716DSr/I51zhSJA==}
     engines: {node: '>=18.0.0'}
     hasBin: true
     peerDependencies:
@@ -3121,8 +3118,8 @@ packages:
   hast-util-whitespace@3.0.0:
     resolution: {integrity: sha512-88JUN06ipLwsnv+dVn+OIYOvAuvBMy/Qoi6O7mQHxdPXpjy+Cd6xRkWwux7DKO+4sYILtLBRIKgsdpS2gQc7qw==}
 
-  hono@4.7.7:
-    resolution: {integrity: sha512-2PCpQRbN87Crty8/L/7akZN3UyZIAopSoRxCwRbJgUuV1+MHNFHzYFxZTg4v/03cXUm+jce/qa2VSBZpKBm3Qw==}
+  hono@4.7.9:
+    resolution: {integrity: sha512-/EsCoR5h7N4yu01TDu9GMCCJa6ZLk5ZJIWFFGNawAXmd1Tp53+Wir4xm0D2X19bbykWUlzQG0+BvPAji6p9E8Q==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -5997,13 +5994,13 @@ snapshots:
   '@esbuild/win32-x64@0.25.3':
     optional: true
 
-  '@hono/node-server@1.14.1(hono@4.7.7)':
+  '@hono/node-server@1.14.1(hono@4.7.9)':
     dependencies:
-      hono: 4.7.7
+      hono: 4.7.9
 
-  '@hono/zod-validator@0.2.2(hono@4.7.7)(zod@3.24.3)':
+  '@hono/zod-validator@0.2.2(hono@4.7.9)(zod@3.24.3)':
     dependencies:
-      hono: 4.7.7
+      hono: 4.7.9
       zod: 3.24.3
 
   '@ibm-cloud/watsonx-ai@1.6.4(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))':
@@ -6295,8 +6292,8 @@ snapshots:
   '@langgraph-js/api@0.1.36(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0))(@langchain/langgraph@0.2.71(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.3)))(@types/pg@8.11.14)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(typescript@5.8.3)':
     dependencies:
       '@babel/code-frame': 7.27.1
-      '@hono/node-server': 1.14.1(hono@4.7.7)
-      '@hono/zod-validator': 0.2.2(hono@4.7.7)(zod@3.24.3)
+      '@hono/node-server': 1.14.1(hono@4.7.9)
+      '@hono/zod-validator': 0.2.2(hono@4.7.9)(zod@3.24.3)
       '@langchain/core': 0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))
       '@langchain/langgraph': 0.2.71(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.3))
       '@langchain/langgraph-checkpoint': 0.0.17(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))
@@ -6308,7 +6305,7 @@ snapshots:
       dedent: 1.5.3
       dotenv: 16.5.0
       exit-hook: 4.0.0
-      hono: 4.7.7
+      hono: 4.7.9
       langsmith: 0.2.15(openai@4.96.2(ws@8.18.1)(zod@3.24.3))
       open: 10.1.1
       pg: 8.15.6
@@ -6329,7 +6326,7 @@ snapshots:
       - pg-native
       - supports-color
 
-  '@langgraph-js/bundler@1.0.1(@langgraph-js/api@0.1.36(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0))(@langchain/langgraph@0.2.71(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.3)))(@types/pg@8.11.14)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(typescript@5.8.3))(@types/node@20.17.31)(lightningcss@1.29.2)(rollup@4.40.1)':
+  '@langgraph-js/bundler@1.1.1(@langgraph-js/api@0.1.36(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0))(@langchain/langgraph@0.2.71(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.3)))(@types/pg@8.11.14)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(typescript@5.8.3))(@types/node@20.17.31)(lightningcss@1.29.2)(rollup@4.40.1)':
     dependencies:
       '@langgraph-js/api': 0.1.36(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0))(@langchain/langgraph@0.2.71(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.3)))(@types/pg@8.11.14)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(typescript@5.8.3)
       rollup-plugin-node-externals: 8.0.0(rollup@4.40.1)
@@ -8210,7 +8207,7 @@ snapshots:
     dependencies:
       '@types/hast': 3.0.4
 
-  hono@4.7.7: {}
+  hono@4.7.9: {}
 
   hookable@5.5.3: {}
 

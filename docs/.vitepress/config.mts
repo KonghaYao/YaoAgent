@@ -8,12 +8,34 @@ export default defineConfig({
         // https://vitepress.dev/reference/default-theme-config
         nav: [
             { text: "🏠 首页", link: "/" },
+            { text: "📦 LangGraph Server", link: "/langgraph-js/api/index" },
             { text: "📦 @langgraph-js/sdk", link: "/langgraph-js/sdk/index" },
         ],
 
         sidebar: [
             {
-                text: "🛒 Langgraph UI Store",
+                text: "🏢 LangGraph Server",
+                items: [
+                    { text: "🌐 概述", link: "/langgraph-js/api/index" },
+                    { text: "💽 PostgreSQL 配置", link: "/langgraph-js/api/postgres-setup" },
+                    { text: "📦 @langgraph-js/sdk", link: "/langgraph-js/sdk/index" },
+                    { text: "📟 @langgraph-js/api", link: "/langgraph-js/api/api" },
+                    { text: "🔨 @langgraph-js/bundler", link: "/langgraph-js/api/bundler" },
+                    { text: "🖥️ @langgraph-js/ui", link: "/langgraph-js/api/ui" },
+                ],
+            },
+            {
+                text: "🚀 部署指南",
+                items: [
+                    { text: "📋 基本部署说明", link: "/langgraph-js/api/deployment/index" },
+
+                    { text: "📦 Node.js 部署", link: "/langgraph-js/api/deployment/node" },
+                    { text: "🦕 Deno 部署", link: "/langgraph-js/api/deployment/deno" },
+                    { text: "⚡ Bun 部署", link: "/langgraph-js/api/deployment/bun" },
+                ],
+            },
+            {
+                text: "🛒 @langgraph-js/sdk",
                 items: [
                     { text: "🚀 快速开始", link: "/langgraph-js/sdk/index" },
                     { text: "⚙️ 速查表", link: "/langgraph-js/sdk/quickstart" },
