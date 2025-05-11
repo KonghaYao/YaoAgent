@@ -4,7 +4,7 @@ import { StructuredToolInterface } from "@langchain/core/tools";
 import { Annotation, AnnotationRoot } from "@langchain/langgraph";
 import { createReactAgent, createReactAgentAnnotation } from "@langchain/langgraph/prebuilt";
 import { createHandoffTool, createSwarm, SwarmState } from "@langchain/langgraph-swarm";
-import { createDefaultAnnotation } from "src/utils/index.js";
+import { createDefaultAnnotation } from "../utils/index.js";
 
 export const ExpertState = Annotation.Root({
     ...createReactAgentAnnotation().spec,

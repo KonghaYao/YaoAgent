@@ -4,13 +4,13 @@ import { createMCPNode } from "./tools/mcp.js";
 import { initializeTools } from "./tools/index.js";
 import { GraphState, ConfigurationState } from "./state.js";
 import { createLLM } from "../model/index.js";
-import { AIMessage, BaseMessage, SystemMessage } from "@langchain/core/messages";
+import { SystemMessage } from "@langchain/core/messages";
 import { MemoryPrompt } from "./tools/memory.js";
-import { createExpert } from "src/create-expert/index.js";
+import { createExpert } from "../create-expert/index.js";
 import { SequentialThinkingTool } from "./tools/sequential-thinking.js";
-import { MemoryNode } from "src/create-expert/short-term-memory.js";
-import { getPrompt } from "src/model/prompt-getter.js";
-import { createFeTools } from "src/model/fe_tools.js";
+import { MemoryNode } from "../create-expert/short-term-memory.js";
+import { getPrompt } from "../model/prompt-getter.js";
+import { createFeTools } from "../model/fe_tools.js";
 const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<ConfigurationState>>(
     {
         // npm: {
@@ -25,10 +25,10 @@ const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<Configuration
     },
     async (state, config, mcpTools) => {
         const feTools = createFeTools(state.fe_tools);
-        const stylePrompt = await getPrompt("./src/prompt/style.md");
-        const plannerPrompt = await getPrompt("./src/prompt/planner.md");
-        const executorPrompt = await getPrompt("./src/prompt/executor.md");
-        const summaryPrompt = await getPrompt("./src/prompt/summary.md");
+        const stylePrompt = await getPrompt("style.md");
+        const plannerPrompt = await getPrompt("planner.md");
+        const executorPrompt = await getPrompt("executor.md");
+        const summaryPrompt = await getPrompt("summary.md");
         const normalTools = initializeTools(state, config);
 
         const tools = [...normalTools, ...mcpTools, ...feTools];

@@ -13,7 +13,6 @@ export const PREFIX =
 
 export const getPrompt = async (relativePath: string, addPrefix = true) => {
     // 使用 process.cwd() 获取当前工作目录
-    const fullPath = path.resolve(process.cwd(), relativePath);
+    const fullPath = path.resolve(process.cwd() + process.env.PROMPT_PATH, relativePath);
     return (addPrefix ? PREFIX : "") + (await fs.readFile(fullPath, "utf-8"));
 };
-

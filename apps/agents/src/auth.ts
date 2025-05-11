@@ -19,7 +19,7 @@ export const auth = new Auth()
             throw new HTTPException(401, { message: "Invalid token", cause: error });
         }
     })
-    .on("*", ({ value, user, event, resource }) => {
+    .on("*", ({ value, user, event }) => {
         // Add owner to the resource metadata
         if ("metadata" in value) {
             value.metadata ??= {};
@@ -35,7 +35,7 @@ export const auth = new Auth()
     .on("store", ({ user, value }) => {
         if (value.namespace != null) {
             // Assuming you organize information in store like (user_id, resource_type, resource_id)
-            const [userId, resourceType, resourceId] = value.namespace;
+            const [userId] = value.namespace;
             if (userId !== user.identity) {
                 throw new HTTPException(403, { message: "Not authorized" });
             }

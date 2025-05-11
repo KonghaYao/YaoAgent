@@ -3,7 +3,7 @@ import { tool } from "@langchain/core/tools";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
 import { randomUUID } from "crypto";
 import OpenAI from "openai";
-import { GraphState } from "src/super-agent/state.js";
+import { GraphState } from "../super-agent/state.js";
 import { z } from "zod";
 
 /** 创建一个图像信息抽取工具, 可以识别图片中更加丰富的内容 */

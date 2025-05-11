@@ -1,8 +1,8 @@
 import { AIMessage, HumanMessage, RemoveMessage, SystemMessage, trimMessages } from "@langchain/core/messages";
 import { Annotation } from "@langchain/langgraph";
-import { createLLM } from "src/model/llm.js";
-import { ModelState } from "src/model/states.js";
-import { createDefaultAnnotation } from "src/utils/index.js";
+import { createLLM } from "../model/llm.js";
+import { ModelState } from "../model/states.js";
+import { createDefaultAnnotation } from "../utils/index.js";
 
 export const MemoryState = Annotation.Root({
     ...ModelState.spec,

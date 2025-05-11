@@ -1,5 +1,5 @@
 import { Annotation, BinaryOperatorAggregate } from "@langchain/langgraph";
-import { createDefaultAnnotation } from "src/utils/index.js";
+import { createDefaultAnnotation } from "../utils/index.js";
 import { createReactAgentAnnotation } from "@langchain/langgraph/prebuilt";
 /** 大模型允许值的定义，可以传入，第一个为默认值 */
 export const ModelAllow = {
