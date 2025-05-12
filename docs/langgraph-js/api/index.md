@@ -61,13 +61,13 @@ LangGraph 生态系统由以下几个核心组件组成：
 要开始使用 LangGraph Server，请参考各个组件的详细文档：
 
 - [@langgraph-js/sdk 文档](../sdk/index.md)
-- [@langgraph-js/api 文档](langgraph-api.md)
+- [@langgraph-js/api 文档](api.md)
 - [@langgraph-js/bundler 文档](bundler.md)
 - [@langgraph-js/ui 文档](ui.md)
-- [多平台部署指南](deployment.md)
-  - [Node.js 部署](node-deployment.md)
-  - [Deno 部署](deno-deployment.md)
-  - [Bun 部署](bun-deployment.md)
+- [多平台部署指南](deployment/index.md)
+  - [Node.js 部署](deployment/node.md)
+  - [Deno 部署](deployment/deno.md)
+  - [Bun 部署](deployment/bun.md)
 
 ## 社区和贡献
 
