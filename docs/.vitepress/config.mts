@@ -18,6 +18,7 @@ export default defineConfig({
                 items: [
                     { text: "🌐 概述", link: "/langgraph-js/api/index" },
                     { text: "💽 PostgreSQL 配置", link: "/langgraph-js/api/postgres-setup" },
+                    { text: "🔍 监控系统", link: "/langgraph-js/api/monitoring" },
                     { text: "📦 @langgraph-js/sdk", link: "/langgraph-js/sdk/index" },
                     { text: "📟 @langgraph-js/api", link: "/langgraph-js/api/api" },
                     { text: "🔨 @langgraph-js/bundler", link: "/langgraph-js/api/bundler" },
