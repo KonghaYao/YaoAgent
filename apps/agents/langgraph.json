@@ -4,6 +4,9 @@
     "graphs": {
         "agent": "./src/super-agent/graph.ts:graph"
     },
+    "callbacks": {
+        "path": "./src/monitor/index.ts"
+    },
     "env": ".env",
     "auth": {
         "path": "./src/auth.ts:auth"

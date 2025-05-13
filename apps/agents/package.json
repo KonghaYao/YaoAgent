@@ -5,7 +5,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "bun ./src/dev.ts",
+        "dev": "bun --watch run ./scripts/bun.dev.ts",
         "dev:node": "node --env-file=.env ./scripts/node.mjs",
         "build": "langgraph-bundler",
         "clean": "rm -rf ./dist .turbo || true",
@@ -23,16 +23,17 @@
         "@langchain/langgraph-swarm": "^0.0.3",
         "@langchain/mcp-adapters": "^0.4.2",
         "@langchain/openai": "^0.5.8",
-        "@langgraph-js/api": "^0.1.37",
+        "@langgraph-js/api": "^0.2.39",
         "eventsource": "^3.0.6",
         "langchain": "^0.3.24",
+        "langfuse-langchain": "^3.37.2",
         "openai": "^4.96.2",
         "uuid": "^11.1.0",
         "zod": "^3.24.3"
     },
     "devDependencies": {
-        "@langgraph-js/bundler": "^1.1.1",
         "@jest/globals": "^29.7.0",
+        "@langgraph-js/bundler": "^1.1.1",
         "@types/node": "^20.17.31",
         "@types/uuid": "^10.0.0",
         "globals": "^16.0.0",

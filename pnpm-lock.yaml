@@ -67,14 +67,17 @@ importers:
         specifier: ^0.5.8
         version: 0.5.8(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(ws@8.18.1)
       '@langgraph-js/api':
-        specifier: ^0.1.37
-        version: 0.1.37(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0))(@langchain/langgraph@0.2.71(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.3)))(@types/pg@8.11.14)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(typescript@5.8.3)
+        specifier: ^0.2.39
+        version: 0.2.39(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0))(@langchain/langgraph@0.2.71(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.3)))(@types/pg@8.11.14)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(typescript@5.8.3)
       eventsource:
         specifier: ^3.0.6
         version: 3.0.6
       langchain:
         specifier: ^0.3.24
         version: 0.3.24(@langchain/anthropic@0.3.19(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/cohere@0.3.3(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(axios@1.9.0)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(ws@8.18.1)
+      langfuse-langchain:
+        specifier: ^3.37.2
+        version: 3.37.2(langchain@0.3.24(@langchain/anthropic@0.3.19(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/cohere@0.3.3(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(axios@1.9.0)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(ws@8.18.1))
       openai:
         specifier: ^4.96.2
         version: 4.96.2(ws@8.18.1)(zod@3.24.3)
@@ -90,7 +93,7 @@ importers:
         version: 29.7.0
       '@langgraph-js/bundler':
         specifier: ^1.1.1
-        version: 1.1.1(@langgraph-js/api@0.1.37(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0))(@langchain/langgraph@0.2.71(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.3)))(@types/pg@8.11.14)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(typescript@5.8.3))(@types/node@20.17.31)(lightningcss@1.29.2)(rollup@4.40.1)
+        version: 1.1.1(@langgraph-js/api@0.2.39(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0))(@langchain/langgraph@0.2.71(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.3)))(@types/pg@8.11.14)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(typescript@5.8.3))(@types/node@20.17.31)(lightningcss@1.29.2)(rollup@4.40.1)
       '@types/node':
         specifier: ^20.17.31
         version: 20.17.31
@@ -1541,8 +1544,8 @@ packages:
     peerDependencies:
       '@langchain/core': ^0.3.42
 
-  '@langgraph-js/api@0.1.37':
-    resolution: {integrity: sha512-0kFAd3Mg3NGtzNCYUJ4DaK6WRuMpcbfMlFK6mnvqnuwm6ulczDagwlnTB55wmw5PKJnORg2+zJdgGmKOrKJSww==}
+  '@langgraph-js/api@0.2.39':
+    resolution: {integrity: sha512-N6VqF+bisw6O2leAruTlEBjqqCuonP9vRITguq2D7MH8jA9mQcaqBQpy/oTjxsYIlO0VoCmtqwpnVcMpsbw+5Q==}
     engines: {node: ^18.19.0 || >=20.0.0}
     peerDependencies:
       '@langchain/core': ^0.3.42
@@ -1626,67 +1629,56 @@ packages:
     resolution: {integrity: sha512-ehSKrewwsESPt1TgSE/na9nIhWCosfGSFqv7vwEtjyAqZcvbGIg4JAcV7ZEh2tfj/IlfBeZjgOXm35iOOjadcg==}
     cpu: [arm]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-arm-musleabihf@4.40.1':
     resolution: {integrity: sha512-m39iO/aaurh5FVIu/F4/Zsl8xppd76S4qoID8E+dSRQvTyZTOI2gVk3T4oqzfq1PtcvOfAVlwLMK3KRQMaR8lg==}
     cpu: [arm]
     os: [linux]
-    libc: [musl]
 
   '@rollup/rollup-linux-arm64-gnu@4.40.1':
     resolution: {integrity: sha512-Y+GHnGaku4aVLSgrT0uWe2o2Rq8te9hi+MwqGF9r9ORgXhmHK5Q71N757u0F8yU1OIwUIFy6YiJtKjtyktk5hg==}
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-arm64-musl@4.40.1':
     resolution: {integrity: sha512-jEwjn3jCA+tQGswK3aEWcD09/7M5wGwc6+flhva7dsQNRZZTe30vkalgIzV4tjkopsTS9Jd7Y1Bsj6a4lzz8gQ==}
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@rollup/rollup-linux-loongarch64-gnu@4.40.1':
     resolution: {integrity: sha512-ySyWikVhNzv+BV/IDCsrraOAZ3UaC8SZB67FZlqVwXwnFhPihOso9rPOxzZbjp81suB1O2Topw+6Ug3JNegejQ==}
     cpu: [loong64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-powerpc64le-gnu@4.40.1':
     resolution: {integrity: sha512-BvvA64QxZlh7WZWqDPPdt0GH4bznuL6uOO1pmgPnnv86rpUpc8ZxgZwcEgXvo02GRIZX1hQ0j0pAnhwkhwPqWg==}
     cpu: [ppc64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-riscv64-gnu@4.40.1':
     resolution: {integrity: sha512-EQSP+8+1VuSulm9RKSMKitTav89fKbHymTf25n5+Yr6gAPZxYWpj3DzAsQqoaHAk9YX2lwEyAf9S4W8F4l3VBQ==}
     cpu: [riscv64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-riscv64-musl@4.40.1':
     resolution: {integrity: sha512-n/vQ4xRZXKuIpqukkMXZt9RWdl+2zgGNx7Uda8NtmLJ06NL8jiHxUawbwC+hdSq1rrw/9CghCpEONor+l1e2gA==}
     cpu: [riscv64]
     os: [linux]
-    libc: [musl]
 
   '@rollup/rollup-linux-s390x-gnu@4.40.1':
     resolution: {integrity: sha512-h8d28xzYb98fMQKUz0w2fMc1XuGzLLjdyxVIbhbil4ELfk5/orZlSTpF/xdI9C8K0I8lCkq+1En2RJsawZekkg==}
     cpu: [s390x]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-x64-gnu@4.40.1':
     resolution: {integrity: sha512-XiK5z70PEFEFqcNj3/zRSz/qX4bp4QIraTy9QjwJAb/Z8GM7kVUsD0Uk8maIPeTyPCP03ChdI+VVmJriKYbRHQ==}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@rollup/rollup-linux-x64-musl@4.40.1':
     resolution: {integrity: sha512-2BRORitq5rQ4Da9blVovzNCMaUlyKrzMSvkVR0D4qPuOy/+pMCrh1d7o01RATwVy+6Fa1WBw+da7QPeLWU/1mQ==}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@rollup/rollup-win32-arm64-msvc@4.40.1':
     resolution: {integrity: sha512-b2bcNm9Kbde03H+q+Jjw9tSfhYkzrDUf2d5MAd1bOJuVplXvFhWz7tRtWvD8/ORZi7qSCy0idW6tf2HgxSXQSg==}
@@ -1988,28 +1980,24 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@tailwindcss/oxide-linux-arm64-musl@4.1.4':
     resolution: {integrity: sha512-X3As2xhtgPTY/m5edUtddmZ8rCruvBvtxYLMw9OsZdH01L2gS2icsHRwxdU0dMItNfVmrBezueXZCHxVeeb7Aw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@tailwindcss/oxide-linux-x64-gnu@4.1.4':
     resolution: {integrity: sha512-2VG4DqhGaDSmYIu6C4ua2vSLXnJsb/C9liej7TuSO04NK+JJJgJucDUgmX6sn7Gw3Cs5ZJ9ZLrnI0QRDOjLfNQ==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@tailwindcss/oxide-linux-x64-musl@4.1.4':
     resolution: {integrity: sha512-v+mxVgH2kmur/X5Mdrz9m7TsoVjbdYQT0b4Z+dr+I4RvreCNXyCFELZL/DO0M1RsidZTrm6O1eMnV6zlgEzTMQ==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@tailwindcss/oxide-wasm32-wasi@4.1.4':
     resolution: {integrity: sha512-2TLe9ir+9esCf6Wm+lLWTMbgklIjiF0pbmDnwmhR9MksVOq+e8aP3TSsXySnBDDvTTVd/vKu1aNttEGj3P6l8Q==}
@@ -3410,6 +3398,20 @@ packages:
       typeorm:
         optional: true
 
+  langfuse-core@3.37.2:
+    resolution: {integrity: sha512-3iFz1UZzKDi9GEjIRRSSqcKbusmB17uR9qYxMR1BHQYuBkQv2wIV+HI793hWh3tmc6q2pmqPMjtJdoFVBhucDA==}
+    engines: {node: '>=18'}
+
+  langfuse-langchain@3.37.2:
+    resolution: {integrity: sha512-hVxoDitHXzlZ4Hrb6IpSOvd2dZSK1iOlK1KWBZsOAHAr451GGdGYm1WFLpk5T2CIt2yl1iXYAzk/NvUwU6C/uA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      langchain: '>=0.0.157 <0.4.0'
+
+  langfuse@3.37.2:
+    resolution: {integrity: sha512-C4P56hJDNk8vWNJR102JhgyCYXbt3HG19PY0brurlrU4dh5pq91JPt44jyiT5RzUs+NFew//gCkgFEcQd3RogA==}
+    engines: {node: '>=18'}
+
   langsmith@0.2.15:
     resolution: {integrity: sha512-homtJU41iitqIZVuuLW7iarCzD4f39KcfP9RTBWav9jifhrsDa1Ez89Ejr+4qi72iuBu8Y5xykchsGVgiEZ93w==}
     peerDependencies:
@@ -3455,28 +3457,24 @@ packages:
     engines: {node: '>= 12.0.0'}
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   lightningcss-linux-arm64-musl@1.29.2:
     resolution: {integrity: sha512-Q64eM1bPlOOUgxFmoPUefqzY1yV3ctFPE6d/Vt7WzLW4rKTv7MyYNky+FWxRpLkNASTnKQUaiMJ87zNODIrrKQ==}
     engines: {node: '>= 12.0.0'}
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   lightningcss-linux-x64-gnu@1.29.2:
     resolution: {integrity: sha512-0v6idDCPG6epLXtBH/RPkHvYx74CVziHo6TMYga8O2EiQApnUPZsbR9nFNrg2cgBzk1AYqEd95TlrsL7nYABQg==}
     engines: {node: '>= 12.0.0'}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   lightningcss-linux-x64-musl@1.29.2:
     resolution: {integrity: sha512-rMpz2yawkgGT8RULc5S4WiZopVMOFWjiItBT7aSfDX4NQav6M44rhn5hjtkKzB+wMTRlLLqxkeYEtQ3dd9696w==}
     engines: {node: '>= 12.0.0'}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   lightningcss-win32-arm64-msvc@1.29.2:
     resolution: {integrity: sha512-nL7zRW6evGQqYVu/bKGK+zShyz8OVzsCotFgc7judbt6wnB2KbiKKJwBE4SGoDBQ1O94RjW4asrCjQL4i8Fhbw==}
@@ -6289,7 +6287,7 @@ snapshots:
       '@langchain/core': 0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))
       js-tiktoken: 1.0.20
 
-  '@langgraph-js/api@0.1.37(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0))(@langchain/langgraph@0.2.71(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.3)))(@types/pg@8.11.14)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(typescript@5.8.3)':
+  '@langgraph-js/api@0.2.39(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0))(@langchain/langgraph@0.2.71(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.3)))(@types/pg@8.11.14)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(typescript@5.8.3)':
     dependencies:
       '@babel/code-frame': 7.27.1
       '@hono/node-server': 1.14.1(hono@4.7.9)
@@ -6326,9 +6324,9 @@ snapshots:
       - pg-native
       - supports-color
 
-  '@langgraph-js/bundler@1.1.1(@langgraph-js/api@0.1.37(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0))(@langchain/langgraph@0.2.71(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.3)))(@types/pg@8.11.14)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(typescript@5.8.3))(@types/node@20.17.31)(lightningcss@1.29.2)(rollup@4.40.1)':
+  '@langgraph-js/bundler@1.1.1(@langgraph-js/api@0.2.39(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0))(@langchain/langgraph@0.2.71(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.3)))(@types/pg@8.11.14)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(typescript@5.8.3))(@types/node@20.17.31)(lightningcss@1.29.2)(rollup@4.40.1)':
     dependencies:
-      '@langgraph-js/api': 0.1.37(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0))(@langchain/langgraph@0.2.71(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.3)))(@types/pg@8.11.14)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(typescript@5.8.3)
+      '@langgraph-js/api': 0.2.39(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0))(@langchain/langgraph@0.2.71(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.3)))(@types/pg@8.11.14)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(typescript@5.8.3)
       rollup-plugin-node-externals: 8.0.0(rollup@4.40.1)
       vite: 5.4.18(@types/node@20.17.31)(lightningcss@1.29.2)
     transitivePeerDependencies:
@@ -8245,7 +8243,7 @@ snapshots:
       isstream: 0.1.2
       jsonwebtoken: 9.0.2
       mime-types: 2.1.35
-      retry-axios: 2.6.0(axios@1.9.0(debug@4.4.0))
+      retry-axios: 2.6.0(axios@1.9.0)
       tough-cookie: 4.1.4
     transitivePeerDependencies:
       - supports-color
@@ -8508,6 +8506,20 @@ snapshots:
       - encoding
       - openai
       - ws
+
+  langfuse-core@3.37.2:
+    dependencies:
+      mustache: 4.2.0
+
+  langfuse-langchain@3.37.2(langchain@0.3.24(@langchain/anthropic@0.3.19(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/cohere@0.3.3(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(axios@1.9.0)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(ws@8.18.1)):
+    dependencies:
+      langchain: 0.3.24(@langchain/anthropic@0.3.19(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/cohere@0.3.3(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3))))(@langchain/core@0.3.49(openai@4.96.2(ws@8.18.1)(zod@3.24.3)))(axios@1.9.0)(openai@4.96.2(ws@8.18.1)(zod@3.24.3))(ws@8.18.1)
+      langfuse: 3.37.2
+      langfuse-core: 3.37.2
+
+  langfuse@3.37.2:
+    dependencies:
+      langfuse-core: 3.37.2
 
   langsmith@0.2.15(openai@4.96.2(ws@8.18.1)(zod@3.24.3)):
     dependencies:
@@ -9470,7 +9482,7 @@ snapshots:
 
   resolve-pkg-maps@1.0.0: {}
 
-  retry-axios@2.6.0(axios@1.9.0(debug@4.4.0)):
+  retry-axios@2.6.0(axios@1.9.0):
     dependencies:
       axios: 1.9.0(debug@4.4.0)
 
