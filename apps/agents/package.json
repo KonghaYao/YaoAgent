@@ -6,6 +6,7 @@
     "type": "module",
     "scripts": {
         "dev": "bun ./src/dev.ts",
+        "dev:node": "node --env-file=.env ./scripts/node.mjs",
         "build": "langgraph-bundler",
         "clean": "rm -rf ./dist .turbo || true",
         "format": "prettier --config .prettierrc --write \"src\"",

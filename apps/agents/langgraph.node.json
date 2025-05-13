@@ -1,0 +1,11 @@
+{
+    "node_version": "20",
+    "dependencies": ["."],
+    "graphs": {
+        "agent": "./dist/agent.js:graph"
+    },
+    "env": ".env",
+    "auth": {
+        "path": "./dist/auth.js:auth"
+    }
+}
