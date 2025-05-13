@@ -1,38 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./chat.css";
-import MessageHuman from "./components/MessageHuman";
-import MessageAI from "./components/MessageAI";
-import MessageTool from "./components/MessageTool";
+import { MessagesBox } from "./components/MessageBox";
 import HistoryList from "./components/HistoryList";
 import { ChatProvider, useChat } from "./context/ChatContext";
 import { ExtraParamsProvider, useExtraParams } from "./context/ExtraParamsContext";
 import { UsageMetadata } from "./components/UsageMetadata";
-import { formatTime, formatTokens, getMessageContent, Message } from "@langgraph-js/sdk";
+import { formatTime, Message } from "@langgraph-js/sdk";
 import FileList from "./components/FileList";
 import JsonEditorPopup from "./components/JsonEditorPopup";
+import { JsonToMessageButton } from "./components/JsonToMessage";
 
 const ChatMessages: React.FC = () => {
     const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse } = useChat();
 
     return (
         <div className="chat-messages">
-            {renderMessages.map((message) =>
-                message.type === "human" ? (
-                    <MessageHuman content={message.content} key={message.unique_id} />
-                ) : message.type === "tool" ? (
-                    <MessageTool
-                        key={message.unique_id}
-                        message={message}
-                        client={client!}
-                        getMessageContent={getMessageContent}
-                        formatTokens={formatTokens}
-                        isCollapsed={collapsedTools.includes(message.id!)}
-                        onToggleCollapse={() => toggleToolCollapse(message.id!)}
-                    />
-                ) : (
-                    <MessageAI key={message.unique_id} message={message} />
-                )
-            )}
+            <MessagesBox renderMessages={renderMessages} collapsedTools={collapsedTools} toggleToolCollapse={toggleToolCollapse} client={client!} />
             {loading && <div className="loading-indicator">正在思考中...</div>}
             {inChatError && <div className="error-message">{inChatError}</div>}
         </div>
@@ -127,6 +110,7 @@ const Chat: React.FC = () => {
             {showHistory && <HistoryList onClose={() => toggleHistoryVisible()} formatTime={formatTime} />}
             <div className="chat-main">
                 <div className="chat-header">
+                    <JsonToMessageButton></JsonToMessageButton>
                     <button onClick={() => setIsPopupOpen(true)} className="edit-params-button">
                         编辑参数
                     </button>
