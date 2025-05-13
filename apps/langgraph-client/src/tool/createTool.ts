@@ -1,6 +1,6 @@
-import { actionParametersToJsonSchema, convertJsonSchemaToZodRawShape } from "./utils";
+import { actionParametersToJsonSchema, convertJsonSchemaToZodRawShape } from "./utils.js";
 import { z, ZodRawShape, ZodTypeAny } from "zod";
-import { Action, Parameter } from "./copilotkit-actions";
+import { Action, Parameter } from "./copilotkit-actions.js";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { Message } from "@langchain/langgraph-sdk";
 

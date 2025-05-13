@@ -1,2 +1,2 @@
-export * from "./createTool";
-export * from "./copilotkit-actions";
+export * from "./createTool.js";
+export * from "./copilotkit-actions.js";

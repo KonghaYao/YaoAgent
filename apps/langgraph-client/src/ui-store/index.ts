@@ -1,2 +1,2 @@
-export * from "./createChatStore";
-export * from "./UnionStore";
+export * from "./createChatStore.js";
+export * from "./UnionStore.js";

@@ -1,5 +1,5 @@
 import { atom } from "nanostores";
-import { LangGraphClient, LangGraphClientConfig, RenderMessage, SendMessageOptions } from "../LangGraphClient";
+import { LangGraphClient, LangGraphClientConfig, RenderMessage, SendMessageOptions } from "../LangGraphClient.js";
 import { Message, Thread } from "@langchain/langgraph-sdk";
 
 /**
@@ -95,7 +95,7 @@ export const createChatStore = (
             }
             if (event.type === "error") {
                 loading.set(false);
-                inChatError.set(event.data?.message || "发生错误");
+                inChatError.set(event.data);
             }
             // console.log(newClient.renderMessage);
             renderMessages.set(newClient.renderMessage);
@@ -215,6 +215,7 @@ export const createChatStore = (
              */
             createNewChat() {
                 client.get()?.reset();
+                inChatError.set(null);
             },
             /**
              * @zh 切换到指定的历史聊天会话。

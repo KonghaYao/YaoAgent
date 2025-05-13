@@ -1,8 +1,25 @@
 import { Client, Thread, Message, Assistant, HumanMessage, AIMessage, ToolMessage, Command } from "@langchain/langgraph-sdk";
-import { ToolManager } from "./ToolManager";
-import { CallToolResult } from "./tool";
-import { AsyncCallerParams } from "@langchain/langgraph-sdk/dist/utils/async_caller";
-
+import { ToolManager } from "./ToolManager.js";
+import { CallToolResult } from "./tool/createTool.js";
+interface AsyncCallerParams {
+    /**
+     * The maximum number of concurrent calls that can be made.
+     * Defaults to `Infinity`, which means no limit.
+     */
+    maxConcurrency?: number;
+    /**
+     * The maximum number of retries that can be made for a single call,
+     * with an exponential backoff between each attempt. Defaults to 6.
+     */
+    maxRetries?: number;
+    onFailedResponseHook?: any;
+    /**
+     * Specify a custom fetch implementation.
+     *
+     * By default we expect the `fetch` is available in the global scope.
+     */
+    fetch?: typeof fetch | ((...args: any[]) => any);
+}
 export type RenderMessage = Message & {
     /** 工具入参 ，聚合而来*/
     tool_input?: string;

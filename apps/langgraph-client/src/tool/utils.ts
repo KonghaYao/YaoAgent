@@ -5,7 +5,7 @@
  * MIT License
  */
 import { z, ZodRawShape } from "zod";
-import { Parameter } from "./copilotkit-actions";
+import { Parameter } from "./copilotkit-actions.js";
 
 export type JSONSchemaString = {
     type: "string";

@@ -1,6 +1,6 @@
 import { ToolMessage } from "@langchain/langgraph-sdk";
-import { LangGraphClient } from "./LangGraphClient";
-import { CallToolResult, createJSONDefineTool, UnionTool } from "./tool/createTool";
+import { LangGraphClient } from "./LangGraphClient.js";
+import { CallToolResult, createJSONDefineTool, UnionTool } from "./tool/createTool.js";
 
 /**
  * @zh ToolManager 类用于管理和执行工具。
