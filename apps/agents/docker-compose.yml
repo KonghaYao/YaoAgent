@@ -1,13 +1,28 @@
 version: "3.8"
 
 services:
+    agents:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        depends_on:
+            - postgres
+        ports:
+            - "8123:8123"
+        environment:
+            - OPENAI_API_KEY=${OPENAI_API_KEY}
+            - OPENAI_BASE_URL=${OPENAI_BASE_URL}
+            - PROMPT_PATH=${PROMPT_PATH}
+            - DATABASE_URL=postgres://postgres:postgres@postgres:5432/langgraph_test_10?sslmode=disable
+            - DATABASE_NAME=langgraph_test_10
+            - DISABLE_AGENT_INIT=True
     postgres:
         image: postgres:16
-        container_name: langgraphjs-postgres-test
+        container_name: postgres
         environment:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
-            POSTGRES_DB: langgraph
+            POSTGRES_DB: langgraph_test_10
             # Enable logging of connections and disconnections
             POSTGRES_LOG_CONNECTIONS: "on"
             POSTGRES_LOG_DISCONNECTIONS: "on"
