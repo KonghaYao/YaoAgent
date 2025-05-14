@@ -1,13 +1,13 @@
 import { Annotation, GraphBubbleUp, LangGraphRunnableConfig } from "@langchain/langgraph";
 import { StructuredToolInterface } from "@langchain/core/tools";
 import { MultiServerMCPClient } from "@langchain/mcp-adapters";
-export const McpState = Annotation.Root({
+import { createState } from "../state-builder.js";
+export const McpState = createState().build({
     mcpServers: Annotation<Record<string, boolean>>(),
 });
-export type McpState = typeof McpState.State;
 
 // Create client and connect to server
-export const createMCPNode = <State extends McpState, Config = LangGraphRunnableConfig, Output = unknown>(
+export const createMCPNode = <State extends typeof McpState.State, Config = LangGraphRunnableConfig, Output = unknown>(
     config: ConstructorParameters<typeof MultiServerMCPClient>[0]["mcpServers"],
     nodeFn: (state: State, config: Config, tools: StructuredToolInterface[]) => Output
 ) => {

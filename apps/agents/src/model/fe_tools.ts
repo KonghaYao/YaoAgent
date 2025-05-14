@@ -1,9 +1,9 @@
-import { Annotation, interrupt } from "@langchain/langgraph";
+import { interrupt } from "@langchain/langgraph";
 import { createDefaultAnnotation } from "../utils/index.js";
 import { ContentAndArtifact, DynamicStructuredTool } from "@langchain/core/tools";
+import { createState } from "../super-agent/state-builder.js";
 
-export type FEToolsState = typeof FEToolsState.State;
-export const FEToolsState = Annotation.Root({
+export const FEToolsState = createState().build({
     fe_tools: createDefaultAnnotation<FETool[]>(() => []),
 });
 

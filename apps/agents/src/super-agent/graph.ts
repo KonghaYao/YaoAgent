@@ -11,8 +11,7 @@ import { SequentialThinkingTool } from "./tools/sequential-thinking.js";
 import { MemoryNode } from "../create-expert/short-term-memory.js";
 import { getPrompt } from "../model/prompt-getter.js";
 import { createFeTools } from "../model/fe_tools.js";
-import monitor from "src/monitor/index.js";
-const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<ConfigurationState>>(
+const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<typeof ConfigurationState.State>>(
     {
         // npm: {
         //     transport: "sse",

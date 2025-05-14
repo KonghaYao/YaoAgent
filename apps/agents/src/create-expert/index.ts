@@ -1,17 +1,15 @@
 import { LanguageModelLike } from "@langchain/core/language_models/base";
 import { SystemMessage } from "@langchain/core/messages";
 import { StructuredToolInterface } from "@langchain/core/tools";
-import { Annotation, AnnotationRoot } from "@langchain/langgraph";
+import { AnnotationRoot } from "@langchain/langgraph";
 import { createReactAgent, createReactAgentAnnotation } from "@langchain/langgraph/prebuilt";
 import { createHandoffTool, createSwarm, SwarmState } from "@langchain/langgraph-swarm";
 import { createDefaultAnnotation } from "../utils/index.js";
+import { createState } from "../super-agent/state-builder.js";
 
-export const ExpertState = Annotation.Root({
-    ...createReactAgentAnnotation().spec,
-    ...SwarmState.spec,
+export const ExpertState = createState(createReactAgentAnnotation(), SwarmState).build({
     need_plan: createDefaultAnnotation(() => false),
 });
-export type ExpertState = typeof ExpertState.State;
 
 export const createPlanNode = <T>(config: CreateNodeConfig<T>) => {
     const { llm, tools, stateModifier } = config.plannerConfig;
