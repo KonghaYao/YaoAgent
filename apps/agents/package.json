@@ -5,8 +5,8 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "bun --watch run ./scripts/bun.dev.ts",
-        "dev:node": "node --env-file=.env ./scripts/node.mjs",
+        "dev": "tsx watch --env-file=.env ./scripts/bun.dev.ts",
+        "dev:bun": "bun --watch run ./scripts/bun.dev.ts",
         "build": "langgraph-bundler",
         "clean": "rm -rf ./dist .turbo || true",
         "format": "prettier --config .prettierrc --write \"src\"",

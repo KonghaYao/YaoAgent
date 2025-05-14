@@ -43,6 +43,8 @@ export type RenderMessage = Message & {
     spend_time?: number;
     /** 渲染时的唯一 id，聚合而来*/
     unique_id?: string;
+    /** 工具调用是否完成 */
+    done?: boolean;
 };
 export type SendMessageOptions = {
     extraParams?: Record<string, any>;
@@ -312,7 +314,9 @@ export class LangGraphClient extends Client {
                     message.tool_input = typeof assistantToolMessage.args !== "string" ? JSON.stringify(assistantToolMessage.args) : assistantToolMessage.args;
                     if (message.additional_kwargs) {
                         message.additional_kwargs.done = true;
+                        message.done = true;
                     } else {
+                        message.done = true;
                         message.additional_kwargs = {
                             done: true,
                         };
