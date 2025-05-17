@@ -17,7 +17,7 @@ services:
             - DATABASE_NAME=langgraph_test_10
             - DISABLE_AGENT_INIT=True
     postgres:
-        image: postgres:16
+        image: pgvector/pgvector:pg17
         container_name: postgres
         environment:
             POSTGRES_USER: postgres

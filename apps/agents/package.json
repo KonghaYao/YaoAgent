@@ -7,6 +7,7 @@
     "scripts": {
         "dev": "tsx watch --env-file=.env ./scripts/bun.dev.ts",
         "dev:bun": "bun --watch run ./scripts/bun.dev.ts",
+        "dev:deno": "deno serve -A --unstable-sloppy-imports --env-file --port 8123 --watch ./scripts/deno.dev.ts",
         "build": "langgraph-bundler",
         "clean": "rm -rf ./dist .turbo || true",
         "format": "prettier --config .prettierrc --write \"src\"",

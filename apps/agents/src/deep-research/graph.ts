@@ -3,7 +3,7 @@ import { Plan, DeepResearchState } from "./state.js";
 import { apply_prompt_template } from "./utils.js";
 import { createHandoffTool, createSwarm } from "@langchain/langgraph-swarm";
 import { ChatOpenAI } from "@langchain/openai";
-import { SequentialThinkingTool } from "src/super-agent/tools/sequential-thinking.js";
+import { SequentialThinkingTool } from "../super-agent/tools/sequential-thinking.js";
 import { MultiServerMCPClient } from "@langchain/mcp-adapters";
 import { END, START, StateGraph } from "@langchain/langgraph";
 import { tool } from "@langchain/core/tools";

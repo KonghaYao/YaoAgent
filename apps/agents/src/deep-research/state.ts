@@ -1,8 +1,8 @@
 import { SwarmState } from "@langchain/langgraph-swarm";
 import { createReactAgentAnnotation } from "@langchain/langgraph/prebuilt";
-import { ModelState } from "src/model/states.js";
-import { createState } from "src/super-agent/state-builder.js";
-import { createDefaultAnnotation } from "src/utils/index.js";
+import { ModelState } from "../model/states.js";
+import { createState } from "../super-agent/state-builder.js";
+import { createDefaultAnnotation } from "../utils/index.js";
 import { z } from "zod";
 
 export const DeepResearchState = createState(createReactAgentAnnotation(), ModelState, SwarmState).build({

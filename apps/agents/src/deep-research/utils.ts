@@ -1,7 +1,7 @@
 import { PromptTemplate } from "@langchain/core/prompts";
 
 import { DeepResearchState } from "./state.js";
-import { getPrompt } from "src/model/prompt-getter.js";
+import { getPrompt } from "../model/prompt-getter.js";
 
 export const apply_prompt_template = async (prompt_name: string, state: typeof DeepResearchState.State) => {
     const prompt = await getPrompt(prompt_name);
