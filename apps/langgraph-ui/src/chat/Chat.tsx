@@ -17,7 +17,7 @@ const ChatMessages: React.FC = () => {
         <div className="chat-messages">
             <MessagesBox renderMessages={renderMessages} collapsedTools={collapsedTools} toggleToolCollapse={toggleToolCollapse} client={client!} />
             {loading && <div className="loading-indicator">正在思考中...</div>}
-            {inChatError && <div className="error-message">{inChatError}</div>}
+            {inChatError && <div className="error-message">{JSON.stringify(inChatError)}</div>}
         </div>
     );
 };
@@ -30,7 +30,10 @@ const ChatInput: React.FC = () => {
     const handleFileUploaded = (url: string) => {
         setImageUrls((prev) => [...prev, url]);
     };
-
+    const _setCurrentAgent = (agent: string) => {
+        localStorage.setItem("agent_name", agent);
+        setCurrentAgent(agent);
+    };
     const sendMultiModalMessage = () => {
         const content: Message[] = [
             {
@@ -68,7 +71,7 @@ const ChatInput: React.FC = () => {
             <div className="chat-input-header">
                 <FileList onFileUploaded={handleFileUploaded} />
                 <UsageMetadata usage_metadata={client?.tokenCounter || {}} />
-                <select value={currentAgent} onChange={(e) => setCurrentAgent(e.target.value)}>
+                <select value={currentAgent} onChange={(e) => _setCurrentAgent(e.target.value)}>
                     {client?.availableAssistants.map((i) => {
                         return (
                             <option value={i.graph_id} key={i.graph_id}>

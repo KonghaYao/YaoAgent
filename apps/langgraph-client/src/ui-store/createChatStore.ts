@@ -1,6 +1,7 @@
 import { atom } from "nanostores";
 import { LangGraphClient, LangGraphClientConfig, RenderMessage, SendMessageOptions } from "../LangGraphClient.js";
 import { Message, Thread } from "@langchain/langgraph-sdk";
+import { rafDebounce } from "./rafDebounce.js";
 
 /**
  * @zh 格式化日期对象为时间字符串。
@@ -77,6 +78,9 @@ export const createChatStore = (
     const currentAgent = atom<string>(initClientName);
     const currentChatId = atom<string | null>(null);
 
+    const updateUI = rafDebounce((newClient: LangGraphClient) => {
+        renderMessages.set(newClient.renderMessage);
+    });
     /**
      * @zh 初始化 LangGraph 客户端。
      * @en Initializes the LangGraph client.
@@ -84,6 +88,7 @@ export const createChatStore = (
     async function initClient() {
         const newClient = new LangGraphClient(config);
         await newClient.initAssistant(currentAgent.get());
+        currentAgent.set(newClient.getCurrentAssistant()!.graph_id);
         // 不再需要创建，sendMessage 会自动创建
         // await newClient.createThread();
         inChatError.set(null);
@@ -98,12 +103,13 @@ export const createChatStore = (
                 inChatError.set(event.data);
             }
             // console.log(newClient.renderMessage);
-            renderMessages.set(newClient.renderMessage);
+
+            updateUI(newClient);
         });
         context.onInit?.(newClient);
         newClient.graphState = {};
         client.set(newClient);
-    };
+    }
 
     /**
      * @zh 发送消息。
@@ -206,7 +212,9 @@ export const createChatStore = (
             setCurrentAgent(agent: string) {
                 currentAgent.set(agent);
                 return initClient().then(() => {
-                    refreshHistoryList();
+                    if (showHistory.get()) {
+                        refreshHistoryList();
+                    }
                 });
             },
             /**

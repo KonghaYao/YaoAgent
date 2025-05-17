@@ -6,8 +6,9 @@ const F =
               return fetch(url, options);
           }
         : fetch;
+
 export const globalChatStore = createChatStore(
-    "agent",
+    localStorage.getItem("agent_name") || "",
     {
         apiUrl: localStorage.getItem("apiUrl") || "http://localhost:8123",
         defaultHeaders: JSON.parse(localStorage.getItem("code") || "{}"),

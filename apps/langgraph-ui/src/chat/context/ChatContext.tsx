@@ -21,9 +21,11 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     const store = useUnionStore(globalChatStore, useStore);
     useEffect(() => {
         store.initClient().then((res) => {
-            store.refreshHistoryList();
+            if (store.showHistory) {
+                store.refreshHistoryList();
+            }
         });
-    }, [store.currentAgent]);
+    }, []);
 
     return <ChatContext.Provider value={store}>{children}</ChatContext.Provider>;
 };
