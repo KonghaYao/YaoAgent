@@ -2,7 +2,7 @@ import { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import { ChatOpenAI } from "@langchain/openai";
 import { ModelAllow, type ModelState } from "./states.js";
 
-export const modelGuard = (state: ModelState, model_type: keyof typeof ModelAllow) => {
+export const modelGuard = (state: typeof ModelState.State, model_type: keyof typeof ModelAllow) => {
     const modelName = state[model_type];
     if (!modelName) {
         throw new Error(`Model ${String(model_type)} not found in state`);
@@ -13,7 +13,7 @@ export const modelGuard = (state: ModelState, model_type: keyof typeof ModelAllo
     return modelName as string;
 };
 export async function createLLM(
-    state: ModelState,
+    state: typeof ModelState.State,
     model_type: keyof typeof ModelAllow,
     params: {
         temperature?: number;
@@ -38,3 +38,4 @@ export async function createLLM(
         streaming: true,
     });
 }
+

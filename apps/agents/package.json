@@ -14,8 +14,8 @@
         "lint:fix": "eslint src --fix"
     },
     "dependencies": {
-        "@langchain/community": "^0.3.42",
-        "@langchain/core": "^0.3.55",
+        "@langchain/community": "^0.3.43",
+        "@langchain/core": "^0.3.56",
         "@langchain/langgraph": "^0.2.72",
         "@langchain/langgraph-checkpoint": "^0.0.17",
         "@langchain/langgraph-sdk": "^0.0.74",
@@ -25,9 +25,9 @@
         "@langchain/openai": "^0.5.10",
         "@langgraph-js/api": "^0.2.39",
         "eventsource": "^3.0.7",
-        "langchain": "^0.3.25",
+        "langchain": "^0.3.26",
         "langfuse-langchain": "^3.37.2",
-        "openai": "^4.98.0",
+        "openai": "^4.100.0",
         "uuid": "^11.1.0",
         "zod": "^3.24.4"
     },

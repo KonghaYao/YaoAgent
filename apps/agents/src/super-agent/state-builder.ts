@@ -1,15 +1,16 @@
 import { Annotation, AnnotationRoot, StateDefinition } from "@langchain/langgraph";
 
 export const createState = <T extends readonly AnnotationRoot<any>[]>(...parents: T) => {
-    type MergedState = UnionToIntersection<
-        {
-            [K in keyof T]: T[K] extends AnnotationRoot<infer D> ? D : never;
-        }[number]
-    > &
-        StateDefinition;
     return {
-        build: (state: StateDefinition) =>
-            Annotation.Root<MergedState>(Object.assign({}, ...parents.map((p) => p.spec), state)),
+        build: <D extends StateDefinition>(state: D = {} as D) => {
+            type MergedState = UnionToIntersection<
+                {
+                    [K in keyof T]: T[K] extends AnnotationRoot<infer D> ? D : never;
+                }[number]
+            > &
+                D;
+            return Annotation.Root<MergedState>(Object.assign({}, ...parents.map((p) => p.spec), state));
+        },
     };
 };
 
