@@ -13,8 +13,8 @@ services:
             - OPENAI_API_KEY=${OPENAI_API_KEY}
             - OPENAI_BASE_URL=${OPENAI_BASE_URL}
             - PROMPT_PATH=${PROMPT_PATH}
-            - DATABASE_URL=postgres://postgres:postgres@postgres:5432/langgraph_test_10?sslmode=disable
-            - DATABASE_NAME=langgraph_test_10
+            - DATABASE_URL=postgres://postgres:postgres@postgres:5432/langgraph?sslmode=disable
+            - DATABASE_NAME=langgraph
             - DISABLE_AGENT_INIT=True
     postgres:
         image: pgvector/pgvector:pg17
@@ -22,7 +22,7 @@ services:
         environment:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
-            POSTGRES_DB: langgraph_test_10
+            POSTGRES_DB: langgraph
             # Enable logging of connections and disconnections
             POSTGRES_LOG_CONNECTIONS: "on"
             POSTGRES_LOG_DISCONNECTIONS: "on"

@@ -43,7 +43,7 @@ npm run langgraph-bundler
 # 数据库配置
 DATABASE_URL=postgres://user:password@localhost:5432/langgraph
 DATABASE_INIT=true  # 首次运行时设置
-DISABLE_AGENT_INIT=true # 关闭服务器开启时注册 agent
+DISABLE_AGENT_INIT=true # 关闭服务器开启时注册 agent 的行为
 
 N_WORKERS=4 # 允许同时接收 4 个服务
 PORT=8123
