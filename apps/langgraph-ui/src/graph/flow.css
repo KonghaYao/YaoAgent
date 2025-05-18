@@ -1,0 +1,176 @@
+/* xyflow theme files - Adjusted for a cleaner look */
+.react-flow {
+    /* Custom Variables - Refined Palette */
+    --xy-theme-selected: #77b6ff; /* 更柔和且更具现代感的蓝色 */
+    --xy-theme-hover: #d1d5db; /* 更柔和的悬停效果 */
+    --xy-theme-edge-hover: #374151; /* 深灰色，更专业 */
+    --xy-theme-color-focus: #e5e7eb; /* 更浅的焦点颜色 */
+
+    /* Built-in Variables - Subtle Adjustments */
+    --xy-node-border-default: 1px solid #cbd5e1; /* 更柔和的边框 */
+    --xy-node-boxshadow-default: 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06); /* 更柔和的阴影 */
+    --xy-node-border-radius-default: 6px; /* 略微减小圆角 */
+    --xy-handle-background-color-default: #f9fafb; /* 更柔和的连接点背景 */
+    --xy-handle-border-color-default: #9ca3af; /* 更柔和的连接点边框 */
+    --xy-edge-label-color-default: #4b5563; /* 更深的标签颜色 */
+    --xy-node-color: #777;
+}
+
+.react-flow.dark {
+    --xy-node-boxshadow-default: 0 2px 4px rgba(255, 255, 255, 0.06), 0 1px 3px rgba(255, 255, 255, 0.04); /* 调整暗色阴影 */
+    --xy-theme-color-focus: #4a5568; /* 更深的暗色焦点颜色 */
+}
+
+/* Customizing Default Theming - Enhanced Visuals */
+
+.react-flow__node {
+    box-shadow: var(--xy-node-boxshadow-default);
+    border-radius: var(--xy-node-border-radius-default);
+    background-color: var(--xy-node-background-color-default);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 12px; /* 略微增加内边距 */
+    font-size: 14px; /* 略微增大字体 */
+    flex-direction: column;
+    border: var(--xy-node-border-default);
+    color: var(--xy-node-color, var(--xy-node-color-default));
+}
+
+.react-flow__node.selectable:focus {
+    box-shadow: 0 0 0 3px var(--xy-theme-color-focus); /* 更柔和的焦点边框 */
+    border-color: #9ca3af; /* 更柔和的焦点边框颜色 */
+}
+
+.react-flow__node.selectable:focus:active {
+    box-shadow: var(--xy-node-boxshadow-default);
+}
+
+.react-flow__node.selectable:hover,
+.react-flow__node.draggable:hover {
+    border-color: var(--xy-theme-hover);
+    cursor: grab; /* 增加手型光标 */
+}
+
+.react-flow__node.selectable.selected {
+    border-color: var(--xy-theme-selected);
+    box-shadow: 0 0 0 2px var(--xy-theme-selected); /* 更清晰的选中效果 */
+}
+
+.react-flow__node-group {
+    background-color: rgba(147, 197, 253, 0.2); /* 更柔和的 Group 背景 */
+    border-color: #77b6ff; /* 与选中颜色一致 */
+    border-style: dashed; /* 虚线边框 */
+}
+
+.react-flow__edge.selectable:hover .react-flow__edge-path,
+.react-flow__edge.selectable.selected .react-flow__edge-path {
+    stroke: var(--xy-theme-edge-hover);
+    stroke-width: 1.5px; /* 略微加粗选中的边 */
+}
+
+.react-flow__handle {
+    background-color: var(--xy-handle-background-color-default);
+    border: 1px solid var(--xy-handle-border-color-default); /* 添加边框 */
+    border-radius: 3px; /* 略微圆角 */
+    width: 10px; /* 略微增大尺寸 */
+    height: 10px;
+}
+
+.react-flow__handle.connectionindicator:hover {
+    pointer-events: all;
+    border-color: var(--xy-theme-edge-hover);
+    background-color: white;
+}
+
+.react-flow__handle.connectionindicator:focus,
+.react-flow__handle.connectingfrom,
+.react-flow__handle.connectingto {
+    border-color: var(--xy-theme-edge-hover);
+    background-color: var(--xy-theme-selected); /* 连接时高亮 */
+}
+
+.react-flow__node-resizer {
+    border-radius: 2px; /* 略微圆角 */
+    border: 1px solid #cbd5e1; /* 更柔和的边框 */
+    background-color: #f9fafb; /* 与 handle 颜色一致 */
+}
+
+.react-flow__resize-control.handle {
+    background-color: var(--xy-theme-selected); /* 使用选中颜色 */
+    border-color: var(--xy-theme-selected);
+    border-radius: 2px; /* 略微圆角 */
+    width: 7px; /* 略微增大尺寸 */
+    height: 7px; /* 略微增大尺寸 */
+}
+.react-flow__node-group {
+    border-style: dashed;
+    background-color: transparent;
+    border-color: transparent;
+    font-size: 0.5rem;
+}
+
+.react-flow .react-flow__node-group:nth-child(1) {
+    background-color: rgba(179, 229, 252, 0.3); /* 非常浅的蓝色 */
+    border-color: #4fc3f7; /* 柔和的蓝色 */
+    color: #4fc3f7;
+}
+
+.react-flow .react-flow__node-group:nth-child(2) {
+    background-color: rgba(200, 230, 201, 0.3); /* 非常浅的绿色 */
+    border-color: #81c784; /* 柔和的绿色 */
+    color: #81c784;
+}
+
+.react-flow .react-flow__node-group:nth-child(3) {
+    background-color: rgba(255, 224, 178, 0.3); /* 非常浅的橙色 */
+    border-color: #ffb74d; /* 柔和的橙色 */
+    color: #ffb74d;
+}
+
+.react-flow .react-flow__node-group:nth-child(4) {
+    background-color: rgba(225, 190, 231, 0.3); /* 非常浅的紫色 */
+    border-color: #ba68c8; /* 柔和的紫色 */
+    color: #ba68c8;
+}
+
+.react-flow .react-flow__node-group:nth-child(5) {
+    background-color: rgba(255, 204, 204, 0.3); /* 非常浅的粉色 */
+    border-color: #e57373; /* 柔和的粉色 */
+    color: #e57373;
+}
+
+/* 更多柔和的颜色 */
+.react-flow .react-flow__node-group:nth-child(6) {
+    background-color: rgba(255, 245, 157, 0.3); /* 非常浅的黄色 */
+    border-color: #ffee58; /* 柔和的黄色 */
+    color: #ffee58;
+}
+
+.react-flow .react-flow__node-group:nth-child(7) {
+    background-color: rgba(165, 214, 167, 0.3); /* 非常浅的薄荷绿 */
+    border-color: #66bb6a; /* 柔和的薄荷绿 */
+    color: #66bb6a;
+}
+
+.react-flow .react-flow__node-group:nth-child(8) {
+    background-color: rgba(244, 143, 177, 0.3); /* 非常浅的玫瑰色 */
+    border-color: #f06292; /* 柔和的玫瑰色 */
+    color: #f06292;
+}
+
+.react-flow .react-flow__node-group:nth-child(9) {
+    background-color: rgba(210, 180, 140, 0.3); /* 非常浅的卡其色 */
+    border-color: #a1887f; /* 柔和的棕色 */
+    color: #a1887f;
+}
+
+.react-flow .react-flow__node-group:nth-child(10) {
+    background-color: rgba(197, 176, 213, 0.3); /* 非常浅的薰衣草色 */
+    border-color: #9575cd; /* 柔和的薰衣草色 */
+    color: #9575cd;
+}
+.react-flow__handle.connectionindicator {
+    visibility: hidden;
+}

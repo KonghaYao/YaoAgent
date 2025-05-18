@@ -7,6 +7,18 @@ const F =
           }
         : fetch;
 
+const getLocalConfig = () => {
+    return {
+        showHistory: localStorage.getItem("showHistory") === "true" || false,
+        showGraph: localStorage.getItem("showGraph") === "true" || false,
+    };
+};
+export const setLocalConfig = (config: Partial<{ showHistory: boolean; showGraph: boolean }>) => {
+    Object.entries(config).forEach(([key, value]) => {
+        localStorage.setItem(key, value.toString());
+    });
+};
+
 export const globalChatStore = createChatStore(
     localStorage.getItem("agent_name") || "",
     {
@@ -18,6 +30,7 @@ export const globalChatStore = createChatStore(
         },
     },
     {
+        ...getLocalConfig(),
         onInit(client) {
             client.tools.bindTools([]);
         },

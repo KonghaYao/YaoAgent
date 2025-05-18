@@ -9,6 +9,8 @@ import { formatTime, Message } from "@langgraph-js/sdk";
 import FileList from "./components/FileList";
 import JsonEditorPopup from "./components/JsonEditorPopup";
 import { JsonToMessageButton } from "./components/JsonToMessage";
+import { GraphPanel } from "../graph/GraphPanel";
+import { setLocalConfig } from "./store";
 
 const ChatMessages: React.FC = () => {
     const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse } = useChat();
@@ -105,7 +107,7 @@ const ChatInput: React.FC = () => {
 
 const Chat: React.FC = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const { showHistory, toggleHistoryVisible } = useChat();
+    const { showHistory, toggleHistoryVisible, showGraph, toggleGraphVisible } = useChat();
     const { extraParams, setExtraParams } = useExtraParams();
 
     return (
@@ -117,8 +119,23 @@ const Chat: React.FC = () => {
                     <button onClick={() => setIsPopupOpen(true)} className="edit-params-button">
                         编辑参数
                     </button>
-                    <button className="history-button" onClick={() => toggleHistoryVisible()}>
+                    <button
+                        className="history-button"
+                        onClick={() => {
+                            toggleHistoryVisible();
+                            setLocalConfig({ showHistory: !showHistory });
+                        }}
+                    >
                         历史记录
+                    </button>
+                    <button
+                        className="graph-button"
+                        onClick={() => {
+                            toggleGraphVisible();
+                            setLocalConfig({ showGraph: !showGraph });
+                        }}
+                    >
+                        图
                     </button>
                     <button
                         className="history-button"
@@ -134,6 +151,7 @@ const Chat: React.FC = () => {
                 <ChatInput />
                 <JsonEditorPopup isOpen={isPopupOpen} initialJson={extraParams} onClose={() => setIsPopupOpen(false)} onSave={setExtraParams} />
             </div>
+            {showGraph && <GraphPanel />}
         </div>
     );
 };
