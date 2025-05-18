@@ -1,6 +1,6 @@
 import { atom } from "nanostores";
 import { LangGraphClient, LangGraphClientConfig, RenderMessage, SendMessageOptions } from "../LangGraphClient.js";
-import { Message, Thread } from "@langchain/langgraph-sdk";
+import { AssistantGraph, Message, Thread } from "@langchain/langgraph-sdk";
 import { rafDebounce } from "./rafDebounce.js";
 
 /**
@@ -65,6 +65,8 @@ export const createChatStore = (
     initClientName: string,
     config: LangGraphClientConfig,
     context: {
+        showHistory?: boolean;
+        showGraph?: boolean;
         onInit?: (client: LangGraphClient) => void;
     } = {}
 ) => {
@@ -74,10 +76,16 @@ export const createChatStore = (
     const loading = atom<boolean>(false);
     const collapsedTools = atom<string[]>([]);
     const inChatError = atom<string | null>(null);
-    const showHistory = atom<boolean>(true);
+    const showHistory = atom<boolean>(context.showHistory ?? false);
     const currentAgent = atom<string>(initClientName);
     const currentChatId = atom<string | null>(null);
 
+    // 显示 langgraph 可视化图
+    const showGraph = atom<boolean>(context.showGraph ?? false);
+    const graphVisualize = atom<AssistantGraph | null>(null);
+    const refreshGraph = async () => {
+        if (showGraph.get()) graphVisualize.set((await client.get()?.graphVisualize()) || null);
+    };
     const updateUI = rafDebounce((newClient: LangGraphClient) => {
         renderMessages.set(newClient.renderMessage);
     });
@@ -109,6 +117,8 @@ export const createChatStore = (
         context.onInit?.(newClient);
         newClient.graphState = {};
         client.set(newClient);
+        if (showGraph.get()) refreshGraph();
+        return newClient;
     }
 
     /**
@@ -150,6 +160,9 @@ export const createChatStore = (
      */
     const toggleHistoryVisible = () => {
         showHistory.set(!showHistory.get());
+        if (showHistory.get()) {
+            refreshHistoryList();
+        }
     };
 
     const historyList = atom<Thread<{ messages: Message[] }>[]>([]);
@@ -189,6 +202,8 @@ export const createChatStore = (
             showHistory,
             historyList,
             currentChatId,
+            showGraph,
+            graphVisualize,
         },
         mutations: {
             initClient,
@@ -215,8 +230,18 @@ export const createChatStore = (
                     if (showHistory.get()) {
                         refreshHistoryList();
                     }
+                    if (showGraph.get()) {
+                        refreshGraph();
+                    }
                 });
             },
+            toggleGraphVisible() {
+                showGraph.set(!showGraph.get());
+                if (showGraph.get()) {
+                    refreshGraph();
+                }
+            },
+            refreshGraph,
             /**
              * @zh 创建一个新的聊天会话。
              * @en Creates a new chat session.

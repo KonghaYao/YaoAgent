@@ -154,6 +154,12 @@ export class LangGraphClient extends Client {
             throw error;
         }
     }
+
+    graphVisualize() {
+        return this.assistants.getGraph(this.currentAssistant?.assistant_id!, {
+            xray: true,
+        });
+    }
     /**
      * @zh 列出所有的 Thread。
      * @en Lists all Threads.
