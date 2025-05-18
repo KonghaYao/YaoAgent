@@ -13,7 +13,7 @@ importers:
     dependencies:
       '@langchain/core':
         specifier: ^0.3.42
-        version: 0.3.55(openai@4.100.0(ws@8.18.2)(zod@3.24.4))
+        version: 0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4))
     devDependencies:
       '@tsconfig/recommended':
         specifier: ^1.0.8
@@ -52,11 +52,11 @@ importers:
         specifier: ^0.0.17
         version: 0.0.17(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))
       '@langchain/langgraph-sdk':
-        specifier: ^0.0.74
-        version: 0.0.74(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)
+        specifier: ^0.0.76
+        version: 0.0.76(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)
       '@langchain/langgraph-supervisor':
-        specifier: ^0.0.11
-        version: 0.0.11(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.4)))
+        specifier: ^0.0.12
+        version: 0.0.12(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.4)))
       '@langchain/langgraph-swarm':
         specifier: ^0.0.3
         version: 0.0.3(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.4)))
@@ -68,7 +68,7 @@ importers:
         version: 0.5.10(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(ws@8.18.2)
       '@langgraph-js/api':
         specifier: ^0.2.39
-        version: 0.2.39(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.4)))(@types/pg@8.15.1)(openai@4.100.0(ws@8.18.2)(zod@3.24.4))(typescript@5.8.3)
+        version: 0.2.39(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4))))(@langchain/langgraph-sdk@0.0.76(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.4)))(@types/pg@8.15.1)(openai@4.100.0(ws@8.18.2)(zod@3.24.4))(typescript@5.8.3)
       eventsource:
         specifier: ^3.0.7
         version: 3.0.7
@@ -93,7 +93,7 @@ importers:
         version: 29.7.0
       '@langgraph-js/bundler':
         specifier: ^1.3.0
-        version: 1.3.0(@langgraph-js/api@0.2.39(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.4)))(@types/pg@8.15.1)(openai@4.100.0(ws@8.18.2)(zod@3.24.4))(typescript@5.8.3))(@types/node@20.17.47)(jiti@2.4.2)(lightningcss@1.30.1)(rollup@4.40.2)(tsx@4.19.4)(yaml@2.8.0)
+        version: 1.3.0(@langgraph-js/api@0.2.39(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4))))(@langchain/langgraph-sdk@0.0.76(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.4)))(@types/pg@8.15.1)(openai@4.100.0(ws@8.18.2)(zod@3.24.4))(typescript@5.8.3))(@types/node@20.17.47)(jiti@2.4.2)(lightningcss@1.30.1)(rollup@4.40.2)(tsx@4.19.4)(yaml@2.8.0)
       '@tsconfig/recommended':
         specifier: ^1.0.8
         version: 1.0.8
@@ -146,8 +146,8 @@ importers:
   apps/langgraph-client:
     dependencies:
       '@langchain/langgraph-sdk':
-        specifier: ^0.0.74
-        version: 0.0.74(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)
+        specifier: ^0.0.76
+        version: 0.0.76(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)
       nanostores:
         specifier: ^1.0.1
         version: 1.0.1
@@ -160,6 +160,9 @@ importers:
 
   apps/langgraph-ui:
     dependencies:
+      '@dagrejs/dagre':
+        specifier: ^1.1.4
+        version: 1.1.4
       '@langgraph-js/sdk':
         specifier: workspace:*
         version: link:../langgraph-client
@@ -172,6 +175,9 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^4.3.4
         version: 4.4.1(vite@6.3.5(@types/node@22.15.18)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.19.4)(yaml@2.8.0))
+      '@xyflow/react':
+        specifier: ^12.6.4
+        version: 12.6.4(@types/react@19.1.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       nanostores:
         specifier: ^1.0.1
         version: 1.0.1
@@ -202,7 +208,7 @@ importers:
     dependencies:
       '@modelcontextprotocol/sdk':
         specifier: ^1.8.0
-        version: 1.11.2
+        version: 1.11.4
       diff:
         specifier: ^7.0.0
         version: 7.0.0
@@ -690,6 +696,13 @@ packages:
 
   '@dabh/diagnostics@2.0.3':
     resolution: {integrity: sha512-hrlQOIi7hAfzsMqlGSFyVucrx38O+j6wiGOf//H2ecvIEqYN4ADBSS2iLMh5UFyDunCNniUIPk/q3riFv45xRA==}
+
+  '@dagrejs/dagre@1.1.4':
+    resolution: {integrity: sha512-QUTc54Cg/wvmlEUxB+uvoPVKFazM1H18kVHBQNmK2NbrDR5ihOCR6CXLnDSZzMcSQKJtabPUWridBOlJM3WkDg==}
+
+  '@dagrejs/graphlib@2.2.4':
+    resolution: {integrity: sha512-mepCf/e9+SKYy1d02/UkvSy6+6MoyXhVxP8lLDfA7BPE1X1d4dR0sZznmbM8/XVJ1GPM+Svnx7Xj6ZweByWUkw==}
+    engines: {node: '>17.0.0'}
 
   '@docsearch/css@3.8.2':
     resolution: {integrity: sha512-y05ayQFyUmCXze79+56v/4HpycYF3uFqB78pLPrSV5ZKAlDuIAAJNhaRi8tTdRNXh05yxX/TyNnzD6LwSM89vQ==}
@@ -1489,10 +1502,6 @@ packages:
       youtubei.js:
         optional: true
 
-  '@langchain/core@0.3.55':
-    resolution: {integrity: sha512-SojY2ugpT6t9eYfFB9Ysvyhhyh+KJTGXs50hdHUE9tAEQWp3WAwoxe4djwJnOZ6fSpWYdpFt2UT2ksHVDy2vXA==}
-    engines: {node: '>=18'}
-
   '@langchain/core@0.3.56':
     resolution: {integrity: sha512-eF9MyInM9RLNisAygiCrzHnqzOnuzGWy4f1SAqAis+XIMhcA98WuZDNWxyX9pP3aKQGc47FAJ/9XWJwv5KiquA==}
     engines: {node: '>=18'}
@@ -1510,8 +1519,8 @@ packages:
     peerDependencies:
       '@langchain/core': ^0.3.42
 
-  '@langchain/langgraph-sdk@0.0.74':
-    resolution: {integrity: sha512-IUN0m4BYkGWdviFd4EaWDcQgxNq8z+1LIwXajCSt9B+Cb/pz0ZNpIPdu5hAIsf6a0RWu5yRUhzL1L40t7vu3Zg==}
+  '@langchain/langgraph-sdk@0.0.76':
+    resolution: {integrity: sha512-TWAjCVTgIZ9dLRclWhupO+TCtVi5hqGh/tKja54qkZGnIappjMGZMZpor3yi3qHnnIn5UEHl+f59mZsJJKM/Sg==}
     peerDependencies:
       '@langchain/core': ^0.3.42
       react: ^18 || ^19
@@ -1521,12 +1530,12 @@ packages:
       react:
         optional: true
 
-  '@langchain/langgraph-supervisor@0.0.11':
-    resolution: {integrity: sha512-bpm1HB+/p6G6ZHp5wLPArU/z9JzOji2PuK9I0E02jPtKcEzxdXQ0CwJax5MUiGr/SEQBalEDWtUcWoZsebg5fA==}
+  '@langchain/langgraph-supervisor@0.0.12':
+    resolution: {integrity: sha512-bBB7rYj0Kn/rx36rNxfIgkTP6vMOniaMo9grz2Xa99BxB3Vw+vMbDM3zn0YsfBNWMp3isIyimaDJa3mUOGQbMQ==}
     engines: {node: '>=18'}
     peerDependencies:
       '@langchain/core': ^0.3.42
-      '@langchain/langgraph': ^0.2.63
+      '@langchain/langgraph': ^0.2.72
 
   '@langchain/langgraph-swarm@0.0.3':
     resolution: {integrity: sha512-6ctP1KGj344KXeY5c08LzvfayCWPA2I52pw7a6t4tcaQ3Y39h3aDvYl94wEqxv20KXIccdzvtAFX1ndxRBrP2Q==}
@@ -1591,10 +1600,6 @@ packages:
 
   '@langgraph-js/langgraph-pg@1.1.2':
     resolution: {integrity: sha512-MuT5mGUpRd5S05TOeMKU8KKbwNIccsYGMlH2HsPqrXVB5WWyFFRs3fIiDogwb08Vuglh2sM17ZLbRArDQxudKA==}
-
-  '@modelcontextprotocol/sdk@1.11.2':
-    resolution: {integrity: sha512-H9vwztj5OAqHg9GockCQC06k1natgcxWQSRpQcPJf6i5+MWBzfKkRtxGbjQf0X2ihii0ffLZCRGbYV2f2bjNCQ==}
-    engines: {node: '>=18'}
 
   '@modelcontextprotocol/sdk@1.11.4':
     resolution: {integrity: sha512-OTbhe5slIjiOtLxXhKalkKGhIQrwvhgCDs/C2r8kcBTy5HR/g43aDQU0l7r8O0VGbJPTNJvDc7ZdQMdQDJXmbw==}
@@ -2088,6 +2093,24 @@ packages:
   '@types/connect@3.4.38':
     resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
 
+  '@types/d3-color@3.1.3':
+    resolution: {integrity: sha512-iO90scth9WAbmgv7ogoq57O9YpKmFBbmoEoCHDB2xMBY0+/KVrqAaCDyCE16dUspeOvIxFFRI+0sEtqDqy2b4A==}
+
+  '@types/d3-drag@3.0.7':
+    resolution: {integrity: sha512-HE3jVKlzU9AaMazNufooRJ5ZpWmLIoc90A37WU2JMmeq28w1FQqCZswHZ3xR+SuxYftzHq6WU6KJHvqxKzTxxQ==}
+
+  '@types/d3-interpolate@3.0.4':
+    resolution: {integrity: sha512-mgLPETlrpVV1YRJIglr4Ez47g7Yxjl1lj7YKsiMCb27VJH9W8NVM6Bb9d8kkpG/uAQS5AmbA48q2IAolKKo1MA==}
+
+  '@types/d3-selection@3.0.11':
+    resolution: {integrity: sha512-bhAXu23DJWsrI45xafYpkQ4NtcKMwWnAC/vKrd2l+nxMFuvOT3XMYTIj2opv8vq8AO5Yh7Qac/nSeP/3zjTK0w==}
+
+  '@types/d3-transition@3.0.9':
+    resolution: {integrity: sha512-uZS5shfxzO3rGlu0cC3bjmMFKsXv+SmZZcgp0KD22ts4uGXp5EVYGzu/0YdwZeKmddhcAccYtREJKkPfXkZuCg==}
+
+  '@types/d3-zoom@3.0.8':
+    resolution: {integrity: sha512-iqMC4/YlFCSlO8+2Ii1GGGliCAY4XdeG748w5vQUbevlbDu0zSjH/+jojorQVBK/se0j6DUFNPBGSqD3YWYnDw==}
+
   '@types/debug@4.1.12':
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
 
@@ -2363,6 +2386,15 @@ packages:
   '@vueuse/shared@12.8.2':
     resolution: {integrity: sha512-dznP38YzxZoNloI0qpEfpkms8knDtaoQ6Y/sfS0L7Yki4zh40LFHEhur0odJC6xTHG5dxWVPiUWBXn+wCG2s5w==}
 
+  '@xyflow/react@12.6.4':
+    resolution: {integrity: sha512-/dOQ43Nu217cwHzy7f8kNUrFMeJJENzftVgT2VdFFHi6fHlG83pF+gLmvkRW9Be7alCsR6G+LFxxCdsQQbazHg==}
+    peerDependencies:
+      react: '>=17'
+      react-dom: '>=17'
+
+  '@xyflow/system@0.0.61':
+    resolution: {integrity: sha512-TsZG/Ez8dzxX6/Ol44LvFqVZsYvyz6dpDlAQZZk6hTL7JLGO5vN3dboRJqMwU8/Qtr5IEv5YBzojjAwIqW1HCA==}
+
   abort-controller@3.0.0:
     resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}
     engines: {node: '>=6.5'}
@@ -2585,6 +2617,9 @@ packages:
     resolution: {integrity: sha512-NIxF55hv4nSqQswkAeiOi1r83xy8JldOFDTWiug55KBu9Jnblncd2U6ViHmYgHf01TPZS77NJBhBMKdWj9HQMQ==}
     engines: {node: '>=8'}
 
+  classcat@5.0.5:
+    resolution: {integrity: sha512-JhZUT7JFcQy/EzW605k/ktHtncoo9vnyW/2GspNYwFlN1C/WmjuV/xtS04e9SOkL2sTdw0VAZ2UGCcQ9lR6p6w==}
+
   cliui@8.0.1:
     resolution: {integrity: sha512-BSeNnyus75C4//NQ9gQt1/csTXyo/8Sb+afLAkzAptFuMsod9HFokGNudZpi/oQV73hnVK+sR+5PVRMd+Dr7YQ==}
     engines: {node: '>=12'}
@@ -2705,6 +2740,44 @@ packages:
 
   csstype@3.1.3:
     resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
+
+  d3-color@3.1.0:
+    resolution: {integrity: sha512-zg/chbXyeBtMQ1LbD/WSoW2DpC3I0mpmPdW+ynRTj/x2DAWYrIY7qeZIHidozwV24m4iavr15lNwIwLxRmOxhA==}
+    engines: {node: '>=12'}
+
+  d3-dispatch@3.0.1:
+    resolution: {integrity: sha512-rzUyPU/S7rwUflMyLc1ETDeBj0NRuHKKAcvukozwhshr6g6c5d8zh4c2gQjY2bZ0dXeGLWc1PF174P2tVvKhfg==}
+    engines: {node: '>=12'}
+
+  d3-drag@3.0.0:
+    resolution: {integrity: sha512-pWbUJLdETVA8lQNJecMxoXfH6x+mO2UQo8rSmZ+QqxcbyA3hfeprFgIT//HW2nlHChWeIIMwS2Fq+gEARkhTkg==}
+    engines: {node: '>=12'}
+
+  d3-ease@3.0.1:
+    resolution: {integrity: sha512-wR/XK3D3XcLIZwpbvQwQ5fK+8Ykds1ip7A2Txe0yxncXSdq1L9skcG7blcedkOX+ZcgxGAmLX1FrRGbADwzi0w==}
+    engines: {node: '>=12'}
+
+  d3-interpolate@3.0.1:
+    resolution: {integrity: sha512-3bYs1rOD33uo8aqJfKP3JWPAibgw8Zm2+L9vBKEHJ2Rg+viTR7o5Mmv5mZcieN+FRYaAOWX5SJATX6k1PWz72g==}
+    engines: {node: '>=12'}
+
+  d3-selection@3.0.0:
+    resolution: {integrity: sha512-fmTRWbNMmsmWq6xJV8D19U/gw/bwrHfNXxrIN+HfZgnzqTHp9jOmKMhsTUjXOJnZOdZY9Q28y4yebKzqDKlxlQ==}
+    engines: {node: '>=12'}
+
+  d3-timer@3.0.1:
+    resolution: {integrity: sha512-ndfJ/JxxMd3nw31uyKoY2naivF+r29V+Lc0svZxe1JvvIRmi8hUsrMvdOwgS1o6uBHmiz91geQ0ylPP0aj1VUA==}
+    engines: {node: '>=12'}
+
+  d3-transition@3.0.1:
+    resolution: {integrity: sha512-ApKvfjsSR6tg06xrL434C0WydLr7JewBB3V+/39RMHsaXTOG0zmt/OAXeng5M5LBm0ojmxJrpomQVZ1aPvBL4w==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      d3-selection: 2 - 3
+
+  d3-zoom@3.0.0:
+    resolution: {integrity: sha512-b8AmV3kfQaqWAuacbPuNbL6vahnOJflOhexLzMMNLga62+/nh0JzvJ0aO/5a5MVgUFGS7Hu1P9P03o3fJkDCyw==}
+    engines: {node: '>=12'}
 
   debug@2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
@@ -3478,14 +3551,6 @@ packages:
 
   langsmith@0.2.15:
     resolution: {integrity: sha512-homtJU41iitqIZVuuLW7iarCzD4f39KcfP9RTBWav9jifhrsDa1Ez89Ejr+4qi72iuBu8Y5xykchsGVgiEZ93w==}
-    peerDependencies:
-      openai: '*'
-    peerDependenciesMeta:
-      openai:
-        optional: true
-
-  langsmith@0.3.28:
-    resolution: {integrity: sha512-Vq8n0zJ9MhDMhwkOhmOEb/rl/8jpm0LnAF4dE5TEXMdLmhJ784gcrWOghnFh7Qs5B4DY2Bdz3OKxIevkGKn5xg==}
     peerDependencies:
       openai: '*'
     peerDependenciesMeta:
@@ -4763,6 +4828,11 @@ packages:
   url-parse@1.5.10:
     resolution: {integrity: sha512-WypcfiRhfeUP9vvF0j6rw0J3hrWrw6iZv3+22h6iRMJ/8z1Tj6XfLP4DsUix5MhMPnXpiHDoKyoZ/bdCkwBCiQ==}
 
+  use-sync-external-store@1.5.0:
+    resolution: {integrity: sha512-Rb46I4cGGVBmjamjphe8L/UnvJD+uPPtTkNvX5mZgqdbavhI4EbgIWJiIHXJ8bc/i9EQGPRh4DwEURJ552Do0A==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
@@ -5024,6 +5094,21 @@ packages:
 
   zod@3.24.4:
     resolution: {integrity: sha512-OdqJE9UDRPwWsrHjLN2F8bPxvwJBK22EHLWtanu0LSYr5YqzsaaW3RMgmjwr8Rypg5k+meEJdSPXJZXE/yqOMg==}
+
+  zustand@4.5.7:
+    resolution: {integrity: sha512-CHOUy7mu3lbD6o6LJLfllpjkzhHXSBlX8B9+qPddUsIfeF5S/UZ5q0kmCsnRqT1UHFQZchNFDDzMbQsuesHWlw==}
+    engines: {node: '>=12.7.0'}
+    peerDependencies:
+      '@types/react': '>=16.8'
+      immer: '>=9.0.6'
+      react: '>=16.8'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      immer:
+        optional: true
+      react:
+        optional: true
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -5941,6 +6026,12 @@ snapshots:
       enabled: 2.0.0
       kuler: 2.0.0
 
+  '@dagrejs/dagre@1.1.4':
+    dependencies:
+      '@dagrejs/graphlib': 2.2.4
+
+  '@dagrejs/graphlib@2.2.4': {}
+
   '@docsearch/css@3.8.2': {}
 
   '@docsearch/js@3.8.2(@algolia/client-search@5.24.0)(search-insights@2.17.3)':
@@ -6330,23 +6421,6 @@ snapshots:
       - handlebars
       - peggy
 
-  '@langchain/core@0.3.55(openai@4.100.0(ws@8.18.2)(zod@3.24.4))':
-    dependencies:
-      '@cfworker/json-schema': 4.1.1
-      ansi-styles: 5.2.0
-      camelcase: 6.3.0
-      decamelize: 1.2.0
-      js-tiktoken: 1.0.20
-      langsmith: 0.3.28(openai@4.100.0(ws@8.18.2)(zod@3.24.4))
-      mustache: 4.2.0
-      p-queue: 6.6.2
-      p-retry: 4.6.2
-      uuid: 10.0.0
-      zod: 3.24.4
-      zod-to-json-schema: 3.24.5(zod@3.24.4)
-    transitivePeerDependencies:
-      - openai
-
   '@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4))':
     dependencies:
       '@cfworker/json-schema': 4.1.1
@@ -6377,7 +6451,7 @@ snapshots:
       '@langchain/core': 0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4))
       uuid: 10.0.0
 
-  '@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)':
+  '@langchain/langgraph-sdk@0.0.76(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)':
     dependencies:
       '@types/json-schema': 7.0.15
       p-queue: 6.6.2
@@ -6387,7 +6461,7 @@ snapshots:
       '@langchain/core': 0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4))
       react: 19.1.0
 
-  '@langchain/langgraph-supervisor@0.0.11(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.4)))':
+  '@langchain/langgraph-supervisor@0.0.12(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.4)))':
     dependencies:
       '@langchain/core': 0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4))
       '@langchain/langgraph': 0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.4))
@@ -6412,7 +6486,7 @@ snapshots:
     dependencies:
       '@langchain/core': 0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4))
       '@langchain/langgraph-checkpoint': 0.0.17(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))
-      '@langchain/langgraph-sdk': 0.0.74(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)
+      '@langchain/langgraph-sdk': 0.0.76(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)
       uuid: 10.0.0
       zod: 3.24.4
     optionalDependencies:
@@ -6447,7 +6521,7 @@ snapshots:
       '@langchain/core': 0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4))
       js-tiktoken: 1.0.20
 
-  '@langgraph-js/api@0.2.39(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.4)))(@types/pg@8.15.1)(openai@4.100.0(ws@8.18.2)(zod@3.24.4))(typescript@5.8.3)':
+  '@langgraph-js/api@0.2.39(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4))))(@langchain/langgraph-sdk@0.0.76(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.4)))(@types/pg@8.15.1)(openai@4.100.0(ws@8.18.2)(zod@3.24.4))(typescript@5.8.3)':
     dependencies:
       '@babel/code-frame': 7.27.1
       '@hono/node-server': 1.14.1(hono@4.7.9)
@@ -6477,16 +6551,16 @@ snapshots:
       winston-console-format: 1.0.8
       zod: 3.24.4
     optionalDependencies:
-      '@langchain/langgraph-sdk': 0.0.74(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)
+      '@langchain/langgraph-sdk': 0.0.76(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)
     transitivePeerDependencies:
       - babel-plugin-macros
       - openai
       - pg-native
       - supports-color
 
-  '@langgraph-js/bundler@1.3.0(@langgraph-js/api@0.2.39(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.4)))(@types/pg@8.15.1)(openai@4.100.0(ws@8.18.2)(zod@3.24.4))(typescript@5.8.3))(@types/node@20.17.47)(jiti@2.4.2)(lightningcss@1.30.1)(rollup@4.40.2)(tsx@4.19.4)(yaml@2.8.0)':
+  '@langgraph-js/bundler@1.3.0(@langgraph-js/api@0.2.39(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4))))(@langchain/langgraph-sdk@0.0.76(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.4)))(@types/pg@8.15.1)(openai@4.100.0(ws@8.18.2)(zod@3.24.4))(typescript@5.8.3))(@types/node@20.17.47)(jiti@2.4.2)(lightningcss@1.30.1)(rollup@4.40.2)(tsx@4.19.4)(yaml@2.8.0)':
     dependencies:
-      '@langgraph-js/api': 0.2.39(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4))))(@langchain/langgraph-sdk@0.0.74(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.4)))(@types/pg@8.15.1)(openai@4.100.0(ws@8.18.2)(zod@3.24.4))(typescript@5.8.3)
+      '@langgraph-js/api': 0.2.39(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4))))(@langchain/langgraph-sdk@0.0.76(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.24.4)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.24.4)))(@types/pg@8.15.1)(openai@4.100.0(ws@8.18.2)(zod@3.24.4))(typescript@5.8.3)
       rollup-plugin-node-externals: 8.0.0(rollup@4.40.2)
       vite: 6.3.5(@types/node@20.17.47)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.19.4)(yaml@2.8.0)
     transitivePeerDependencies:
@@ -6511,21 +6585,6 @@ snapshots:
     transitivePeerDependencies:
       - '@langchain/core'
       - pg-native
-
-  '@modelcontextprotocol/sdk@1.11.2':
-    dependencies:
-      content-type: 1.0.5
-      cors: 2.8.5
-      cross-spawn: 7.0.6
-      eventsource: 3.0.7
-      express: 5.1.0
-      express-rate-limit: 7.5.0(express@5.1.0)
-      pkce-challenge: 5.0.0
-      raw-body: 3.0.0
-      zod: 3.24.4
-      zod-to-json-schema: 3.24.5(zod@3.24.4)
-    transitivePeerDependencies:
-      - supports-color
 
   '@modelcontextprotocol/sdk@1.11.4':
     dependencies:
@@ -7170,6 +7229,27 @@ snapshots:
     dependencies:
       '@types/node': 22.15.18
 
+  '@types/d3-color@3.1.3': {}
+
+  '@types/d3-drag@3.0.7':
+    dependencies:
+      '@types/d3-selection': 3.0.11
+
+  '@types/d3-interpolate@3.0.4':
+    dependencies:
+      '@types/d3-color': 3.1.3
+
+  '@types/d3-selection@3.0.11': {}
+
+  '@types/d3-transition@3.0.9':
+    dependencies:
+      '@types/d3-selection': 3.0.11
+
+  '@types/d3-zoom@3.0.8':
+    dependencies:
+      '@types/d3-interpolate': 3.0.4
+      '@types/d3-selection': 3.0.11
+
   '@types/debug@4.1.12':
     dependencies:
       '@types/ms': 2.1.0
@@ -7482,6 +7562,27 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
+  '@xyflow/react@12.6.4(@types/react@19.1.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@xyflow/system': 0.0.61
+      classcat: 5.0.5
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+      zustand: 4.5.7(@types/react@19.1.4)(react@19.1.0)
+    transitivePeerDependencies:
+      - '@types/react'
+      - immer
+
+  '@xyflow/system@0.0.61':
+    dependencies:
+      '@types/d3-drag': 3.0.7
+      '@types/d3-selection': 3.0.11
+      '@types/d3-transition': 3.0.9
+      '@types/d3-zoom': 3.0.8
+      d3-drag: 3.0.0
+      d3-selection: 3.0.0
+      d3-zoom: 3.0.0
+
   abort-controller@3.0.0:
     dependencies:
       event-target-shim: 5.0.1
@@ -7761,6 +7862,8 @@ snapshots:
 
   ci-info@3.9.0: {}
 
+  classcat@5.0.5: {}
+
   cliui@8.0.1:
     dependencies:
       string-width: 4.2.3
@@ -7902,6 +8005,42 @@ snapshots:
   cssesc@3.0.0: {}
 
   csstype@3.1.3: {}
+
+  d3-color@3.1.0: {}
+
+  d3-dispatch@3.0.1: {}
+
+  d3-drag@3.0.0:
+    dependencies:
+      d3-dispatch: 3.0.1
+      d3-selection: 3.0.0
+
+  d3-ease@3.0.1: {}
+
+  d3-interpolate@3.0.1:
+    dependencies:
+      d3-color: 3.1.0
+
+  d3-selection@3.0.0: {}
+
+  d3-timer@3.0.1: {}
+
+  d3-transition@3.0.1(d3-selection@3.0.0):
+    dependencies:
+      d3-color: 3.1.0
+      d3-dispatch: 3.0.1
+      d3-ease: 3.0.1
+      d3-interpolate: 3.0.1
+      d3-selection: 3.0.0
+      d3-timer: 3.0.1
+
+  d3-zoom@3.0.0:
+    dependencies:
+      d3-dispatch: 3.0.1
+      d3-drag: 3.0.0
+      d3-interpolate: 3.0.1
+      d3-selection: 3.0.0
+      d3-transition: 3.0.1(d3-selection@3.0.0)
 
   debug@2.6.9:
     dependencies:
@@ -8741,18 +8880,6 @@ snapshots:
     dependencies:
       '@types/uuid': 10.0.0
       commander: 10.0.1
-      p-queue: 6.6.2
-      p-retry: 4.6.2
-      semver: 7.7.2
-      uuid: 10.0.0
-    optionalDependencies:
-      openai: 4.100.0(ws@8.18.2)(zod@3.24.4)
-
-  langsmith@0.3.28(openai@4.100.0(ws@8.18.2)(zod@3.24.4)):
-    dependencies:
-      '@types/uuid': 10.0.0
-      chalk: 4.1.2
-      console-table-printer: 2.12.1
       p-queue: 6.6.2
       p-retry: 4.6.2
       semver: 7.7.2
@@ -10204,6 +10331,10 @@ snapshots:
       querystringify: 2.2.0
       requires-port: 1.0.0
 
+  use-sync-external-store@1.5.0(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+
   util-deprecate@1.0.2: {}
 
   utils-merge@1.0.1: {}
@@ -10493,5 +10624,12 @@ snapshots:
       zod: 3.24.4
 
   zod@3.24.4: {}
+
+  zustand@4.5.7(@types/react@19.1.4)(react@19.1.0):
+    dependencies:
+      use-sync-external-store: 1.5.0(react@19.1.0)
+    optionalDependencies:
+      '@types/react': 19.1.4
+      react: 19.1.0
 
   zwitch@2.0.4: {}

@@ -32,6 +32,10 @@ export const auth = new Auth()
         // Filter the resource by the owner
         return { owner: user.identity };
     })
+    // 给予读取权限
+    .on("assistants:read", () => {
+        return {};
+    })
     .on("store", ({ user, value }) => {
         if (value.namespace != null) {
             // Assuming you organize information in store like (user_id, resource_type, resource_id)
