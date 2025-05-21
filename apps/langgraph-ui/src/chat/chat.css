@@ -110,7 +110,10 @@
     flex-direction: column;
     gap: 1rem;
 }
-
+.message-title {
+    font-weight: 500;
+    color: #374151;
+}
 .message {
     display: flex;
     max-width: 80%;

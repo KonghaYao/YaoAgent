@@ -21,6 +21,10 @@ interface AsyncCallerParams {
     fetch?: typeof fetch | ((...args: any[]) => any);
 }
 export type RenderMessage = Message & {
+    /** 对于 AIMessage 来说是节点名称，对于工具节点来说是工具名称 */
+    name?: string;
+    /** 工具节点的触发节点名称 */
+    node_name?: string;
     /** 工具入参 ，聚合而来*/
     tool_input?: string;
     additional_kwargs?: {
@@ -335,6 +339,7 @@ export class LangGraphClient extends Client {
                 }
                 if (parentMessage) {
                     message.usage_metadata = parentMessage.usage_metadata;
+                    message.node_name = parentMessage.name;
                 }
             }
             result.push(message);

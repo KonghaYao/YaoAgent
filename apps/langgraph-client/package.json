@@ -34,10 +34,9 @@
         "url": "https://github.com/KonghaYao/YaoAgent/issues"
     },
     "dependencies": {
-        "@langchain/langgraph-sdk": "^0.0.76",
+        "@langchain/langgraph-sdk": "^0.0.77",
         "nanostores": "^1.0.1",
-        "zod": "^3.24.3",
-        "zod-to-json-schema": "^3.24.3"
-    },
-    "devDependencies": {}
+        "zod": "^3.25.17",
+        "zod-to-json-schema": "^3.24.5"
+    }
 }
