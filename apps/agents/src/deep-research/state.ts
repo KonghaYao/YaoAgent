@@ -1,9 +1,9 @@
 import { SwarmState } from "@langchain/langgraph-swarm";
-import { createReactAgentAnnotation } from "@langchain/langgraph/prebuilt";
 import { ModelState } from "../model/states.js";
 import { createState } from "../super-agent/state-builder.js";
 import { createDefaultAnnotation } from "../utils/index.js";
 import { z } from "zod";
+import { createReactAgentAnnotation } from "@langchain/langgraph/prebuilt";
 
 export const DeepResearchState = createState(createReactAgentAnnotation(), ModelState, SwarmState).build({
     locale: createDefaultAnnotation(() => "en-US"),
@@ -41,7 +41,7 @@ export const Plan = z.object({
     locale: z.string(),
     has_enough_context: z.boolean(),
     thought: z.string(),
-    title: z.string().describe("The title of the research"),
+    title: z.string().describe("The title of the research").optional(),
     steps: z.array(Step),
 });
 

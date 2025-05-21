@@ -1,8 +1,19 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
+const schema = z.object({
+    thought: z.string().describe("Your current thinking step"),
+    nextThoughtNeeded: z.boolean().describe("Whether another thought step is needed"),
+    thoughtNumber: z.number().min(1).describe("Current thought number"),
+    totalThoughts: z.number().min(1).describe("Estimated total thoughts needed"),
+    isRevision: z.boolean().optional().describe("Whether this revises previous thinking"),
+    revisesThought: z.number().min(1).optional().describe("Which thought is being reconsidered"),
+    branchFromThought: z.number().min(1).optional().describe("Branching point thought number"),
+    branchId: z.string().optional().describe("Branch identifier"),
+    needsMoreThoughts: z.boolean().optional().describe("If more thoughts are needed"),
+});
 // 存储思考历史
-const thoughtHistory: any[] = [];
-const branches: Record<string, any[]> = {};
+const thoughtHistory: z.infer<typeof schema>[] = [];
+const branches: Record<string, z.infer<typeof schema>[]> = {};
 
 export const SequentialThinkingTool = tool(
     async (args) => {
@@ -67,16 +78,6 @@ Key features:
 - Verifies the hypothesis based on the Chain of Thought steps
 - Repeats the process until satisfied
 - Provides a correct answer`,
-        schema: z.object({
-            thought: z.string().describe("Your current thinking step"),
-            nextThoughtNeeded: z.boolean().describe("Whether another thought step is needed"),
-            thoughtNumber: z.number().min(1).describe("Current thought number"),
-            totalThoughts: z.number().min(1).describe("Estimated total thoughts needed"),
-            isRevision: z.boolean().optional().describe("Whether this revises previous thinking"),
-            revisesThought: z.number().min(1).optional().describe("Which thought is being reconsidered"),
-            branchFromThought: z.number().min(1).optional().describe("Branching point thought number"),
-            branchId: z.string().optional().describe("Branch identifier"),
-            needsMoreThoughts: z.boolean().optional().describe("If more thoughts are needed"),
-        }),
+        schema,
     }
 );

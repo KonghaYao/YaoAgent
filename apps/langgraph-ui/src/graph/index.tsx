@@ -48,7 +48,7 @@ const transformEdges = (edges: AssistantGraph["edges"], nodes: Node[]): Edge[] =
 
 const LayoutFlow = () => {
     const { fitView } = useReactFlow();
-    const { graphVisualize } = useChat();
+    const { graphVisualize, currentNodeName } = useChat();
     const graphData = graphVisualize || { nodes: [], edges: [] };
 
     const initialNodes = flattenGraph(graphData.nodes.map((node) => ({ ...node, type: "default" })));
@@ -74,7 +74,15 @@ const LayoutFlow = () => {
             fitView();
         }
     }, [graphData]);
-
+    useEffect(() => {
+        const index = nodes.findIndex((i) => i.id.endsWith(currentNodeName));
+        if (index !== -1) {
+            const newNodes = [...nodes].map((i) => ({ ...i, selected: false }));
+            newNodes[index] = { ...newNodes[index], selected: true };
+            setNodes(newNodes);
+            fitView();
+        }
+    }, [currentNodeName]);
     return (
         <div style={{ width: "30%", height: "100%", position: "relative", overflow: "hidden" }}>
             <ReactFlow nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} fitView className="w-full h-full" nodeTypes={nodeTypes}>

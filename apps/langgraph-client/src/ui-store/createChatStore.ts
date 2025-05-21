@@ -79,6 +79,7 @@ export const createChatStore = (
     const showHistory = atom<boolean>(context.showHistory ?? false);
     const currentAgent = atom<string>(initClientName);
     const currentChatId = atom<string | null>(null);
+    const currentNodeName = atom<string>("__start__");
 
     // 显示 langgraph 可视化图
     const showGraph = atom<boolean>(context.showGraph ?? false);
@@ -87,7 +88,12 @@ export const createChatStore = (
         if (showGraph.get()) graphVisualize.set((await client.get()?.graphVisualize()) || null);
     };
     const updateUI = rafDebounce((newClient: LangGraphClient) => {
-        renderMessages.set(newClient.renderMessage);
+        const messages = newClient.renderMessage;
+        const lastMessage = messages[messages.length - 1];
+
+        currentNodeName.set(lastMessage?.node_name || lastMessage?.name || "__start__");
+
+        renderMessages.set(messages);
     });
     /**
      * @zh 初始化 LangGraph 客户端。
@@ -103,6 +109,8 @@ export const createChatStore = (
         newClient.onStreamingUpdate((event) => {
             if (event.type === "thread" || event.type === "done") {
                 // console.log(event.data);
+                // 创建新流程时，默认为 __start__
+                currentNodeName.set("__start__");
                 // 创建新会话时，需要自动刷新历史面板
                 return refreshHistoryList();
             }
@@ -204,6 +212,7 @@ export const createChatStore = (
             currentChatId,
             showGraph,
             graphVisualize,
+            currentNodeName,
         },
         mutations: {
             initClient,

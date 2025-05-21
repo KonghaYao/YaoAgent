@@ -1,7 +1,3 @@
-import { Annotation } from "@langchain/langgraph";
+import { createDefaultAnnotation } from "../pro/index.js";
 
-export const createDefaultAnnotation = <T>(default_value: () => T) =>
-    Annotation<T>({
-        reducer: (_, a) => a,
-        default: default_value,
-    });
+export { createDefaultAnnotation };

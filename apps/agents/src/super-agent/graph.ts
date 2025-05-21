@@ -7,10 +7,10 @@ import { createLLM } from "../model/index.js";
 import { SystemMessage } from "@langchain/core/messages";
 import { MemoryPrompt } from "./tools/memory.js";
 import { createExpert } from "../create-expert/index.js";
-import { SequentialThinkingTool } from "./tools/sequential-thinking.js";
+import { SequentialThinkingTool } from "../pro/tools/sequential-thinking.js";
 import { MemoryNode } from "../create-expert/short-term-memory.js";
 import { getPrompt } from "../model/prompt-getter.js";
-import { createFeTools } from "../model/fe_tools.js";
+import { createFeTools } from "../pro/feTools.js";
 const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<typeof ConfigurationState.State>>(
     {
         // npm: {

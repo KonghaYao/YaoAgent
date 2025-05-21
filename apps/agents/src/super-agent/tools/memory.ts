@@ -1,17 +1,17 @@
 import { v4 as uuidv4 } from "uuid";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
-import { BaseStore, LangGraphRunnableConfig } from "@langchain/langgraph";
+import { LangGraphRunnableConfig } from "@langchain/langgraph";
 import { ConfigurationState } from "../state.js";
 
 export const MemoryPrompt = `你记忆力只有七秒，所以你拥有一本 notebook, 你依靠notebook来记住重要信息。
 请通过记录(notebook_write)保存重要信息，并在需要时查阅(notebook_read)以确保对话连贯性和个性化服务。
 `;
 
-export function createNoteTool<
-    State,
-    Config extends LangGraphRunnableConfig<typeof ConfigurationState.State>,
->(_state: State, config?: Config) {
+export function createNoteTool<State, Config extends LangGraphRunnableConfig<typeof ConfigurationState.State>>(
+    _state: State,
+    config?: Config
+) {
     if (!config || !config.store || !config.metadata?.userId) {
         console.warn("MemoryTool: Config or store or userId not provided");
         return [];
