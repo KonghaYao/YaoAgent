@@ -8,6 +8,8 @@ import { CallToolResult, createJSONDefineTool, UnionTool } from "./tool/createTo
  */
 export class ToolManager {
     private tools: Map<string, UnionTool<any>> = new Map();
+    // === 专门为前端设计的异步触发结构
+    private waitingMap: Map<string, (value: CallToolResult) => void> = new Map();
 
     /**
      * @zh 注册一个工具。
@@ -59,6 +61,10 @@ export class ToolManager {
     clearTools() {
         this.tools.clear();
     }
+    reset() {
+        this.clearTools();
+        this.waitingMap.clear();
+    }
 
     /**
      * @zh 调用指定名称的工具。
@@ -79,9 +85,6 @@ export class ToolManager {
     toJSON() {
         return Array.from(this.tools.values()).map((i) => createJSONDefineTool(i));
     }
-
-    // === 专门为前端设计的异步触发结构
-    private waitingMap: Map<string, (value: CallToolResult) => void> = new Map();
 
     /**
      * @zh 标记指定 ID 的工具等待已完成，并传递结果。

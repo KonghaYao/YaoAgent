@@ -122,7 +122,6 @@ export class LangGraphClient extends Client {
             this.availableAssistants = assistants;
             if (assistants.length > 0) {
                 if (agentName) {
-                    console.log("agentName", agentName);
                     this.currentAssistant = assistants.find((assistant) => assistant.graph_id === agentName) || null;
                     if (!this.currentAssistant) {
                         throw new Error("Agent not found: " + agentName);
@@ -558,12 +557,13 @@ export class LangGraphClient extends Client {
      * @en Resets the client state.
      */
     async reset() {
-        await this.initAssistant(this.currentAssistant?.name!);
+        await this.initAssistant(this.currentAssistant?.graph_id!);
         this.currentThread = null;
         this.graphState = {};
         this.graphMessages = [];
         this.streamingMessage = [];
         this.currentRun = undefined;
+        this.tools.reset();
         this.emitStreamingUpdate({
             type: "value",
             data: {

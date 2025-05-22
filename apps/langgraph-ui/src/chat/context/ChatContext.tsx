@@ -24,7 +24,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
             if (store.showHistory) {
                 store.refreshHistoryList();
             }
-            console.log(res);
         });
     }, []);
 

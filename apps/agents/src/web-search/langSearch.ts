@@ -1,28 +1,31 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
-import axios from "axios";
 
 export function createLangSearchTool(apiKey: string) {
     const langSearchTool = tool(
         async ({ query, freshness = "noLimit", summary = false, count = 10 }) => {
             try {
-                const response = await axios.post(
-                    "https://api.langsearch.com/v1/web-search",
-                    {
+                const response = await fetch("https://api.langsearch.com/v1/web-search", {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${apiKey}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
                         query,
                         freshness,
                         summary,
                         count,
-                    },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${apiKey}`,
-                            "Content-Type": "application/json",
-                        },
-                    }
-                );
+                    }),
+                });
 
-                const data = response.data.data;
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(`搜索失败: ${errorData.msg || response.statusText}`);
+                }
+
+                const responseData = await response.json();
+                const data = responseData.data;
                 if (!data || !data.webPages || !data.webPages.value) {
                     return "未找到相关搜索结果";
                 }
@@ -36,10 +39,7 @@ export function createLangSearchTool(apiKey: string) {
 
                 return results || "未找到相关搜索结果";
             } catch (error) {
-                if (axios.isAxiosError(error)) {
-                    throw new Error(`搜索失败: ${error.response?.data?.msg || error.message}`);
-                }
-                throw error;
+                throw error instanceof Error ? error : new Error(`搜索失败: ${String(error)}`);
             }
         },
         {

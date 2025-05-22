@@ -258,6 +258,7 @@ export const createChatStore = (
             createNewChat() {
                 client.get()?.reset();
                 inChatError.set(null);
+                loading.set(false);
             },
             /**
              * @zh 切换到指定的历史聊天会话。
@@ -268,6 +269,8 @@ export const createChatStore = (
                     messages: Message[];
                 }>
             ) {
+                inChatError.set(null);
+                loading.set(false);
                 client.get()?.resetThread(thread.metadata?.graph_id as string, thread.thread_id);
             },
             /**
