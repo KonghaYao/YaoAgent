@@ -563,7 +563,7 @@ export class LangGraphClient extends Client {
         this.graphMessages = [];
         this.streamingMessage = [];
         this.currentRun = undefined;
-        this.tools.reset();
+        this.tools.clearWaiting();
         this.emitStreamingUpdate({
             type: "value",
             data: {

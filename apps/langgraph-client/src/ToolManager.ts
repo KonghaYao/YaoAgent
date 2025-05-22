@@ -63,6 +63,9 @@ export class ToolManager {
     }
     reset() {
         this.clearTools();
+        this.clearWaiting();
+    }
+    clearWaiting() {
         this.waitingMap.clear();
     }
 
