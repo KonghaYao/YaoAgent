@@ -1,14 +1,16 @@
 import { createReactAgent, ToolNode } from "@langchain/langgraph/prebuilt";
 import { Plan, DeepResearchState } from "./state.js";
 import { apply_prompt_template } from "./utils.js";
-import { createHandoffTool, createSwarm } from "@langchain/langgraph-swarm";
+import { createSwarm } from "@langchain/langgraph-swarm";
+import { createHandoffTool } from "../pro/swarm/handoff.js";
 import { ChatOpenAI } from "@langchain/openai";
 import { SequentialThinkingTool } from "../pro/tools/sequential-thinking.js";
 import { MultiServerMCPClient } from "@langchain/mcp-adapters";
 import { Command, END, START, StateGraph } from "@langchain/langgraph";
 import { tool, ToolRunnableConfig } from "@langchain/core/tools";
 import { SystemMessage, ToolMessage } from "@langchain/core/messages";
-import { createLangSearchTool } from "src/web-search/langSearch.js";
+import { createLangSearchTool } from "../web-search/langSearch.js";
+import { keepAllStateInHandOff } from "../pro/swarm/keepState.js";
 
 const llm = new ChatOpenAI({
     modelName: "gpt-4o-mini",
@@ -17,7 +19,7 @@ const llm = new ChatOpenAI({
 const coordinator_agent = createReactAgent({
     name: "coordinator",
     llm,
-    tools: [createHandoffTool({ agentName: "planner", description: "制定计划" })],
+    tools: [createHandoffTool({ agentName: "planner", description: "制定计划", updateState: keepAllStateInHandOff })],
     prompt: async (state) => {
         const data = await apply_prompt_template("deep_research_coordinator.md", state as any);
         return [new SystemMessage(data), ...state.messages];
@@ -52,8 +54,16 @@ const planner_agent = createReactAgent({
     tools: [
         // SequentialThinkingTool,
         update_plan,
-        createHandoffTool({ agentName: "researcher", description: "进行研究" }),
-        createHandoffTool({ agentName: "reporter", description: "进行总结" }),
+        createHandoffTool({
+            agentName: "researcher",
+            description: "进行研究",
+            updateState: keepAllStateInHandOff,
+        }),
+        createHandoffTool({
+            agentName: "reporter",
+            description: "进行总结",
+            updateState: keepAllStateInHandOff,
+        }),
     ],
     prompt: async (state) => {
         const data = await apply_prompt_template("deep_research_planner.md", state as any);
@@ -72,7 +82,11 @@ function create_researcher_graph() {
                 llm,
                 tools: [
                     ...createLangSearchTool(process.env.LANGSEARCH_API_KEY!),
-                    createHandoffTool({ agentName: "planner", description: "返回计划" }),
+                    createHandoffTool({
+                        agentName: "planner",
+                        description: "返回计划",
+                        updateState: keepAllStateInHandOff,
+                    }),
                 ],
                 prompt,
                 stateSchema: DeepResearchState,
