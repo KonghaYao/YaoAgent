@@ -66,6 +66,9 @@ importers:
       '@langchain/openai':
         specifier: ^0.5.10
         version: 0.5.10(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(ws@8.18.2)
+      '@langchain/tavily':
+        specifier: ^0.1.1
+        version: 0.1.1(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))
       '@langgraph-js/api':
         specifier: ^0.2.39
         version: 0.2.39(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/langgraph-sdk@0.0.76(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(react@19.1.0))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.25.17)))(@types/pg@8.15.2)(openai@4.100.0(ws@8.18.2)(zod@3.25.17))(typescript@5.8.3)
@@ -1578,6 +1581,12 @@ packages:
 
   '@langchain/openai@0.5.10':
     resolution: {integrity: sha512-hBQIWjcVxGS7tgVvgBBmrZ5jSaJ8nu9g6V64/Tx6KGjkW7VdGmUvqCO+koiQCOZVL7PBJkHWAvDsbghPYXiZEA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@langchain/core': ^0.3.42
+
+  '@langchain/tavily@0.1.1':
+    resolution: {integrity: sha512-nvg/gJkt9F8xOlMDoP8YR22BdUz9IjsHFYp3LjCsjFq2SMlKicIWDP9M8Z4Pv0Zd9zHYk4v9Ljr3TZfCj39LRA==}
     engines: {node: '>=18'}
     peerDependencies:
       '@langchain/core': ^0.3.42
@@ -6536,6 +6545,11 @@ snapshots:
     transitivePeerDependencies:
       - encoding
       - ws
+
+  '@langchain/tavily@0.1.1(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))':
+    dependencies:
+      '@langchain/core': 0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))
+      zod: 3.25.17
 
   '@langchain/textsplitters@0.1.0(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))':
     dependencies:

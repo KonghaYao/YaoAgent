@@ -4,12 +4,13 @@ import { createState } from "../super-agent/state-builder.js";
 import { createDefaultAnnotation } from "../utils/index.js";
 import { z } from "zod";
 import { createReactAgentAnnotation } from "@langchain/langgraph/prebuilt";
+import { Annotation } from "@langchain/langgraph";
 
 export const DeepResearchState = createState(createReactAgentAnnotation(), ModelState, SwarmState).build({
     locale: createDefaultAnnotation(() => "en-US"),
     observations: createDefaultAnnotation<string[]>(() => []),
     plan_iterations: createDefaultAnnotation(() => 0),
-    current_plan: createDefaultAnnotation<Plan | null>(() => null),
+    current_plan: Annotation<Plan>,
     final_report: createDefaultAnnotation<string>(() => ""),
     auto_accepted_plan: createDefaultAnnotation<boolean>(() => false),
     enable_background_investigation: createDefaultAnnotation<boolean>(() => true),

@@ -46,6 +46,7 @@ You have access to two types of tools:
 
 # Output Format
 
+- Call `submit_result` to submit response. 
 - Provide a structured response in markdown format.
 - Include the following sections:
 

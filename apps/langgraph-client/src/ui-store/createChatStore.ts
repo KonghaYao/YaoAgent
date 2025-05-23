@@ -111,6 +111,7 @@ export const createChatStore = (
                 // console.log(event.data);
                 // 创建新流程时，默认为 __start__
                 currentNodeName.set("__start__");
+                if (event.type === "done") loading.set(false);
                 // 创建新会话时，需要自动刷新历史面板
                 return refreshHistoryList();
             }

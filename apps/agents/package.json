@@ -24,6 +24,7 @@
         "@langchain/langgraph-swarm": "^0.0.3",
         "@langchain/mcp-adapters": "^0.4.5",
         "@langchain/openai": "^0.5.10",
+        "@langchain/tavily": "^0.1.1",
         "@langgraph-js/api": "^0.2.39",
         "eventsource": "^3.0.7",
         "langchain": "^0.3.26",

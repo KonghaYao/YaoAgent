@@ -457,7 +457,7 @@ export class LangGraphClient extends Client {
                     data: chunk,
                 });
                 continue;
-            } else if (chunk.event.startsWith("values")) {
+            } else if (chunk.event === "values") {
                 const data = chunk.data as { messages: Message[] };
 
                 if (data.messages) {
