@@ -4,13 +4,15 @@ interface UsageMetadataProps {
         output_tokens: number;
         total_tokens: number;
     }>;
-    response_metadata?:{
+    response_metadata?: {
         model_name?: string;
-    }
+    };
     spend_time?: number;
+    tool_call_id?: string;
+    id?: string;
 }
 
-export const UsageMetadata: React.FC<UsageMetadataProps> = ({ usage_metadata, spend_time ,response_metadata}) => {
+export const UsageMetadata: React.FC<UsageMetadataProps> = ({ usage_metadata, spend_time, response_metadata, id, tool_call_id }) => {
     const formatTokens = (tokens: number) => {
         return tokens.toString();
     };
@@ -31,10 +33,10 @@ export const UsageMetadata: React.FC<UsageMetadataProps> = ({ usage_metadata, sp
                     {formatTokens(usage_metadata.total_tokens || 0)}
                 </span>
             </div>
-            <div>
-                {response_metadata?.model_name}
-            </div>
+            <div>{response_metadata?.model_name}</div>
             <span className="message-time">{spend_time ? `${(spend_time / 1000).toFixed(2)}s` : ""}</span>
+            {tool_call_id && <span className="tool-call-id">Tool: {tool_call_id}</span>}
+            {id && <span className="message-id">ID: {id}</span>}
         </div>
     );
 };

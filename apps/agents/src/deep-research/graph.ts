@@ -17,10 +17,8 @@ import {
     ToolMessage,
 } from "@langchain/core/messages";
 import { keepAllStateInHandOff } from "../pro/swarm/keepState.js";
-import z from "zod";
 import { TavilySearch } from "@langchain/tavily";
 import { web_search_tool } from "../web-search/searchMock.js";
-
 const tavilyTool = new TavilySearch({
     maxResults: 5,
 });
@@ -117,7 +115,7 @@ const research_dispatcher = new StateGraph(DeepResearchState)
                         step.title +
                         "\n\n下面是你要完成的目标\n" +
                         step.description +
-                        "\n\n请你开始工作"
+                        "\n\n请你开始工作, 搜索只能搜索一次"
                 ),
             ],
             current_plan: state.current_plan,
@@ -125,7 +123,7 @@ const research_dispatcher = new StateGraph(DeepResearchState)
         });
         step.execution_res = getMessageContent(messages[messages.length - 1]);
         return {
-            messages,
+            messages: [...state.messages, ...messages],
             plan_iterations: state.plan_iterations + 1,
             current_plan: state.current_plan,
         };

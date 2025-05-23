@@ -172,6 +172,7 @@ export class LangGraphClient extends Client {
             sortOrder: "desc",
         });
     }
+
     /**
      * @zh 从历史中恢复 Thread 数据。
      * @en Resets the Thread data from history.
@@ -198,6 +199,14 @@ export class LangGraphClient extends Client {
     cloneMessage(message: Message): Message {
         return JSON.parse(JSON.stringify(message));
     }
+    private updateStreamingMessage(message: RenderMessage) {
+        const lastMessage = this.streamingMessage[this.streamingMessage.length - 1];
+        if (!lastMessage?.id || message.id !== lastMessage.id) {
+            this.streamingMessage.push(message);
+            return;
+        }
+        this.streamingMessage[this.streamingMessage.length - 1] = message;
+    }
     private replaceMessageWithValuesMessage(message: AIMessage | ToolMessage, isTool = false): Message {
         const key = (isTool ? "tool_call_id" : "id") as any as "id";
         const valuesMessage = this.graphMessages.find((i) => i[key] === message[key]);
@@ -217,9 +226,10 @@ export class LangGraphClient extends Client {
      */
     get renderMessage() {
         const previousMessage = new Map<string, Message>();
+        const closedToolCallIds = new Set<string>();
         const result: Message[] = [];
         const inputMessages = [...this.graphMessages, ...this.streamingMessage];
-
+        console.log(inputMessages);
         // 从后往前遍历，这样可以保证最新的消息在前面
         for (let i = inputMessages.length - 1; i >= 0; i--) {
             const message = this.cloneMessage(inputMessages[i]);
@@ -241,21 +251,25 @@ export class LangGraphClient extends Client {
 
                 /** @ts-ignore */
                 const tool_calls: NonNullable<AIMessage["tool_calls"]> = (m as AIMessage).tool_calls?.length ? (m as AIMessage).tool_calls : (m as RenderMessage).tool_call_chunks;
-                const new_tool_calls = tool_calls!.map((tool, index) => {
-                    return this.replaceMessageWithValuesMessage(
-                        {
-                            type: "tool",
-                            additional_kwargs: {},
-                            /** @ts-ignore */
-                            tool_input: m.additional_kwargs?.tool_calls?.[index]?.function?.arguments,
-                            id: tool.id,
-                            name: tool.name,
-                            response_metadata: {},
-                            tool_call_id: tool.id!,
-                        },
-                        true
-                    );
-                });
+                const new_tool_calls = tool_calls
+                    .filter((i) => {
+                        return !closedToolCallIds.has(i.id!);
+                    })!
+                    .map((tool, index) => {
+                        return this.replaceMessageWithValuesMessage(
+                            {
+                                type: "tool",
+                                additional_kwargs: {},
+                                /** @ts-ignore */
+                                tool_input: m.additional_kwargs?.tool_calls?.[index]?.function?.arguments,
+                                id: tool.id,
+                                name: tool.name,
+                                response_metadata: {},
+                                tool_call_id: tool.id!,
+                            },
+                            true
+                        );
+                    });
                 for (const tool of new_tool_calls) {
                     if (!previousMessage.has(tool.id!)) {
                         result.unshift(tool);
@@ -264,6 +278,9 @@ export class LangGraphClient extends Client {
                 }
                 result.unshift(m);
             } else {
+                if (message.type === "tool" && message.tool_call_id) {
+                    closedToolCallIds.add(message.tool_call_id);
+                }
                 // 记录这个 id 的消息，并添加到结果中
                 const m = this.replaceMessageWithValuesMessage(message as AIMessage);
                 previousMessage.set(message.id, m);
@@ -450,7 +467,7 @@ export class LangGraphClient extends Client {
                 });
             } else if (chunk.event === "messages/partial") {
                 for (const message of chunk.data) {
-                    this.streamingMessage.push(message);
+                    this.updateStreamingMessage(message);
                 }
                 this.emitStreamingUpdate({
                     type: "message",
@@ -475,6 +492,11 @@ export class LangGraphClient extends Client {
                 this.graphState = chunk.data;
                 this.streamingMessage = [];
                 continue;
+            } else if (chunk.event.startsWith("values|")) {
+                // 这个 values 必然是子 values
+                if (chunk.data.messages) {
+                    this.mergeSubGraphMessagesToStreamingMessages(chunk.data.messages);
+                }
             }
         }
         this.streamingMessage = [];
@@ -487,6 +509,23 @@ export class LangGraphClient extends Client {
             },
         });
         return streamRecord;
+    }
+    /** 子图的数据需要通过 merge 的方式重新进行合并更新 */
+    private mergeSubGraphMessagesToStreamingMessages(messages: Message[]) {
+        const map = new Map(messages.filter((i) => i.id).map((i) => [i.id!, i]));
+        this.streamingMessage.forEach((i) => {
+            if (map.has(i.id!)) {
+                const newValue = map.get(i.id!)!;
+                Object.assign(i, newValue);
+                map.delete(i.id!);
+            }
+        });
+        // 剩余的 message 一定不在 streamMessage 中
+        map.forEach((i) => {
+            if (i.type === "tool" && i.tool_call_id) {
+                this.streamingMessage.push(i as RenderMessage);
+            }
+        });
     }
     private runFETool() {
         const data = this.graphMessages;

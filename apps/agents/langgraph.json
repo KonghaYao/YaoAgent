@@ -5,9 +5,6 @@
         "agent": "./src/super-agent/graph.ts:graph",
         "deep_research_graph": "./src/deep-research/graph.ts:deep_research_graph"
     },
-    "callbacks": {
-        "path": "./src/monitor/index.ts"
-    },
     "env": ".env",
     "auth": {
         "path": "./src/auth.ts:auth"

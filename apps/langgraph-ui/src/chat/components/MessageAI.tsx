@@ -16,7 +16,7 @@ const MessageAI: React.FC<MessageAIProps> = ({ message }) => {
                 <div className="message-text markdown-body">
                     <Markdown remarkPlugins={[remarkGfm]}>{getMessageContent(message.content)}</Markdown>
                 </div>
-                <UsageMetadata response_metadata={message.response_metadata as any} usage_metadata={message.usage_metadata || {}} spend_time={message.spend_time} />
+                <UsageMetadata response_metadata={message.response_metadata as any} usage_metadata={message.usage_metadata || {}} spend_time={message.spend_time} id={message.id} />
             </div>
         </div>
     );

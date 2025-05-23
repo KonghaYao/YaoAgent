@@ -37,7 +37,13 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, client, getMessageCo
                     <div className="tool-content">
                         <div className="tool-input">{message.tool_input}</div>
                         <div className="tool-output">{getMessageContent(message.content)}</div>
-                        <UsageMetadata response_metadata={message.response_metadata as any} usage_metadata={message.usage_metadata || {}} spend_time={message.spend_time} />
+                        <UsageMetadata
+                            response_metadata={message.response_metadata as any}
+                            usage_metadata={message.usage_metadata || {}}
+                            spend_time={message.spend_time}
+                            id={message.id}
+                            tool_call_id={message.tool_call_id}
+                        />
                     </div>
                 )}
             </div>
