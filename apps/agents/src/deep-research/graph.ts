@@ -100,26 +100,12 @@ const research_dispatcher = new StateGraph(DeepResearchState)
     .addNode("sub_research", async (state) => {
         const step = state.current_plan!.steps[state.plan_iterations];
         const prompt = await apply_prompt_template("deep_research_researcher.md", state as any);
-        const update_plan = tool(
-            (input) => {
-                step.execution_res = input.execution_res;
-                return "完成更新";
-            },
-            {
-                name: "update_plan",
-                description: "更新计划",
-                schema: z.object({
-                    execution_res: z.string(),
-                }),
-            }
-        );
         const researcher_agent = createReactAgent({
             name: "sub_researcher",
             llm,
             tools: [
                 web_search_tool,
                 // tavilyTool,
-                update_plan,
             ],
             prompt,
             stateSchema: DeepResearchState,
@@ -137,7 +123,7 @@ const research_dispatcher = new StateGraph(DeepResearchState)
             current_plan: state.current_plan,
             plan_iterations: state.plan_iterations,
         });
-
+        step.execution_res = getMessageContent(messages[messages.length - 1]);
         return {
             messages,
             plan_iterations: state.plan_iterations + 1,
@@ -146,11 +132,11 @@ const research_dispatcher = new StateGraph(DeepResearchState)
     })
     .addEdge(START, "sub_research")
     .addNode("goto_reporter", async (_state) => {
-        const state = getCurrentTaskInput() as (typeof MessagesAnnotation)["State"];
+        const state = getCurrentTaskInput() as (typeof DeepResearchState)["State"];
         return new Command({
             goto: "planner",
             graph: Command.PARENT,
-            update: { messages: [...state.messages, ..._state.messages] },
+            update: { messages: [...state.messages, ..._state.messages], current_plan: state.current_plan },
         });
     })
     .addEdge("goto_reporter", END)
