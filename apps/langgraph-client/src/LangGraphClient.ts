@@ -488,9 +488,9 @@ export class LangGraphClient extends Client {
                             data: chunk,
                         });
                     }
+                    this.graphState = chunk.data;
+                    this.streamingMessage = [];
                 }
-                this.graphState = chunk.data;
-                this.streamingMessage = [];
                 continue;
             } else if (chunk.event.startsWith("values|")) {
                 // 这个 values 必然是子 values
@@ -499,7 +499,6 @@ export class LangGraphClient extends Client {
                 }
             }
         }
-        this.streamingMessage = [];
         const data = await this.runFETool();
         if (data) streamRecord.push(...data);
         this.emitStreamingUpdate({

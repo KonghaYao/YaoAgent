@@ -1,6 +1,7 @@
 import { RenderMessage } from "../LangGraphClient.js";
 
 import { LangGraphClient } from "../LangGraphClient.js";
+import { getMessageContent } from "../ui-store/createChatStore.js";
 
 export class ToolRenderData<D> {
     constructor(
@@ -19,6 +20,12 @@ export class ToolRenderData<D> {
         } catch (e) {
             return null;
         }
+    }
+    get output() {
+        return getMessageContent(this.message.content);
+    }
+    getJSONOutput() {
+        return JSON.parse(this.output);
     }
     response(data: D) {
         this.client.doneFEToolWaiting(this.message.id!, JSON.stringify(data));

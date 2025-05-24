@@ -85,8 +85,10 @@ export class ToolManager {
      * @zh 将所有工具转换为 JSON 定义格式。
      * @en Converts all tools to JSON definition format.
      */
-    toJSON() {
-        return Array.from(this.tools.values()).map((i) => createJSONDefineTool(i));
+    toJSON(remote = true) {
+        return Array.from(this.tools.values())
+            .filter((i) => (remote ? !i.onlyRender : true))
+            .map((i) => createJSONDefineTool(i));
     }
 
     /**
