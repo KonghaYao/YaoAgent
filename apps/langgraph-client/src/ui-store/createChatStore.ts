@@ -108,9 +108,7 @@ export const createChatStore = (
         // await newClient.createThread();
         inChatError.set(null);
         newClient.onStreamingUpdate((event) => {
-            if (event.type === "start") {
-                loading.set(true);
-            }
+            if (event.type === "start") loading.set(true);
             if (event.type === "thread" || event.type === "done") {
                 // console.log(event.data);
                 // 创建新流程时，默认为 __start__

@@ -219,7 +219,21 @@ export class LangGraphClient extends Client {
         }
         return message;
     }
-
+    /** 将 graphMessages 和 streamingMessage 合并，并返回新的消息数组 */
+    private combineGraphMessagesWithStreamingMessages() {
+        const idMap = new Map<string, RenderMessage>(this.streamingMessage.map((i) => [i.id!, i]));
+        return [
+            ...this.graphMessages.map((i) => {
+                if (idMap.has(i.id!)) {
+                    const newValue = idMap.get(i.id!)!;
+                    idMap.delete(i.id!);
+                    return newValue;
+                }
+                return i;
+            }),
+            ...idMap.values(),
+        ];
+    }
     /**
      * @zh 用于 UI 中的流式渲染中的消息。
      * @en Messages used for streaming rendering in the UI.
@@ -228,19 +242,13 @@ export class LangGraphClient extends Client {
         const previousMessage = new Map<string, Message>();
         const closedToolCallIds = new Set<string>();
         const result: Message[] = [];
-        const inputMessages = [...this.graphMessages, ...this.streamingMessage];
-        console.log(inputMessages);
+        const inputMessages = this.combineGraphMessagesWithStreamingMessages();
         // 从后往前遍历，这样可以保证最新的消息在前面
         for (let i = inputMessages.length - 1; i >= 0; i--) {
             const message = this.cloneMessage(inputMessages[i]);
 
             if (!message.id) {
                 result.unshift(message);
-                continue;
-            }
-
-            // 如果已经处理过这个 id 的消息，跳过
-            if (previousMessage.has(message.id)) {
                 continue;
             }
 
@@ -357,7 +365,6 @@ export class LangGraphClient extends Client {
                     message.usage_metadata = parentMessage.usage_metadata;
                     message.node_name = parentMessage.name;
                 }
-                message.id = message.tool_call_id;
             }
             result.push(message);
         }

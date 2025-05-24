@@ -1,5 +1,5 @@
 // Main graph
-import { START, StateGraph, END, LangGraphRunnableConfig } from "@langchain/langgraph";
+import { START, StateGraph, END, LangGraphRunnableConfig, interrupt } from "@langchain/langgraph";
 import { createMCPNode } from "./tools/mcp.js";
 import { initializeTools } from "./tools/index.js";
 import { GraphState, ConfigurationState } from "./state.js";
@@ -11,6 +11,23 @@ import { SequentialThinkingTool } from "../pro/tools/sequential-thinking.js";
 import { MemoryNode } from "../create-expert/short-term-memory.js";
 import { getPrompt } from "../model/prompt-getter.js";
 import { createFeTools } from "../pro/feTools.js";
+import { tool } from "@langchain/core/tools";
+import { ToolRunnableConfig } from "@langchain/core/tools";
+import z from "zod";
+const ask_user_for_approve = tool(
+    async (input, config: ToolRunnableConfig) => {
+        const data = interrupt(JSON.stringify(input));
+        return [data, null];
+    },
+    {
+        name: "ask_user_for_approve",
+        description: "Request user review and approval for plans or content, wait for user feedback before proceeding",
+        schema: z.object({
+            title: z.string().describe("Title or subject of the content to be reviewed"),
+        }),
+        responseFormat: "content_and_artifact",
+    }
+);
 const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<typeof ConfigurationState.State>>(
     {
         // npm: {
@@ -31,7 +48,7 @@ const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<typeof Config
         const summaryPrompt = await getPrompt("summary.md");
         const normalTools = initializeTools(state, config);
 
-        const tools = [...normalTools, ...mcpTools, ...feTools];
+        const tools = [...normalTools, ...mcpTools, ...feTools, ask_user_for_approve];
         const llm = await createLLM(state, "main_model");
 
         const agent = createExpert({
