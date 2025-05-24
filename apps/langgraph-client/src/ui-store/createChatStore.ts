@@ -2,6 +2,7 @@ import { atom } from "nanostores";
 import { LangGraphClient, LangGraphClientConfig, RenderMessage, SendMessageOptions } from "../LangGraphClient.js";
 import { AssistantGraph, Message, Thread } from "@langchain/langgraph-sdk";
 import { rafDebounce } from "./rafDebounce.js";
+import { ToolRenderData } from "../tool/ToolUI.js";
 
 /**
  * @zh 格式化日期对象为时间字符串。
@@ -198,7 +199,11 @@ export const createChatStore = (
         const prev = historyList.get();
         historyList.set([thread, ...prev]);
     };
-
+    const getToolUIRender = (tool_name: string) => {
+        const toolsDefine = client.get()!.tools.getAllTools();
+        const tool = toolsDefine.find((i) => i.name === tool_name!)?.render;
+        return tool ? (message: RenderMessage) => tool(new ToolRenderData(message, client.get()!)) : null;
+    };
     return {
         data: {
             client,
@@ -282,6 +287,7 @@ export const createChatStore = (
                 await client.get()?.threads.delete(thread.thread_id);
                 await refreshHistoryList();
             },
+            getToolUIRender,
         },
     };
 };

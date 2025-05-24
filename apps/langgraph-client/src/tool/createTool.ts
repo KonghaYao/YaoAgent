@@ -3,8 +3,9 @@ import { z, ZodRawShape, ZodTypeAny } from "zod";
 import { Action, Parameter } from "./copilotkit-actions.js";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { Message } from "@langchain/langgraph-sdk";
+import { ToolRenderData } from "./ToolUI.js";
 
-export interface UnionTool<Args extends ZodRawShape> {
+export interface UnionTool<Args extends ZodRawShape, Child extends Object = Object> {
     name: string;
     description: string;
     parameters: Args;
@@ -13,6 +14,8 @@ export interface UnionTool<Args extends ZodRawShape> {
     execute: ToolCallback<Args>;
     /** 工具执行成功后触发的附加消息 */
     callbackMessage?: (result: CallToolResult) => Message[];
+    render?: <D>(tool: ToolRenderData<D>) => Child;
+    onlyRender?: boolean;
 }
 export type ToolCallback<Args extends ZodRawShape> = (args: z.objectOutputType<Args, ZodTypeAny>, context?: any) => CallToolResult | Promise<CallToolResult>;
 
@@ -75,4 +78,12 @@ export const createMCPTool = <Args extends ZodRawShape>(tool: UnionTool<Args>) =
             }
         },
     ];
+};
+
+export const createToolUI = <Args extends Parameter[] | [] = [], Child extends Object = {}>(tool: Action<Args> & { render?: (tool: ToolRenderData<any>) => Child; onlyRender?: boolean }) => {
+    return {
+        ...createFETool(tool),
+        render: tool.render,
+        onlyRender: tool.onlyRender,
+    };
 };

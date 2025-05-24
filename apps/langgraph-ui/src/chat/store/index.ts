@@ -1,4 +1,5 @@
 import { createChatStore } from "@langgraph-js/sdk";
+import { ask_user_for_approve } from "../tools/index";
 const F =
     localStorage.getItem("withCredentials") === "true"
         ? (url: string, options: RequestInit) => {
@@ -18,7 +19,6 @@ export const setLocalConfig = (config: Partial<{ showHistory: boolean; showGraph
         localStorage.setItem(key, value.toString());
     });
 };
-import { askUserTool } from "../tools";
 export const globalChatStore = createChatStore(
     localStorage.getItem("agent_name") || "",
     {
@@ -32,7 +32,7 @@ export const globalChatStore = createChatStore(
     {
         ...getLocalConfig(),
         onInit(client) {
-            client.tools.bindTools([askUserTool]);
+            client.tools.bindTools([ask_user_for_approve]);
         },
     }
 );
