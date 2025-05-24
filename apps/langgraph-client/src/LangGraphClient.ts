@@ -84,7 +84,7 @@ export class StreamingMessageType {
 }
 
 type StreamingUpdateEvent = {
-    type: "message" | "value" | "update" | "error" | "thread" | "done";
+    type: "message" | "value" | "update" | "error" | "thread" | "done" | "start";
     data: any;
 };
 
@@ -357,6 +357,7 @@ export class LangGraphClient extends Client {
                     message.usage_metadata = parentMessage.usage_metadata;
                     message.node_name = parentMessage.name;
                 }
+                message.id = message.tool_call_id;
             }
             result.push(message);
         }
@@ -456,6 +457,12 @@ export class LangGraphClient extends Client {
                 command,
             });
         const streamRecord: any[] = [];
+        this.emitStreamingUpdate({
+            type: "start",
+            data: {
+                event: "start",
+            },
+        });
         for await (const chunk of streamResponse) {
             streamRecord.push(chunk);
             if (chunk.event === "metadata") {
@@ -489,7 +496,6 @@ export class LangGraphClient extends Client {
                         });
                     }
                     this.graphState = chunk.data;
-                    this.streamingMessage = [];
                 }
                 continue;
             } else if (chunk.event.startsWith("values|")) {
@@ -507,6 +513,7 @@ export class LangGraphClient extends Client {
                 event: "done",
             },
         });
+        this.streamingMessage = [];
         return streamRecord;
     }
     /** 子图的数据需要通过 merge 的方式重新进行合并更新 */
@@ -526,9 +533,11 @@ export class LangGraphClient extends Client {
             }
         });
     }
+
     private runFETool() {
-        const data = this.graphMessages;
+        const data = this.streamingMessage; // 需要保证不被清理
         const lastMessage = data[data.length - 1];
+        if (!lastMessage) return;
         // 如果最后一条消息是前端工具消息，则调用工具
         if (lastMessage.type === "ai" && lastMessage.tool_calls?.length) {
             const result = lastMessage.tool_calls.map((tool) => {
@@ -544,6 +553,7 @@ export class LangGraphClient extends Client {
                     return this.callFETool(toolMessage, tool.args);
                 }
             });
+            this.currentThread!.status = "interrupted"; // 修复某些机制下，状态不为 interrupted 与后端有差异
             return Promise.all(result);
         }
     }
