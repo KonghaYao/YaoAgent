@@ -5,27 +5,37 @@ import { createSwarm } from "@langchain/langgraph-swarm";
 import { createHandoffTool } from "../pro/swarm/handoff.js";
 import { ChatOpenAI } from "@langchain/openai";
 import { SequentialThinkingTool } from "../pro/tools/sequential-thinking.js";
-import { MultiServerMCPClient } from "@langchain/mcp-adapters";
-import { Command, END, getCurrentTaskInput, MessagesAnnotation, START, StateGraph } from "@langchain/langgraph";
-import { tool, ToolRunnableConfig } from "@langchain/core/tools";
 import {
-    AIMessage,
-    BaseMessage,
-    HumanMessage,
-    MessageContentText,
-    SystemMessage,
-    ToolMessage,
-} from "@langchain/core/messages";
+    Command,
+    END,
+    getCurrentTaskInput,
+    interrupt,
+    MessagesAnnotation,
+    START,
+    StateGraph,
+} from "@langchain/langgraph";
+import { DynamicStructuredTool, DynamicTool, Tool, tool, ToolRunnableConfig } from "@langchain/core/tools";
+import { AIMessage, HumanMessage, SystemMessage, ToolMessage } from "@langchain/core/messages";
 import { keepAllStateInHandOff } from "../pro/swarm/keepState.js";
 import { TavilySearch } from "@langchain/tavily";
 import { web_search_tool } from "../web-search/searchMock.js";
+import { getTextMessageContent } from "src/pro/utils.js";
+import z from "zod";
 const tavilyTool = new TavilySearch({
     maxResults: 5,
 });
 
 const llm = new ChatOpenAI({
-    modelName: "gpt-4o-mini",
+    modelName: "gpt-4.1-mini",
     temperature: 0,
+});
+const singleLLM = new ChatOpenAI({
+    modelName: "gpt-4.1-mini",
+    temperature: 0,
+    configuration: {
+        /** @ts-ignore */
+        parallel_tool_calls: true,
+    },
 });
 const coordinator_agent = createReactAgent({
     name: "coordinator",
@@ -59,11 +69,27 @@ const update_plan = tool(
     }
 );
 
+const ask_user_for_approve = tool(
+    async (input, config: ToolRunnableConfig) => {
+        const data = interrupt(JSON.stringify(input));
+        return [data, null];
+    },
+    {
+        name: "ask_user_for_approve",
+        description: "Request user review and approval for plans or content, wait for user feedback before proceeding",
+        schema: z.object({
+            title: z.string().describe("Title or subject of the content to be reviewed"),
+        }),
+        responseFormat: "content_and_artifact",
+    }
+);
+
 const planner_agent = createReactAgent({
     name: "planner",
     llm,
     tools: [
         // SequentialThinkingTool,
+        ask_user_for_approve,
         update_plan,
         createHandoffTool({
             agentName: "research_dispatcher",
@@ -82,22 +108,10 @@ const planner_agent = createReactAgent({
     },
     stateSchema: DeepResearchState,
 });
-
-export const getMessageContent = (message: BaseMessage) => {
-    if (typeof message.content === "string") {
-        return message.content;
-    } else {
-        return message.content
-            .filter((i) => i.type === "text")
-            .map((i) => (i as MessageContentText).text)
-            .join("\n");
-    }
-};
-
 const research_dispatcher = new StateGraph(DeepResearchState)
     .addNode("sub_research", async (state) => {
         const step = state.current_plan!.steps[state.plan_iterations];
-        const prompt = await apply_prompt_template("deep_research_researcher.md", state as any);
+        const prompt = await apply_prompt_template("deep_research_researcher.md", state);
         const researcher_agent = createReactAgent({
             name: "sub_researcher",
             llm,
@@ -115,13 +129,13 @@ const research_dispatcher = new StateGraph(DeepResearchState)
                         step.title +
                         "\n\n下面是你要完成的目标\n" +
                         step.description +
-                        "\n\n请你开始工作, 搜索只能搜索一次"
+                        "\n\n请你开始工作"
                 ),
             ],
             current_plan: state.current_plan,
             plan_iterations: state.plan_iterations,
         });
-        step.execution_res = getMessageContent(messages[messages.length - 1]);
+        step.execution_res = getTextMessageContent(messages[messages.length - 1]);
         return {
             messages: [...state.messages, ...messages],
             plan_iterations: state.plan_iterations + 1,

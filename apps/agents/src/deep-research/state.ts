@@ -11,10 +11,12 @@ export const DeepResearchState = createState(createReactAgentAnnotation(), Model
     observations: createDefaultAnnotation<string[]>(() => []),
     plan_iterations: createDefaultAnnotation(() => 0),
     current_plan: Annotation<Plan>,
-    final_report: createDefaultAnnotation<string>(() => ""),
-    auto_accepted_plan: createDefaultAnnotation<boolean>(() => false),
     enable_background_investigation: createDefaultAnnotation<boolean>(() => true),
     background_investigation_results: createDefaultAnnotation<string>(() => ""),
+    auto_accepted_plan: createDefaultAnnotation<boolean>(() => false),
+    final_report: createDefaultAnnotation<string>(() => ""),
+    /** 深度思考会提供给 LLM 工具进行思考 */
+    deep_thinking: createDefaultAnnotation(() => false),
     title: createDefaultAnnotation<string>(() => ""),
 });
 export type State = typeof DeepResearchState.State;
