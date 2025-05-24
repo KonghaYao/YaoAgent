@@ -21,7 +21,7 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, client, getMessageCo
             ) : (
                 <div className="tool-message">
                     <div className="tool-header" onClick={onToggleCollapse}>
-                        <div className="tool-title">
+                        <div className="tool-title" onClick={() => console.log(message)}>
                             {message.node_name} | {message.name}
                         </div>
                     </div>

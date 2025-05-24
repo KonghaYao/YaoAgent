@@ -113,7 +113,6 @@ const research_dispatcher = new StateGraph(DeepResearchState)
         const step = state.current_plan!.steps[state.plan_iterations];
         const prompt = await apply_prompt_template("deep_research_researcher.md", state);
         const researcher_agent = createReactAgent({
-            name: "sub_researcher",
             llm,
             tools: [
                 web_search_tool,

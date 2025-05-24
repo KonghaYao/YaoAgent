@@ -107,7 +107,7 @@ const ChatInput: React.FC = () => {
 
 const Chat: React.FC = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const { showHistory, toggleHistoryVisible, showGraph, toggleGraphVisible } = useChat();
+    const { showHistory, toggleHistoryVisible, showGraph, toggleGraphVisible, renderMessages } = useChat();
     const { extraParams, setExtraParams } = useExtraParams();
 
     return (
@@ -136,6 +136,14 @@ const Chat: React.FC = () => {
                         }}
                     >
                         图
+                    </button>
+                    <button
+                        className="graph-button"
+                        onClick={() => {
+                            console.log(renderMessages);
+                        }}
+                    >
+                        日志数据
                     </button>
                     <button
                         className="history-button"

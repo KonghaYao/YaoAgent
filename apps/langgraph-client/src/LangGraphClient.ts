@@ -68,16 +68,16 @@ export interface LangGraphClientConfig {
  * @en The StreamingMessageType class is used to determine the type of a message.
  */
 export class StreamingMessageType {
-    static isUser(m: Message) {
+    static isUser(m: Message): m is HumanMessage {
         return m.type === "human";
     }
-    static isTool(m: Message) {
+    static isTool(m: Message): m is ToolMessage {
         return m.type === "tool";
     }
-    static isAssistant(m: Message) {
+    static isAssistant(m: Message): m is AIMessage {
         return m.type === "ai" && !this.isToolAssistant(m);
     }
-    static isToolAssistant(m: Message) {
+    static isToolAssistant(m: Message): m is AIMessage {
         /** @ts-ignore */
         return m.type === "ai" && (m.tool_calls?.length || m.tool_call_chunks?.length);
     }
@@ -207,18 +207,6 @@ export class LangGraphClient extends Client {
         }
         this.streamingMessage[this.streamingMessage.length - 1] = message;
     }
-    private replaceMessageWithValuesMessage(message: AIMessage | ToolMessage, isTool = false): Message {
-        const key = (isTool ? "tool_call_id" : "id") as any as "id";
-        const valuesMessage = this.graphMessages.find((i) => i[key] === message[key]);
-        if (valuesMessage) {
-            return {
-                ...valuesMessage,
-                /** @ts-ignore */
-                tool_input: message.tool_input,
-            };
-        }
-        return message;
-    }
     /** 将 graphMessages 和 streamingMessage 合并，并返回新的消息数组 */
     private combineGraphMessagesWithStreamingMessages() {
         const idMap = new Map<string, RenderMessage>(this.streamingMessage.map((i) => [i.id!, i]));
@@ -243,6 +231,7 @@ export class LangGraphClient extends Client {
         const closedToolCallIds = new Set<string>();
         const result: Message[] = [];
         const inputMessages = this.combineGraphMessagesWithStreamingMessages();
+        console.log(inputMessages);
         // 从后往前遍历，这样可以保证最新的消息在前面
         for (let i = inputMessages.length - 1; i >= 0; i--) {
             const message = this.cloneMessage(inputMessages[i]);
@@ -251,9 +240,12 @@ export class LangGraphClient extends Client {
                 result.unshift(message);
                 continue;
             }
-
+            if (message.type === "ai") {
+                /** @ts-ignore */
+                if (!message.name) message.name = this.getGraphNodeNow().name;
+            }
             if (StreamingMessageType.isToolAssistant(message)) {
-                const m = this.replaceMessageWithValuesMessage(message as AIMessage);
+                const m = message;
                 // 记录这个 id 的消息，并添加到结果中
                 previousMessage.set(message.id, m);
 
@@ -264,19 +256,17 @@ export class LangGraphClient extends Client {
                         return !closedToolCallIds.has(i.id!);
                     })!
                     .map((tool, index) => {
-                        return this.replaceMessageWithValuesMessage(
-                            {
-                                type: "tool",
-                                additional_kwargs: {},
-                                /** @ts-ignore */
-                                tool_input: m.additional_kwargs?.tool_calls?.[index]?.function?.arguments,
-                                id: tool.id,
-                                name: tool.name,
-                                response_metadata: {},
-                                tool_call_id: tool.id!,
-                            },
-                            true
-                        );
+                        return {
+                            type: "tool",
+                            additional_kwargs: {},
+                            /** @ts-ignore */
+                            tool_input: m.additional_kwargs?.tool_calls?.[index]?.function?.arguments,
+                            id: tool.id,
+                            name: tool.name,
+                            response_metadata: {},
+                            tool_call_id: tool.id!,
+                            content: "",
+                        } as ToolMessage;
                     });
                 for (const tool of new_tool_calls) {
                     if (!previousMessage.has(tool.id!)) {
@@ -289,10 +279,9 @@ export class LangGraphClient extends Client {
                 if (message.type === "tool" && message.tool_call_id) {
                     closedToolCallIds.add(message.tool_call_id);
                 }
-                // 记录这个 id 的消息，并添加到结果中
-                const m = this.replaceMessageWithValuesMessage(message as AIMessage);
-                previousMessage.set(message.id, m);
-                result.unshift(m);
+
+                previousMessage.set(message.id, message);
+                result.unshift(message);
             }
         }
 
@@ -364,6 +353,10 @@ export class LangGraphClient extends Client {
                 if (parentMessage) {
                     message.usage_metadata = parentMessage.usage_metadata;
                     message.node_name = parentMessage.name;
+                    // 修补特殊情况下，tool name 丢失的问题
+                    if (!message.name) {
+                        message.name = (parentMessage as AIMessage).tool_calls!.find((i) => i.id === message.tool_call_id)?.name;
+                    }
                 }
             }
             result.push(message);
@@ -510,6 +503,7 @@ export class LangGraphClient extends Client {
                 if (chunk.data.messages) {
                     this.mergeSubGraphMessagesToStreamingMessages(chunk.data.messages);
                 }
+                this.graphPosition = chunk.event.split("|")[1];
             }
         }
         const data = await this.runFETool();
@@ -522,6 +516,21 @@ export class LangGraphClient extends Client {
         });
         this.streamingMessage = [];
         return streamRecord;
+    }
+    /** 当前子图位置，但是依赖 stream，不太适合稳定使用*/
+    private graphPosition = "";
+    getGraphPosition() {
+        return this.graphPosition.split("|").map((i) => {
+            const [name, id] = i.split(":");
+            return {
+                id,
+                name,
+            };
+        });
+    }
+    getGraphNodeNow() {
+        const position = this.getGraphPosition();
+        return position[position.length - 1];
     }
     /** 子图的数据需要通过 merge 的方式重新进行合并更新 */
     private mergeSubGraphMessagesToStreamingMessages(messages: Message[]) {
