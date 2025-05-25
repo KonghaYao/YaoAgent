@@ -20,10 +20,6 @@ export interface FETool {
     parameters: FEToolParameters[];
 }
 
-export const createFETool = (tool: FETool) => {
-    return tool;
-};
-
 export const createFeTools = (tools: FETool[]): DynamicStructuredTool[] => {
     return tools
         .map((tool) => {

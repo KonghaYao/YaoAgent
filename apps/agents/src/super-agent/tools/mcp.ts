@@ -1,7 +1,7 @@
 import { Annotation, GraphBubbleUp, LangGraphRunnableConfig } from "@langchain/langgraph";
 import { StructuredToolInterface } from "@langchain/core/tools";
 import { MultiServerMCPClient } from "@langchain/mcp-adapters";
-import { createState } from "../state-builder.js";
+import { createState } from "@langgraph-js/pro";
 export const McpState = createState().build({
     mcpServers: Annotation<Record<string, boolean>>(),
 });

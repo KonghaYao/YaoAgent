@@ -11,7 +11,7 @@ const createMockSearchResultItem = (id: number, query: string, useSummary: boole
 };
 
 export const web_search_tool = tool(
-    async ({ query, freshness = "noLimit", summary = false, count = 3 }) => {
+    async ({ query, summary = false, count = 3 }) => {
         // console.log(`Mock search called with: query="${query}", freshness="${freshness}", summary=${summary}, count=${count}`);
 
         if (query.toLowerCase().includes("empty")) {

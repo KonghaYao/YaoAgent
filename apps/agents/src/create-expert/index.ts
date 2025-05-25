@@ -4,8 +4,7 @@ import { StructuredToolInterface } from "@langchain/core/tools";
 import { AnnotationRoot } from "@langchain/langgraph";
 import { createReactAgent, createReactAgentAnnotation } from "@langchain/langgraph/prebuilt";
 import { createHandoffTool, createSwarm, SwarmState } from "@langchain/langgraph-swarm";
-import { createDefaultAnnotation } from "../utils/index.js";
-import { createState } from "../super-agent/state-builder.js";
+import { createState, createDefaultAnnotation } from "@langgraph-js/pro";
 
 export const ExpertState = createState(createReactAgentAnnotation(), SwarmState).build({
     need_plan: createDefaultAnnotation(() => false),

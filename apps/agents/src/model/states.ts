@@ -1,7 +1,6 @@
 import { BinaryOperatorAggregate } from "@langchain/langgraph";
-import { createDefaultAnnotation } from "../utils/index.js";
 import { createReactAgentAnnotation } from "@langchain/langgraph/prebuilt";
-import { createState } from "../super-agent/state-builder.js";
+import { createState, createDefaultAnnotation } from "@langgraph-js/pro";
 /** 大模型允许值的定义，可以传入，第一个为默认值 */
 export const ModelAllow = {
     main_model: ["gpt-4.1-mini", "gpt-4.1", "gpt-4o-mini"],

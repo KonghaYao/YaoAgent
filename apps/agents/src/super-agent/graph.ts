@@ -7,15 +7,14 @@ import { createLLM } from "../model/index.js";
 import { SystemMessage } from "@langchain/core/messages";
 import { MemoryPrompt } from "./tools/memory.js";
 import { createExpert } from "../create-expert/index.js";
-import { SequentialThinkingTool } from "../pro/tools/sequential-thinking.js";
+import { SequentialThinkingTool, createFeTools } from "@langgraph-js/pro";
 import { MemoryNode } from "../create-expert/short-term-memory.js";
 import { getPrompt } from "../model/prompt-getter.js";
-import { createFeTools } from "../pro/feTools.js";
 import { tool } from "@langchain/core/tools";
 import { ToolRunnableConfig } from "@langchain/core/tools";
 import z from "zod";
 const ask_user_for_approve = tool(
-    async (input, config: ToolRunnableConfig) => {
+    async (input, _config: ToolRunnableConfig) => {
         const data = interrupt(JSON.stringify(input));
         return [data, null];
     },

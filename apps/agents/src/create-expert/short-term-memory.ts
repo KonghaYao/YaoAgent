@@ -2,7 +2,7 @@ import { AIMessage, HumanMessage, RemoveMessage, SystemMessage, trimMessages } f
 import { Annotation } from "@langchain/langgraph";
 import { createLLM } from "../model/llm.js";
 import { ModelState } from "../model/states.js";
-import { createDefaultAnnotation } from "../utils/index.js";
+import { createDefaultAnnotation } from "@langgraph-js/pro";
 
 export const MemoryState = Annotation.Root({
     ...ModelState.spec,

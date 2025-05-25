@@ -72,6 +72,9 @@ importers:
       '@langgraph-js/api':
         specifier: ^0.2.39
         version: 0.2.39(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/langgraph-sdk@0.0.78(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(react@19.1.0))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.25.17)))(@types/pg@8.15.2)(openai@4.100.0(ws@8.18.2)(zod@3.25.17))(typescript@5.8.3)
+      '@langgraph-js/pro':
+        specifier: workspace:^1.6.1
+        version: link:../langgraph-pro
       '@modelcontextprotocol/sdk':
         specifier: ^1.11.4
         version: 1.11.4
@@ -86,10 +89,10 @@ importers:
         version: 4.7.10
       langchain:
         specifier: ^0.3.26
-        version: 0.3.26(@langchain/anthropic@0.3.19(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/cohere@0.3.3(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(axios@1.9.0)(openai@4.100.0(ws@8.18.2)(zod@3.25.17))(ws@8.18.2)
+        version: 0.3.26(@langchain/anthropic@0.3.19(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/cohere@0.3.3(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(axios@1.9.0(debug@4.4.1))(openai@4.100.0(ws@8.18.2)(zod@3.25.17))(ws@8.18.2)
       langfuse-langchain:
         specifier: ^3.37.2
-        version: 3.37.2(langchain@0.3.26(@langchain/anthropic@0.3.19(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/cohere@0.3.3(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(axios@1.9.0)(openai@4.100.0(ws@8.18.2)(zod@3.25.17))(ws@8.18.2))
+        version: 3.37.2(langchain@0.3.26(@langchain/anthropic@0.3.19(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/cohere@0.3.3(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(axios@1.9.0(debug@4.4.1))(openai@4.100.0(ws@8.18.2)(zod@3.25.17))(ws@8.18.2))
       openai:
         specifier: ^4.100.0
         version: 4.100.0(ws@8.18.2)(zod@3.25.17)
@@ -169,6 +172,21 @@ importers:
       zod-to-json-schema:
         specifier: ^3.24.5
         version: 3.24.5(zod@3.25.17)
+
+  apps/langgraph-pro:
+    dependencies:
+      '@langchain/core':
+        specifier: ^0.3.42
+        version: 0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))
+      '@langchain/langgraph':
+        specifier: ^0.2.72
+        version: 0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.25.17))
+      '@langchain/langgraph-swarm':
+        specifier: ^0.0.3
+        version: 0.0.3(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.25.17)))
+      zod:
+        specifier: ^3.25.17
+        version: 3.25.17
 
   apps/langgraph-ui:
     dependencies:
@@ -6413,7 +6431,7 @@ snapshots:
       flat: 5.0.2
       ibm-cloud-sdk-core: 5.3.2
       js-yaml: 4.1.0
-      langchain: 0.3.26(@langchain/anthropic@0.3.19(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/cohere@0.3.3(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(axios@1.9.0)(openai@4.100.0(ws@8.18.2)(zod@3.25.17))(ws@8.18.2)
+      langchain: 0.3.26(@langchain/anthropic@0.3.19(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/cohere@0.3.3(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(axios@1.9.0(debug@4.4.1))(openai@4.100.0(ws@8.18.2)(zod@3.25.17))(ws@8.18.2)
       langsmith: 0.3.29(openai@4.100.0(ws@8.18.2)(zod@3.25.17))
       openai: 4.100.0(ws@8.18.2)(zod@3.25.17)
       uuid: 10.0.0
@@ -8645,7 +8663,7 @@ snapshots:
       isstream: 0.1.2
       jsonwebtoken: 9.0.2
       mime-types: 2.1.35
-      retry-axios: 2.6.0(axios@1.9.0)
+      retry-axios: 2.6.0(axios@1.9.0(debug@4.4.1))
       tough-cookie: 4.1.4
     transitivePeerDependencies:
       - supports-color
@@ -8887,7 +8905,7 @@ snapshots:
 
   kuler@2.0.0: {}
 
-  langchain@0.3.26(@langchain/anthropic@0.3.19(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/cohere@0.3.3(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(axios@1.9.0)(openai@4.100.0(ws@8.18.2)(zod@3.25.17))(ws@8.18.2):
+  langchain@0.3.26(@langchain/anthropic@0.3.19(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/cohere@0.3.3(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(axios@1.9.0(debug@4.4.1))(openai@4.100.0(ws@8.18.2)(zod@3.25.17))(ws@8.18.2):
     dependencies:
       '@langchain/core': 0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))
       '@langchain/openai': 0.5.10(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(ws@8.18.2)
@@ -8915,9 +8933,9 @@ snapshots:
     dependencies:
       mustache: 4.2.0
 
-  langfuse-langchain@3.37.2(langchain@0.3.26(@langchain/anthropic@0.3.19(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/cohere@0.3.3(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(axios@1.9.0)(openai@4.100.0(ws@8.18.2)(zod@3.25.17))(ws@8.18.2)):
+  langfuse-langchain@3.37.2(langchain@0.3.26(@langchain/anthropic@0.3.19(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/cohere@0.3.3(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(axios@1.9.0(debug@4.4.1))(openai@4.100.0(ws@8.18.2)(zod@3.25.17))(ws@8.18.2)):
     dependencies:
-      langchain: 0.3.26(@langchain/anthropic@0.3.19(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/cohere@0.3.3(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(axios@1.9.0)(openai@4.100.0(ws@8.18.2)(zod@3.25.17))(ws@8.18.2)
+      langchain: 0.3.26(@langchain/anthropic@0.3.19(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/cohere@0.3.3(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(axios@1.9.0(debug@4.4.1))(openai@4.100.0(ws@8.18.2)(zod@3.25.17))(ws@8.18.2)
       langfuse: 3.37.2
       langfuse-core: 3.37.2
 
@@ -9898,7 +9916,7 @@ snapshots:
 
   resolve-pkg-maps@1.0.0: {}
 
-  retry-axios@2.6.0(axios@1.9.0):
+  retry-axios@2.6.0(axios@1.9.0(debug@4.4.1)):
     dependencies:
       axios: 1.9.0(debug@4.4.1)
 
