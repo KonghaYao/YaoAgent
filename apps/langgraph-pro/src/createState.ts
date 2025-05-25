@@ -2,7 +2,7 @@ import { Annotation, AnnotationRoot, StateDefinition } from "@langchain/langgrap
 import { createReactAgentAnnotation } from "@langchain/langgraph/prebuilt";
 
 /**
- * create state for langgraph
+ * create state for langgraph, like python version
  * @example
  * export const GraphState = createState(createReactAgentAnnotation(), ModelState, SwarmState).build({
  *   current_plan: createDefaultAnnotation<Plan | null>(() => null),
@@ -25,7 +25,13 @@ export const createState = <T extends readonly AnnotationRoot<any>[]>(...parents
 
 // 辅助类型，用于将联合类型转换为交叉类型
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
-
+/**
+ * 创建一个默认值注解
+ * @example
+ * const state = createState().build({
+ *   current_plan: createDefaultAnnotation<Plan | null>(() => null),
+ * });
+ */
 export const createDefaultAnnotation = <T>(defaultValue: () => T) =>
     Annotation<T>({
         reducer: (_, a) => a,
