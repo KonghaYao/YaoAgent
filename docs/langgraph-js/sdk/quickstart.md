@@ -86,7 +86,7 @@ const ChatComponent = () => {
 
 ```tsx
 // 创建自定义工具
-const fileTool = createFETool({
+const fileTool = createToolUI({
     name: "file_operation",
     description: "执行文件操作",
     parameters: [
@@ -99,6 +99,11 @@ const fileTool = createFETool({
     async handler(args) {
         return [{ type: "text", text: "执行文件操作 " + args.filePath }];
     },
+    // 这个会让整个界面进入loading状态，直到在 UI 界面上调用 tool.response()
+    // handler: ToolManager.waitForUIDone,
+    // render(tool){
+    //     return <div onclick={()=>tool.response("ok")}>确认</div>
+    // }
 });
 
 // 绑定工具
@@ -193,33 +198,3 @@ const UsageStats = ({ usage_metadata, spend_time }) => {
     );
 };
 ```
-
-## 主要功能
-
-1. 聊天功能
-   - 发送和接收消息
-   - 支持 Markdown 格式
-   - 实时消息更新
-   - 消息中断功能
-
-2. 工具集成
-   - 自定义工具创建
-   - 工具状态管理
-   - 工具消息显示
-
-3. 历史记录
-   - 对话历史管理
-   - 历史记录切换
-   - 本地存储支持
-
-4. 使用统计
-   - Token 使用统计
-   - 响应时间统计
-   - 使用量展示
-
-## 注意事项
-
-1. 确保在使用前完成 Store 初始化
-2. 合理处理异步操作和错误情况
-3. 注意管理内存使用和资源清理
-4. 实现优雅的错误处理和用户反馈

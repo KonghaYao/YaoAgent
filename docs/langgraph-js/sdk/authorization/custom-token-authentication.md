@@ -1,10 +1,12 @@
 # 🛡️ 自定义令牌身份验证
 
-在 @langgraph-js/sdk  中，自定义令牌身份验证是一种灵活且安全的方式来保护您的应用程序。这种方法允许您实现各种类型的令牌验证机制，如 JWT、API 密钥或自定义令牌格式。
+在 @langgraph-js/sdk 中，自定义令牌身份验证提供了一种灵活且安全的方式来保护您的应用程序。这种方法允许您实现各种类型的令牌验证机制，如 JWT、API 密钥或自定义令牌格式。通过这种方式，您可以完全控制身份验证流程，确保应用程序的安全性。
+
+auth 权限的配置完全兼容 LangGraph 的实现。
 
 ## 配置客户端
 
-要实现自定义令牌身份验证，首先需要在客户端配置中设置默认请求头：
+要实现自定义令牌身份验证，首先需要在客户端配置中设置默认请求头。这个配置将确保每个请求都包含必要的身份验证信息：
 
 ```tsx
 import { createChatStore } from "@langgraph-js/sdk";
@@ -26,9 +28,20 @@ export const globalChatStore = createChatStore(
 );
 ```
 
+在这个配置中：
+
+- `apiUrl` 指定了后端服务的地址
+- `defaultHeaders` 设置了包含身份验证令牌的请求头
+- 令牌格式遵循 Bearer 认证方案的标准格式
+
 ## 后端令牌验证
 
-在 LangGraph 后端，需要配置身份验证处理程序来验证自定义令牌：
+在 LangGraph 后端，您需要配置身份验证处理程序来验证自定义令牌。这个处理程序将负责：
+
+1. 验证令牌的有效性
+2. 提取用户身份信息
+3. 管理访问权限
+4. 处理错误情况
 
 ```typescript
 import { Auth, HTTPException } from "@langchain/langgraph-sdk/auth";

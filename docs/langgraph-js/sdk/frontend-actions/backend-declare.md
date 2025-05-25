@@ -1,10 +1,12 @@
 # 后端声明-FFT
 
-修改你的后端，使其能够接收前端的工具调用。
+本文档将指导你如何在后端配置 FFT（Frontend Function as Tools）支持，使你的 LangGraph 应用能够接收和处理来自前端的工具调用。
 
-## 开始
+## 开始配置
 
-1. 先保存下面的代码到一个文件中。
+按照以下步骤配置后端以支持 FFT：
+
+1. 首先，将以下代码保存到一个新的 TypeScript 文件中（例如 `fe-tools.ts`）：
 
 ```ts
 import { Annotation, interrupt } from "@langchain/langgraph";
@@ -71,7 +73,14 @@ export const actionToTool = (tool: FETool): DynamicStructuredTool => {
 
 ```
 
-2. 然后修改你的图状态定义
+这段代码提供了以下核心功能：
+
+- `FEToolsState`：定义了前端工具的状态管理
+- `FETool` 接口：定义了前端工具的数据结构
+- `createFeTools`：将前端工具转换为 LangGraph 可用的工具
+- `actionToTool`：将前端工具定义转换为可执行的工具实例
+
+2. 在你的图状态定义中集成 FFT 支持：
 
 ```ts
 const GraphState = Annotation.Root({
@@ -82,7 +91,9 @@ const GraphState = Annotation.Root({
 
 ```
 
-3. 在你的节点中使用它
+这一步将 FFT 的状态管理集成到你的 LangGraph 图中，使其能够处理前端工具的状态。
+
+3. 在节点中实现工具调用：
 
 ```ts
 const myNode = async (state) => {
@@ -105,3 +116,9 @@ const myNode = async (state) => {
     };
 }
 ```
+
+在这个示例中：
+
+- `createFeTools` 将前端定义的工具转换为可用的工具集
+- 这些工具被集成到 React Agent 中
+- Agent 可以使用这些工具来处理用户请求
