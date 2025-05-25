@@ -72,9 +72,15 @@ importers:
       '@langgraph-js/api':
         specifier: ^0.2.39
         version: 0.2.39(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17))))(@langchain/langgraph-sdk@0.0.78(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(react@19.1.0))(@langchain/langgraph@0.2.72(@langchain/core@0.3.56(openai@4.100.0(ws@8.18.2)(zod@3.25.17)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.25.17)))(@types/pg@8.15.2)(openai@4.100.0(ws@8.18.2)(zod@3.25.17))(typescript@5.8.3)
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.11.4
+        version: 1.11.4
       eventsource:
         specifier: ^3.0.7
         version: 3.0.7
+      fetch-to-node:
+        specifier: ^2.1.0
+        version: 2.1.0
       hono:
         specifier: ^4.7.10
         version: 4.7.10
@@ -3092,6 +3098,9 @@ packages:
 
   fecha@4.2.3:
     resolution: {integrity: sha512-OP2IUU6HeYKJi3i0z4A19kHMQoLVs4Hc+DPqqxI2h/DPZHTm/vjsfC6P0b4jCMy14XizLBqvndQ+UilD7707Jw==}
+
+  fetch-to-node@2.1.0:
+    resolution: {integrity: sha512-Wq05j6LE1GrWpT2t1YbCkyFY6xKRJq3hx/oRJdWEJpZlik3g25MmdJS6RFm49iiMJw6zpZuBOrgihOgy2jGyAA==}
 
   file-type@16.5.4:
     resolution: {integrity: sha512-/yFHK0aGjFEgDJjEKP0pWCplsPFPhwyfwevf/pVxiN0tmE4L9LmwWxWukdJSHdoCli4VgQLehjJtwQBnqmsKcw==}
@@ -8394,6 +8403,8 @@ snapshots:
       picomatch: 4.0.2
 
   fecha@4.2.3: {}
+
+  fetch-to-node@2.1.0: {}
 
   file-type@16.5.4:
     dependencies:

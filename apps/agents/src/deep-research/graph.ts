@@ -5,22 +5,14 @@ import { createSwarm } from "@langchain/langgraph-swarm";
 import { createHandoffTool } from "../pro/swarm/handoff.js";
 import { ChatOpenAI } from "@langchain/openai";
 import { SequentialThinkingTool } from "../pro/tools/sequential-thinking.js";
-import {
-    Command,
-    END,
-    getCurrentTaskInput,
-    interrupt,
-    MessagesAnnotation,
-    START,
-    StateGraph,
-} from "@langchain/langgraph";
-import { DynamicStructuredTool, DynamicTool, Tool, tool, ToolRunnableConfig } from "@langchain/core/tools";
+import { Command, END, getCurrentTaskInput, interrupt, START, StateGraph } from "@langchain/langgraph";
+import { tool, ToolRunnableConfig } from "@langchain/core/tools";
 import { AIMessage, HumanMessage, SystemMessage, ToolMessage } from "@langchain/core/messages";
-import { keepAllStateInHandOff } from "../pro/swarm/keepState.js";
+import { createHandoffCommand, keepAllStateInHandOff } from "../pro/swarm/keepState.js";
 import { TavilySearch } from "@langchain/tavily";
-import { web_search_tool } from "../web-search/searchMock.js";
-import { getTextMessageContent } from "src/pro/utils.js";
+import { getLastHumanMessage, getTextMessageContent } from "../pro/utils.js";
 import z from "zod";
+import { crawlSingleDocument, meilisearchTool } from "../web-search/meilisearch.js";
 const tavilyTool = new TavilySearch({
     maxResults: 5,
 });
@@ -29,14 +21,7 @@ const llm = new ChatOpenAI({
     modelName: "gpt-4.1-mini",
     temperature: 0,
 });
-const singleLLM = new ChatOpenAI({
-    modelName: "gpt-4.1-mini",
-    temperature: 0,
-    configuration: {
-        /** @ts-ignore */
-        parallel_tool_calls: true,
-    },
-});
+
 const coordinator_agent = createReactAgent({
     name: "coordinator",
     llm,
@@ -55,7 +40,7 @@ const update_plan = tool(
                 current_plan: input,
                 messages: [
                     new ToolMessage({
-                        content: "完成计划更新",
+                        content: "plan updated",
                         tool_call_id: config.toolCall!.id!,
                     }),
                 ],
@@ -115,8 +100,10 @@ const research_dispatcher = new StateGraph(DeepResearchState)
         const researcher_agent = createReactAgent({
             llm,
             tools: [
-                web_search_tool,
-                // tavilyTool,
+                // meilisearchTool,
+                // crawlSingleDocument,
+                // web_search_tool,
+                tavilyTool,
             ],
             prompt,
             stateSchema: DeepResearchState,
@@ -143,11 +130,10 @@ const research_dispatcher = new StateGraph(DeepResearchState)
     })
     .addEdge(START, "sub_research")
     .addNode("goto_reporter", async (_state) => {
-        const state = getCurrentTaskInput() as (typeof DeepResearchState)["State"];
-        return new Command({
-            goto: "planner",
-            graph: Command.PARENT,
-            update: { messages: [...state.messages, ..._state.messages], current_plan: state.current_plan },
+        const state = getCurrentTaskInput() as typeof DeepResearchState.State;
+        return createHandoffCommand("reporter", {
+            messages: [...state.messages, ..._state.messages],
+            current_plan: state.current_plan,
         });
     })
     .addEdge("goto_reporter", END)
@@ -167,9 +153,10 @@ const reporter_agent = createReactAgent({
     tools: [],
     /** @ts-ignore */
     prompt: async (state: typeof DeepResearchState.State) => {
-        const data = await apply_prompt_template("deep_research_reporter.md", state as any);
+        const prompt = await apply_prompt_template("deep_research_reporter.md", state as any);
         return [
-            new SystemMessage(data),
+            new SystemMessage(prompt),
+            getLastHumanMessage(state.messages),
             new HumanMessage("请你根据下面内容生成总结"),
             new AIMessage({
                 content: JSON.stringify(state.current_plan),

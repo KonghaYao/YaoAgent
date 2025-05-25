@@ -12,7 +12,8 @@
         "clean": "rm -rf ./dist .turbo || true",
         "format": "prettier --config .prettierrc --write \"src\"",
         "lint": "eslint src",
-        "lint:fix": "eslint src --fix"
+        "lint:fix": "eslint src --fix",
+        "dev:mcp": "pnpx @modelcontextprotocol/inspector"
     },
     "dependencies": {
         "@langchain/community": "^0.3.43",
@@ -26,7 +27,9 @@
         "@langchain/openai": "^0.5.10",
         "@langchain/tavily": "^0.1.1",
         "@langgraph-js/api": "^0.2.39",
+        "@modelcontextprotocol/sdk": "^1.11.4",
         "eventsource": "^3.0.7",
+        "fetch-to-node": "^2.1.0",
         "hono": "^4.7.10",
         "langchain": "^0.3.26",
         "langfuse-langchain": "^3.37.2",
