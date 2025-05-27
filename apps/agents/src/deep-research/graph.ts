@@ -3,7 +3,7 @@ import { Plan, DeepResearchState } from "./state.js";
 import { apply_prompt_template } from "./utils.js";
 import { createSwarm } from "@langchain/langgraph-swarm";
 import { ChatOpenAI } from "@langchain/openai";
-import { Command, END, getCurrentTaskInput, interrupt, START, StateGraph } from "@langchain/langgraph";
+import { Command, END, entrypoint, getCurrentTaskInput, interrupt, START, StateGraph } from "@langchain/langgraph";
 import { tool, ToolRunnableConfig } from "@langchain/core/tools";
 import { AIMessage, HumanMessage, SystemMessage, ToolMessage } from "@langchain/core/messages";
 import { TavilySearch } from "@langchain/tavily";
@@ -22,7 +22,7 @@ const tavilyTool = new TavilySearch({
 });
 
 const llm = new ChatOpenAI({
-    modelName: "gpt-4.1-mini",
+    modelName: "gpt-4o-mini",
     temperature: 0,
 });
 
@@ -73,11 +73,9 @@ const ask_user_for_approve = tool(
     }
 );
 
-const planner_agent = createReactAgent({
-    name: "planner",
-    llm,
-    tools: [
-        // SequentialThinkingTool,
+const planner_agent = entrypoint("planner", async (state: typeof DeepResearchState.State) => {
+    const prompt = await apply_prompt_template("deep_research_planner.md", state as any);
+    const tools = [
         ask_user_for_approve,
         update_plan,
         createHandoffTool({
@@ -90,13 +88,21 @@ const planner_agent = createReactAgent({
             description: "进行总结",
             updateState: keepAllStateInHandOff,
         }),
-    ],
-    prompt: async (state) => {
-        const data = await apply_prompt_template("deep_research_planner.md", state as any);
-        return [new SystemMessage(data), ...state.messages];
-    },
-    stateSchema: DeepResearchState,
+    ];
+    state.deep_thinking && tools.push(SequentialThinkingTool as any);
+    const { messages, current_plan } = await createReactAgent({
+        name: "planner",
+        llm,
+        tools,
+        prompt,
+        stateSchema: DeepResearchState,
+    }).invoke(state);
+    return {
+        messages: [...messages],
+        current_plan,
+    };
 });
+
 const research_dispatcher = new StateGraph(DeepResearchState)
     .addNode("sub_research", async (state) => {
         const step = state.current_plan!.steps[state.plan_iterations];
@@ -127,7 +133,7 @@ const research_dispatcher = new StateGraph(DeepResearchState)
         });
         step.execution_res = getTextMessageContent(messages[messages.length - 1]);
         return {
-            messages: [...state.messages, ...messages],
+            messages: [...state.messages, ...messages.filter((i) => i.getType() !== "human")],
             plan_iterations: state.plan_iterations + 1,
             current_plan: state.current_plan,
         };
@@ -162,7 +168,7 @@ const reporter_agent = createReactAgent({
             new SystemMessage(prompt),
             getLastHumanMessage(state.messages),
             new HumanMessage("请你根据下面内容生成总结"),
-            new AIMessage({
+            new HumanMessage({
                 content: JSON.stringify(state.current_plan),
             }),
         ];
