@@ -1,5 +1,7 @@
 import { createChatStore } from "@langgraph-js/sdk";
 import { ask_user_for_approve } from "../tools/index";
+import { OpenAIVectorizer, createMemoryTool } from "../../memory/index";
+
 const F =
     localStorage.getItem("withCredentials") === "true"
         ? (url: string, options: RequestInit) => {
@@ -19,6 +21,13 @@ export const setLocalConfig = (config: Partial<{ showHistory: boolean; showGraph
         localStorage.setItem(key, value.toString());
     });
 };
+
+const vectorizer = new OpenAIVectorizer("text-embedding-ada-002", {
+    apiKey: import.meta.env.VITE_MEMORY_API_KEY,
+    apiEndpoint: import.meta.env.VITE_MEMORY_API_ENDPOINT,
+});
+export const memoryTool = createMemoryTool(vectorizer);
+
 export const globalChatStore = createChatStore(
     localStorage.getItem("agent_name") || "",
     {
@@ -32,7 +41,7 @@ export const globalChatStore = createChatStore(
     {
         ...getLocalConfig(),
         onInit(client) {
-            client.tools.bindTools([ask_user_for_approve]);
+            client.tools.bindTools([ask_user_for_approve, memoryTool.manageMemory, memoryTool.searchMemory]);
         },
     }
 );
