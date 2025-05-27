@@ -500,7 +500,7 @@ export class LangGraphClient extends Client {
                 continue;
             } else if (chunk.event.startsWith("values|")) {
                 // 这个 values 必然是子 values
-                if (chunk.data.messages) {
+                if (chunk.data?.messages) {
                     this.mergeSubGraphMessagesToStreamingMessages(chunk.data.messages);
                 }
                 this.graphPosition = chunk.event.split("|")[1];
