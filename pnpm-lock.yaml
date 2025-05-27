@@ -211,6 +211,9 @@ importers:
       idb:
         specifier: ^8.0.3
         version: 8.0.3
+      minisearch:
+        specifier: ^7.1.2
+        version: 7.1.2
       nanostores:
         specifier: ^1.0.1
         version: 1.0.1

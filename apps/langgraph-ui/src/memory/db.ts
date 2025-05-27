@@ -1,22 +1,13 @@
 import { openDB, DBSchema, IDBPDatabase } from "idb";
+import { BaseDB, BaseRecord, BaseDBConfig, MemoryRecord, Vector } from "./base-db";
 
-// 定义向量类型
-type Vector = number[];
 type BinaryVector = number[];
-
-// 定义数据库记录类型
-interface VectorRecord {
-    id?: number;
-    vector?: Vector | BigUint64Array;
-    text: string;
-    [key: string]: any;
-}
 
 // 定义数据库模式
 interface VecDBSchema extends DBSchema {
     vectors: {
         key: number;
-        value: VectorRecord;
+        value: MemoryRecord;
     };
 }
 
@@ -85,8 +76,7 @@ const binarizeVector = (vector: Vector, threshold: number | null = null): Binary
     return vector.map((val: number) => (val >= threshold! ? 1 : 0));
 };
 
-interface EntityDBConfig {
-    vectorPath: string;
+interface VecDBConfig extends BaseDBConfig {
     vectorizer: TextVectorizer;
 }
 
@@ -94,20 +84,20 @@ interface QueryOptions {
     limit?: number;
 }
 
-class VecDB {
-    private vectorPath: string;
+class VecDB extends BaseDB<MemoryRecord> {
     private vectorizer: TextVectorizer;
-    private dbPromise: Promise<IDBPDatabase<VecDBSchema>>;
-
-    constructor({ vectorPath, vectorizer }: EntityDBConfig) {
-        this.vectorPath = vectorPath;
-        this.vectorizer = vectorizer;
-        this.dbPromise = this._initDB();
+    protected db!: IDBPDatabase<VecDBSchema>;
+    constructor(config: VecDBConfig) {
+        super(config);
+        this.vectorizer = config.vectorizer;
     }
 
-    // Initialize the IndexedDB
-    private async _initDB(): Promise<IDBPDatabase<VecDBSchema>> {
-        const db = await openDB<VecDBSchema>("EntityDB", 1, {
+    public async initialize(): Promise<void> {
+        if (this.isInitialized) {
+            return;
+        }
+
+        this.db = await openDB<VecDBSchema>(this.config.dbName, this.config.dbVersion, {
             upgrade(db) {
                 if (!db.objectStoreNames.contains("vectors")) {
                     db.createObjectStore("vectors", {
@@ -117,79 +107,61 @@ class VecDB {
                 }
             },
         });
-        return db;
+        this.isInitialized = true;
     }
 
-    // Insert data by generating embeddings from text
-    async insert(data: VectorRecord): Promise<number> {
+    public async insert(data: MemoryRecord): Promise<number> {
+        if (!this.isInitialized) {
+            await this.initialize();
+        }
+
         try {
-            let embedding = data[this.vectorPath] as Vector;
-            if (data.text) {
-                embedding = await this.vectorizer.vectorize(data.text);
+            let embedding = data.vector;
+            if (!embedding) {
+                embedding = await this.vectorizer.vectorize(data.text!);
             }
 
-            const db = await this.dbPromise;
-            const transaction = db.transaction("vectors", "readwrite");
+            const transaction = this.db.transaction("vectors", "readwrite");
             const store = transaction.objectStore("vectors");
             const { vector: _, ...rest } = data;
             const record = { vector: embedding, ...rest };
             const key = await store.add(record);
-            return key;
+            return Number(key);
         } catch (error) {
             throw new Error(`Error inserting data: ${error}`);
         }
     }
 
-    async insertBinary(data: VectorRecord): Promise<number> {
-        try {
-            let embedding = data[this.vectorPath] as Vector;
-            if (data.text) {
-                embedding = await this.vectorizer.vectorize(data.text);
-            }
-
-            const binaryEmbedding = binarizeVector(embedding);
-            const packedEmbedding = new BigUint64Array(new ArrayBuffer(Math.ceil(binaryEmbedding.length / 64) * 8));
-            for (let i = 0; i < binaryEmbedding.length; i++) {
-                const bitIndex = i % 64;
-                const arrayIndex = Math.floor(i / 64);
-                if (binaryEmbedding[i] === 1) {
-                    packedEmbedding[arrayIndex] |= 1n << BigInt(bitIndex);
-                }
-            }
-
-            const db = await this.dbPromise;
-            const transaction = db.transaction("vectors", "readwrite");
-            const store = transaction.objectStore("vectors");
-            const { vector: _, ...rest } = data;
-            const record = { vector: packedEmbedding, ...rest };
-            const key = await store.add(record);
-            return key;
-        } catch (error) {
-            throw new Error(`Error inserting binary data: ${error}`);
+    public async update(key: number, data: MemoryRecord): Promise<void> {
+        if (!this.isInitialized) {
+            await this.initialize();
         }
-    }
 
-    async update(key: number, data: VectorRecord): Promise<void> {
-        const db = await this.dbPromise;
-        const transaction = db.transaction("vectors", "readwrite");
+        const transaction = this.db.transaction("vectors", "readwrite");
         const store = transaction.objectStore("vectors");
-        const vector = data[this.vectorPath] as Vector;
+        const vector = data["vector"] as Vector;
         const updatedData = { ...data, id: key, vector };
         await store.put(updatedData);
     }
 
-    async delete(key: number): Promise<void> {
-        const db = await this.dbPromise;
-        const transaction = db.transaction("vectors", "readwrite");
+    public async delete(key: number): Promise<void> {
+        if (!this.isInitialized) {
+            await this.initialize();
+        }
+
+        const transaction = this.db.transaction("vectors", "readwrite");
         const store = transaction.objectStore("vectors");
         await store.delete(key);
     }
 
-    async query(queryText: string, { limit = 10 }: QueryOptions = {}): Promise<Array<VectorRecord & { similarity: number }>> {
+    public async query(queryText: string, { limit = 10 }: QueryOptions = {}): Promise<Array<MemoryRecord & { similarity: number }>> {
+        if (!this.isInitialized) {
+            await this.initialize();
+        }
+
         try {
             const queryVector = await this.vectorizer.vectorize(queryText);
-            const db = await this.dbPromise;
-            const transaction = db.transaction("vectors", "readonly");
+            const transaction = this.db.transaction("vectors", "readonly");
             const store = transaction.objectStore("vectors");
             const vectors = await store.getAll();
 
@@ -205,7 +177,50 @@ class VecDB {
             throw new Error(`Error querying vectors: ${error}`);
         }
     }
+
+    public async getAll(): Promise<MemoryRecord[]> {
+        if (!this.isInitialized) {
+            await this.initialize();
+        }
+
+        const transaction = this.db.transaction("vectors", "readonly");
+        const store = transaction.objectStore("vectors");
+        return store.getAll();
+    }
+
+    // 保留原有的 insertBinary 方法作为特殊方法
+    async insertBinary(data: MemoryRecord): Promise<number> {
+        if (!this.isInitialized) {
+            await this.initialize();
+        }
+
+        try {
+            let embedding = data["vector"] as Vector;
+            if (data.text) {
+                embedding = await this.vectorizer.vectorize(data.text);
+            }
+
+            const binaryEmbedding = binarizeVector(embedding);
+            const packedEmbedding = new BigUint64Array(new ArrayBuffer(Math.ceil(binaryEmbedding.length / 64) * 8));
+            for (let i = 0; i < binaryEmbedding.length; i++) {
+                const bitIndex = i % 64;
+                const arrayIndex = Math.floor(i / 64);
+                if (binaryEmbedding[i] === 1) {
+                    packedEmbedding[arrayIndex] |= 1n << BigInt(bitIndex);
+                }
+            }
+
+            const transaction = this.db.transaction("vectors", "readwrite");
+            const store = transaction.objectStore("vectors");
+            const { vector: _, ...rest } = data;
+            const record = { vector: packedEmbedding, ...rest };
+            const key = await store.add(record);
+            return Number(key);
+        } catch (error) {
+            throw new Error(`Error inserting binary data: ${error}`);
+        }
+    }
 }
 
 export { VecDB, TextVectorizer, OpenAIVectorizer };
-export type { Vector, BinaryVector, VectorRecord };
+export type { Vector, BinaryVector, MemoryRecord, VecDBConfig };

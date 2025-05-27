@@ -1,47 +1,6 @@
 import { createToolUI } from "@langgraph-js/sdk";
-import { VecDB, TextVectorizer } from "./db";
-import type { Vector, VectorRecord } from "./db";
-
-interface MemoryStore {
-    insert(data: VectorRecord): Promise<number>;
-    update(key: number, data: VectorRecord): Promise<void>;
-    delete(key: number): Promise<void>;
-    query(queryText: string, options?: { limit?: number }): Promise<Array<VectorRecord & { similarity: number }>>;
-}
-
-class VecDBStore implements MemoryStore {
-    private db: VecDB;
-
-    constructor(vectorizer: TextVectorizer) {
-        this.db = new VecDB({
-            vectorPath: "db_name",
-            vectorizer,
-        });
-    }
-
-    async insert(data: VectorRecord): Promise<number> {
-        return await this.db.insert(data);
-    }
-
-    async update(key: number, data: VectorRecord): Promise<void> {
-        return await this.db.update(key, data);
-    }
-
-    async delete(key: number): Promise<void> {
-        return await this.db.delete(key);
-    }
-
-    async query(queryText: string, options: { limit?: number } = {}): Promise<Array<VectorRecord & { similarity: number }>> {
-        return await this.db.query(queryText, options);
-    }
-
-    // 简单的文本搜索方法
-    async searchByText(query: string, limit: number = 10): Promise<VectorRecord[]> {
-        // 使用向量搜索作为文本搜索的替代
-        const results = await this.query(query, { limit });
-        return results.map(({ similarity, ...record }) => record);
-    }
-}
+import type { MemoryRecord } from "./base-db";
+import { BaseDB } from "./base-db";
 
 // 获取命名空间（这里简化为标识符）
 function getNamespace(userId?: string): string {
@@ -59,9 +18,7 @@ function ensureJsonSerializable(content: any): any {
     return String(content);
 }
 
-export const createMemoryTool = (vectorizer: TextVectorizer) => {
-    const store = new VecDBStore(vectorizer);
-
+export const createMemoryTool = (store: BaseDB<MemoryRecord>) => {
     return {
         manageMemory: createToolUI({
             name: "manage_memory",
@@ -108,7 +65,7 @@ export const createMemoryTool = (vectorizer: TextVectorizer) => {
                         return `已删除记忆 ${id}`;
                     }
 
-                    const memoryData: VectorRecord = {
+                    const memoryData: MemoryRecord = {
                         text: content!,
                         content: ensureJsonSerializable(content),
                         createdAt: new Date().toISOString(),
@@ -174,6 +131,4 @@ export const createMemoryTool = (vectorizer: TextVectorizer) => {
     };
 };
 
-export type { Vector, VectorRecord, MemoryStore };
-
-export { VecDBStore, getNamespace, ensureJsonSerializable };
+export { getNamespace, ensureJsonSerializable };

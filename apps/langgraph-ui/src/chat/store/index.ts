@@ -1,6 +1,6 @@
 import { createChatStore } from "@langgraph-js/sdk";
 import { ask_user_for_approve } from "../tools/index";
-import { OpenAIVectorizer, createMemoryTool } from "../../memory/index";
+import { FullTextSearchService, OpenAIVectorizer, VecDB, createMemoryTool } from "../../memory/index";
 
 const F =
     localStorage.getItem("withCredentials") === "true"
@@ -22,11 +22,23 @@ export const setLocalConfig = (config: Partial<{ showHistory: boolean; showGraph
     });
 };
 
-const vectorizer = new OpenAIVectorizer("text-embedding-ada-002", {
-    apiKey: import.meta.env.VITE_MEMORY_API_KEY,
-    apiEndpoint: import.meta.env.VITE_MEMORY_API_ENDPOINT,
+// const vectorizer = new OpenAIVectorizer("text-embedding-3-small", {
+//     apiKey: import.meta.env.VITE_MEMORY_API_KEY,
+//     apiEndpoint: import.meta.env.VITE_MEMORY_API_ENDPOINT,
+// });
+// const db = new VecDB({
+//     vectorizer,
+//     dbName: "memory_db",
+//     dbVersion: 1,
+//     storeName: "memory",
+// });
+const db = new FullTextSearchService({
+    dbName: "memory_fulltext_db",
+    dbVersion: 1,
+    storeName: "memory",
 });
-export const memoryTool = createMemoryTool(vectorizer);
+db.initialize();
+export const memoryTool = createMemoryTool(db);
 
 export const globalChatStore = createChatStore(
     localStorage.getItem("agent_name") || "",

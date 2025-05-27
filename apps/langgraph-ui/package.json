@@ -25,6 +25,7 @@
         "@vitejs/plugin-react": "^4.3.4",
         "@xyflow/react": "^12.6.4",
         "idb": "^8.0.3",
+        "minisearch": "^7.1.2",
         "nanostores": "^1.0.1",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
