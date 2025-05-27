@@ -27,6 +27,14 @@ export class ToolRenderData<D> {
     getJSONOutput() {
         return JSON.parse(this.output);
     }
+    /** 如果解析失败，则返回 null */
+    getJSONOutputSafe() {
+        try {
+            return JSON.parse(this.output);
+        } catch (e) {
+            return null;
+        }
+    }
     response(data: D) {
         this.client.doneFEToolWaiting(this.message.id!, JSON.stringify(data));
     }

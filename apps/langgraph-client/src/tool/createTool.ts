@@ -16,6 +16,8 @@ export interface UnionTool<Args extends ZodRawShape, Child extends Object = Obje
     callbackMessage?: (result: CallToolResult) => Message[];
     render?: <D>(tool: ToolRenderData<D>) => Child;
     onlyRender?: boolean;
+    /** 只允许指定的 agent 使用该工具，如果未指定，则所有 agent 都可以使用 */
+    allowAgent?: string[];
 }
 export type ToolCallback<Args extends ZodRawShape> = (args: z.objectOutputType<Args, ZodTypeAny>, context?: any) => CallToolResult | Promise<CallToolResult>;
 
@@ -29,13 +31,18 @@ export const createTool = <Args extends ZodRawShape>(tool: UnionTool<Args>) => {
 /** 提供一种兼容 copilotkit 的定义方式，简化定义形式
  * 来自 copilotkit 的 frontend action
  */
-export const createFETool = <const T extends Parameter[], Args extends ZodRawShape>(tool: Action<T>): UnionTool<Args> => {
+export const createFETool = <const T extends Parameter[], Args extends ZodRawShape>(
+    tool: Action<T> & {
+        allowAgent?: string[];
+    }
+): UnionTool<Args> => {
     return {
         name: tool.name,
         description: tool.description || "",
         parameters: convertJsonSchemaToZodRawShape(actionParametersToJsonSchema(tool.parameters || [])) as any,
         returnDirect: tool.returnDirect,
         callbackMessage: tool.callbackMessage,
+        allowAgent: tool.allowAgent,
         async execute(args, context) {
             try {
                 const result = await tool.handler?.(args, context);
@@ -80,7 +87,13 @@ export const createMCPTool = <Args extends ZodRawShape>(tool: UnionTool<Args>) =
     ];
 };
 
-export const createToolUI = <Args extends Parameter[] | [] = [], Child extends Object = {}>(tool: Action<Args> & { render?: (tool: ToolRenderData<any>) => Child; onlyRender?: boolean }) => {
+export const createToolUI = <Args extends Parameter[] | [] = [], Child extends Object = {}>(
+    tool: Action<Args> & {
+        allowAgent?: string[];
+        render?: (tool: ToolRenderData<any>) => Child;
+        onlyRender?: boolean;
+    }
+) => {
     return {
         ...createFETool(tool),
         render: tool.render,

@@ -18,10 +18,15 @@ export interface FETool {
     name: string;
     description: string;
     parameters: FEToolParameters[];
+    allowAgent?: string[];
 }
 
-export const createFeTools = (tools: FETool[]): DynamicStructuredTool[] => {
+export const createFeTools = (tools: FETool[], agentName: string): DynamicStructuredTool[] => {
     return tools
+        .filter((i) => {
+            if (!i.allowAgent) return true;
+            return i.allowAgent.includes(agentName);
+        })
         .map((tool) => {
             try {
                 return actionToTool(tool);
