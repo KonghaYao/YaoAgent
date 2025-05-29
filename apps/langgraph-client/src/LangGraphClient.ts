@@ -451,7 +451,13 @@ export class LangGraphClient extends Client {
         const streamResponse =
             _debug?.streamResponse ||
             this.runs.stream(this.currentThread!.thread_id, this.currentAssistant.assistant_id, {
-                input: { ...this.graphState, ...(extraParams || {}), messages: messagesToSend, fe_tools: this.tools.toJSON() },
+                input: {
+                    ...this.graphState,
+                    ...this.extraParams,
+                    ...(extraParams || {}),
+                    messages: messagesToSend,
+                    fe_tools: this.tools.toJSON(),
+                },
                 streamMode: ["messages", "values"],
                 streamSubgraphs: true,
                 command,
@@ -578,6 +584,8 @@ export class LangGraphClient extends Client {
         const result = await this.tools.callTool(message.name!, args, { client: that, message });
         return this.resume(result);
     }
+    extraParams: Record<string, any> = {};
+
     /**
      * @zh 继续被前端工具中断的流程。
      * @en Resumes a process interrupted by a frontend tool.
