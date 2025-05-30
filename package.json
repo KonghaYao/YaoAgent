@@ -21,13 +21,15 @@
         "tsx": "^4.19.3",
         "turbo": "latest",
         "typescript": "^5.8.3",
-        "vitepress": "^1.6.3"
+        "vitepress": "^1.6.3",
+        "vitest": "^3.0.0"
     },
     "resolutions": {
         "@langchain/core": "^0.3.42"
     },
     "packageManager": "pnpm@10.10.0",
     "dependencies": {
-        "@langchain/core": "^0.3.49"
+        "@langchain/core": "^0.3.49",
+        "vite": "^6.3.5"
     }
 }

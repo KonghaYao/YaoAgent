@@ -1,0 +1,58 @@
+{
+    "name": "@langgraph-js/crawler",
+    "version": "1.0.0",
+    "description": "A powerful web crawler designed specifically for LLM applications, capable of extracting clean, readable content from various web pages and converting it to Markdown format.",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "type": "module",
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/",
+        "access": "public"
+    },
+    "scripts": {
+        "build": "tsc",
+        "prepublish": "pnpm build",
+        "test": "vitest",
+        "test:coverage": "vitest run --coverage",
+        "lint": "eslint src --ext .ts",
+        "format": "prettier --write \"src/**/*.ts\""
+    },
+    "keywords": [
+        "langgraph",
+        "crawler",
+        "web-scraping",
+        "readability",
+        "markdown",
+        "html-parser",
+        "content-extraction",
+        "wechat",
+        "llm",
+        "ai"
+    ],
+    "author": "KonghaYao",
+    "license": "Apache-2.0",
+    "packageManager": "pnpm@10.6.3",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/KonghaYao/YaoAgent.git"
+    },
+    "homepage": "https://langgraph-js.netlify.app",
+    "bugs": {
+        "url": "https://github.com/KonghaYao/YaoAgent/issues"
+    },
+    "dependencies": {
+        "@mozilla/readability": "^0.6.0",
+        "happy-dom": "^17.5.6",
+        "iconv-lite": "^0.6.3",
+        "turndown": "^7.2.0",
+        "zod": "^3.25.17"
+    },
+    "devDependencies": {
+        "@types/turndown": "^5.0.5",
+        "prettier": "^3.2.5",
+        "typescript": "^5.3.3"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}
