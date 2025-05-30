@@ -11,7 +11,7 @@ export const crawlerTool = tool(
                 };
             }
 
-            const response = await fetch("https://website-to-md.deno.dev", {
+            const response = await fetch(`${process.env.SERVER_URL}/website-to-md`, {
                 method: "POST",
                 body: JSON.stringify({ url }),
             });
