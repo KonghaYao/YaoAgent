@@ -21,10 +21,14 @@ export interface FETool {
     allowAgent?: string[];
 }
 
-export const createFeTools = (tools: FETool[], agentName: string): DynamicStructuredTool[] => {
+export const createFeTools = (
+    tools: FETool[],
+    /** 通过归属的 agent 的名称，来过滤出指定的工具 */
+    agentName?: string
+): DynamicStructuredTool[] => {
     return tools
         .filter((i) => {
-            if (!i.allowAgent) return true;
+            if (!i.allowAgent || !agentName) return true;
             return i.allowAgent.includes(agentName);
         })
         .map((tool) => {

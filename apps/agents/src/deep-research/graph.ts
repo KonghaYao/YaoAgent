@@ -16,6 +16,7 @@ import {
     SequentialThinkingTool,
 } from "@langgraph-js/pro";
 import z from "zod";
+import { crawlerTool } from "src/web-search/crawler.js";
 // import { crawlSingleDocument, meilisearchTool } from "../web-search/meilisearch.js";
 const tavilyTool = new TavilySearch({
     maxResults: 5,
@@ -114,6 +115,7 @@ const research_dispatcher = new StateGraph(DeepResearchState)
                 // crawlSingleDocument,
                 // web_search_tool,
                 tavilyTool,
+                crawlerTool,
             ],
             prompt,
             stateSchema: DeepResearchState,

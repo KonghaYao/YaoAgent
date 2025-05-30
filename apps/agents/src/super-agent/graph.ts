@@ -4,15 +4,14 @@ import { createMCPNode } from "./tools/mcp.js";
 import { initializeTools } from "./tools/index.js";
 import { GraphState, ConfigurationState } from "./state.js";
 import { createLLM } from "../model/index.js";
-import { SystemMessage } from "@langchain/core/messages";
-import { MemoryPrompt } from "./tools/memory.js";
-import { createExpert } from "../create-expert/index.js";
 import { SequentialThinkingTool, createFeTools } from "@langgraph-js/pro";
 import { MemoryNode } from "../create-expert/short-term-memory.js";
 import { getPrompt } from "../model/prompt-getter.js";
 import { tool } from "@langchain/core/tools";
 import { ToolRunnableConfig } from "@langchain/core/tools";
 import z from "zod";
+import { createReactAgent } from "@langchain/langgraph/prebuilt";
+import { crawlerTool } from "../web-search/crawler.js";
 const ask_user_for_approve = tool(
     async (input, _config: ToolRunnableConfig) => {
         const data = interrupt(JSON.stringify(input));
@@ -28,55 +27,26 @@ const ask_user_for_approve = tool(
     }
 );
 const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<typeof ConfigurationState.State>>(
-    {
-        // npm: {
-        //     transport: "sse",
-        //     url: "http://0.0.0.0:6798/npm_bot/sse",
-        //     useNodeEventSource: true,
-        // },
-        // "zhipu-web-search-sse": {
-        //     transport: "sse",
-        //     url: "https://open.bigmodel.cn/api/mcp/web_search/sse?Authorization=" + process.env.ZHIPU_API_KEY,
-        // },
-    },
+    {},
     async (state, config, mcpTools) => {
         const feTools = createFeTools(state.fe_tools);
-        const stylePrompt = await getPrompt("style.md");
-        const plannerPrompt = await getPrompt("planner.md");
         const executorPrompt = await getPrompt("executor.md");
-        const summaryPrompt = await getPrompt("summary.md");
         const normalTools = initializeTools(state, config);
 
-        const tools = [...normalTools, ...mcpTools, ...feTools, ask_user_for_approve];
+        const tools = [
+            ...normalTools,
+            ...mcpTools,
+            ...feTools,
+            ask_user_for_approve,
+            crawlerTool,
+            SequentialThinkingTool,
+        ];
         const llm = await createLLM(state, "main_model");
 
-        const agent = createExpert({
-            plannerConfig: {
-                llm,
-                tools: [...tools, SequentialThinkingTool],
-                stateModifier: new SystemMessage(`${plannerPrompt}  
-
-${stylePrompt}
-
-${MemoryPrompt}`),
-            },
-            executorConfig: {
-                llm,
-                tools,
-                stateModifier: new SystemMessage(`${executorPrompt}
-
-${stylePrompt}
-
-${MemoryPrompt}`),
-            },
-            summaryConfig: {
-                llm,
-                tools,
-                stateModifier: new SystemMessage(`${summaryPrompt}
-
-${stylePrompt}
-`),
-            },
+        const agent = createReactAgent({
+            llm,
+            tools,
+            prompt: executorPrompt,
         });
 
         const response = await agent.invoke({
