@@ -5,8 +5,7 @@ import { createSwarm } from "@langchain/langgraph-swarm";
 import { ChatOpenAI } from "@langchain/openai";
 import { Command, END, entrypoint, getCurrentTaskInput, interrupt, START, StateGraph } from "@langchain/langgraph";
 import { tool, ToolRunnableConfig } from "@langchain/core/tools";
-import { AIMessage, HumanMessage, SystemMessage, ToolMessage } from "@langchain/core/messages";
-import { TavilySearch } from "@langchain/tavily";
+import { HumanMessage, SystemMessage, ToolMessage } from "@langchain/core/messages";
 import {
     getLastHumanMessage,
     getTextMessageContent,
@@ -16,11 +15,7 @@ import {
     SequentialThinkingTool,
 } from "@langgraph-js/pro";
 import z from "zod";
-import { crawlerTool } from "src/web-search/crawler.js";
-// import { crawlSingleDocument, meilisearchTool } from "../web-search/meilisearch.js";
-const tavilyTool = new TavilySearch({
-    maxResults: 5,
-});
+import { crawler_tool, web_search_tool } from "src/web-search/crawler.js";
 
 const llm = new ChatOpenAI({
     modelName: "gpt-4o-mini",
@@ -110,13 +105,7 @@ const research_dispatcher = new StateGraph(DeepResearchState)
         const prompt = await apply_prompt_template("deep_research_researcher.md", state);
         const researcher_agent = createReactAgent({
             llm,
-            tools: [
-                // meilisearchTool,
-                // crawlSingleDocument,
-                // web_search_tool,
-                tavilyTool,
-                crawlerTool,
-            ],
+            tools: [web_search_tool, crawler_tool],
             prompt,
             stateSchema: DeepResearchState,
         });

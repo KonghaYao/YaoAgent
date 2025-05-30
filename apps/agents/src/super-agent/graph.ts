@@ -11,7 +11,7 @@ import { tool } from "@langchain/core/tools";
 import { ToolRunnableConfig } from "@langchain/core/tools";
 import z from "zod";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
-import { crawlerTool } from "../web-search/crawler.js";
+import { crawler_tool } from "../web-search/crawler.js";
 const ask_user_for_approve = tool(
     async (input, _config: ToolRunnableConfig) => {
         const data = interrupt(JSON.stringify(input));
@@ -38,7 +38,7 @@ const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<typeof Config
             ...mcpTools,
             ...feTools,
             ask_user_for_approve,
-            crawlerTool,
+            crawler_tool,
             SequentialThinkingTool,
         ];
         const llm = await createLLM(state, "main_model");
