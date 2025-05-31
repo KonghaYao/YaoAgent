@@ -51,7 +51,17 @@ export abstract class BaseDB<T extends BaseRecord> {
     /**
      * 查询记录
      */
-    public abstract query(query: any, options?: { limit?: number }): Promise<T[]>;
+    public abstract query(
+        query: string,
+        options?: {
+            prefix?: boolean;
+            fields?: string[];
+            limit?: number;
+            fuzzy?: number;
+        }
+    ): Promise<T[]>;
+
+    public abstract get(id: number): Promise<T | undefined>;
 
     /**
      * 获取所有记录
@@ -65,4 +75,18 @@ export type Vector = number[];
 export interface MemoryRecord extends BaseRecord {
     vector?: Vector | BigUint64Array;
     text: string;
+    /**
+     * 记忆存储的路径，与 Linux 文件系统一致
+     * @example memory://user_id/path/to/memory
+     */
+    path: string;
+    /**
+     * 引用文档的 path
+     */
+    referencePath?: string;
+    type: string;
+    /**
+     * 记忆的标签，用于检索
+     */
+    tags: string[];
 }

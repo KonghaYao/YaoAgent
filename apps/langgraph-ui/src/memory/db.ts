@@ -1,5 +1,5 @@
 import { openDB, DBSchema, IDBPDatabase } from "idb";
-import { BaseDB, BaseRecord, BaseDBConfig, MemoryRecord, Vector } from "./base-db";
+import { BaseDB, BaseRecord, BaseDBConfig, MemoryRecord, Vector } from "./BaseDB";
 
 type BinaryVector = number[];
 
@@ -178,6 +178,12 @@ class VecDB extends BaseDB<MemoryRecord> {
         }
     }
 
+    public async get(id: number): Promise<MemoryRecord | undefined> {
+        if (!this.isInitialized) {
+            await this.initialize();
+        }
+        return this.db.transaction("vectors", "readonly").objectStore("vectors").get(id);
+    }
     public async getAll(): Promise<MemoryRecord[]> {
         if (!this.isInitialized) {
             await this.initialize();

@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export function createLangSearchTool(apiKey: string) {
     const langSearchTool = tool(
-        async ({ query, freshness = "noLimit", summary = false, count = 10 }) => {
+        async ({ query, freshness = "noLimit", count = 10 }) => {
             try {
                 const response = await fetch("https://api.langsearch.com/v1/web-search", {
                     method: "POST",
@@ -14,7 +14,7 @@ export function createLangSearchTool(apiKey: string) {
                     body: JSON.stringify({
                         query,
                         freshness,
-                        summary,
+                        summary: false,
                         count,
                     }),
                 });
@@ -53,7 +53,6 @@ export function createLangSearchTool(apiKey: string) {
                     .describe(
                         "搜索结果的时间范围：oneDay-24小时内/oneWeek-一周内/oneMonth-一个月内/oneYear-一年内/noLimit-不限时间"
                     ),
-                summary: z.boolean().optional().describe("是否返回详细摘要"),
                 count: z.number().optional().describe("返回结果数量（1-10）"),
             }),
         }

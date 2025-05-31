@@ -258,8 +258,15 @@
     padding: 0.75rem;
     border-radius: 4px;
     font-family: monospace;
+    white-space: pre-wrap;
     border: 1px solid #e5e7eb;
     margin-bottom: 0.5rem;
+}
+.tool-input pre,
+.tool-output pre {
+    white-space: pre-wrap;
+    max-height: 40vh;
+    overflow-y: auto;
 }
 
 .chat-input {
@@ -386,6 +393,10 @@
     text-align: center;
 }
 
+.params-body {
+    max-height: 40vh;
+    overflow-y: auto;
+}
 .markdown-body p {
     text-align: left;
 }

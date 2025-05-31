@@ -2,7 +2,7 @@
 
 import MiniSearch, { AsPlainObject, type Options, type SearchOptions, type SearchResult } from "minisearch";
 import { openDB, type IDBPDatabase } from "idb";
-import { BaseDB, BaseRecord, BaseDBConfig } from "./base-db";
+import { BaseDB, BaseDBConfig } from "./BaseDB";
 import { MemoryRecord } from "./db";
 
 /**
@@ -18,8 +18,8 @@ const DEFAULT_CONFIG: Required<FullTextSearchConfig> = {
     dbVersion: 1,
     storeName: "memory",
     miniSearchOptions: {
-        fields: ["text"],
-        storeFields: ["text"],
+        fields: ["text", "path", "tags", "referencePath"],
+        storeFields: ["text", "path", "tags", "referencePath"],
         tokenize: chineseWordSegmenter,
     },
 };
@@ -90,7 +90,8 @@ export class FullTextSearchService extends BaseDB<MemoryRecord> {
         try {
             const savedIndex = await this.loadMiniSearchIndex();
             if (savedIndex) {
-                await MiniSearch.loadJSAsync(savedIndex, miniSearchOptions);
+                console.log(savedIndex);
+                this.miniSearch = await MiniSearch.loadJSAsync(savedIndex, miniSearchOptions);
                 console.log("MiniSearch index loaded from IndexedDB.");
             } else {
                 console.log("No saved index found, building from documents...");
@@ -155,14 +156,22 @@ export class FullTextSearchService extends BaseDB<MemoryRecord> {
     public async query(query: string, options?: SearchOptions & { limit?: number }): Promise<MemoryRecord[]> {
         const results = this.miniSearch.search(query, options);
         // 将 SearchResult 转换为 MemoryRecord
-        return results.map((result) => {
-            const { id, text, ...rest } = result;
+        return results.slice(0, options?.limit ?? 5).map((i) => {
+            const { id, text, ...rest } = i;
             return {
                 id,
                 text,
-                ...rest,
-            } as MemoryRecord;
+                tags: rest.tags,
+                path: rest.path,
+                type: rest.type,
+                score: Math.round(i.score),
+                referencePath: rest.referencePath,
+            } as unknown as MemoryRecord;
         });
+    }
+
+    public async get(id: number): Promise<MemoryRecord | undefined> {
+        return this.db.transaction(this.config.storeName, "readonly").objectStore(this.config.storeName).get(id);
     }
 
     public async getAll(): Promise<MemoryRecord[]> {

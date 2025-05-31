@@ -11,7 +11,9 @@ import { tool } from "@langchain/core/tools";
 import { ToolRunnableConfig } from "@langchain/core/tools";
 import z from "zod";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
-import { crawler_tool } from "../web-search/crawler.js";
+import { crawler_tool, web_search_tool } from "../web-search/crawler.js";
+import { createLangSearchTool } from "src/web-search/langSearch.js";
+import { juejin_search_tool } from "src/web-search/juejin.js";
 const ask_user_for_approve = tool(
     async (input, _config: ToolRunnableConfig) => {
         const data = interrupt(JSON.stringify(input));
@@ -30,13 +32,15 @@ const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<typeof Config
     {},
     async (state, config, mcpTools) => {
         const feTools = createFeTools(state.fe_tools);
-        const executorPrompt = await getPrompt("executor.md");
+        const executorPrompt = await getPrompt("executor.md", false);
         const normalTools = initializeTools(state, config);
 
         const tools = [
             ...normalTools,
             ...mcpTools,
             ...feTools,
+            // ...createLangSearchTool(process.env.LANGSEARCH_API_KEY!),
+            juejin_search_tool,
             ask_user_for_approve,
             crawler_tool,
             SequentialThinkingTool,

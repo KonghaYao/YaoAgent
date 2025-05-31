@@ -11,7 +11,7 @@ export const crawler_tool = tool(
                 };
             }
 
-            const response = await fetch(`${process.env.SERVER_URL}/website-to-md`, {
+            const response = await fetch(`${process.env.SERVER_URL || "http://localhost:8123"}/website-to-md`, {
                 method: "POST",
                 body: JSON.stringify({ url }),
             });
@@ -37,8 +37,8 @@ export const crawler_tool = tool(
         }
     },
     {
-        name: "crawler_tool",
-        description: "get the content of the website",
+        name: "crawl_tool",
+        description: "Use this to crawl a url and get a readable content in markdown format.",
         schema: z.object({
             url: z.string().url().describe("the url of the website"),
         }),

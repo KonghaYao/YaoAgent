@@ -38,6 +38,7 @@ const db = new FullTextSearchService({
     storeName: "memory",
 });
 db.initialize();
+console.log(db);
 export const memoryTool = createMemoryTool(db);
 
 export const globalChatStore = createChatStore(

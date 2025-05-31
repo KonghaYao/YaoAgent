@@ -1,7 +1,10 @@
-import React, { JSX } from "react";
+import React, { JSX, useState } from "react";
 import { LangGraphClient, RenderMessage, ToolMessage } from "@langgraph-js/sdk";
 import { UsageMetadata } from "./UsageMetadata";
 import { useChat } from "../context/ChatContext";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
 interface MessageToolProps {
     message: ToolMessage & RenderMessage;
     client: LangGraphClient;
@@ -28,8 +31,8 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, client, getMessageCo
 
                     {!isCollapsed && (
                         <div className="tool-content">
-                            <div className="tool-input">{message.tool_input}</div>
-                            <div className="tool-output">{getMessageContent(message.content)}</div>
+                            <Previewer className="tool-input" content={message.tool_input || ""} />
+                            <Previewer className="tool-output" content={getMessageContent(message.content)} />
                             <UsageMetadata
                                 response_metadata={message.response_metadata as any}
                                 usage_metadata={message.usage_metadata || {}}
@@ -45,4 +48,37 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, client, getMessageCo
     );
 };
 
+const Previewer = ({ content, className }: { content: string; className: string }) => {
+    const validJSON = () => {
+        try {
+            JSON.parse(content);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    };
+    const isJSON = content.startsWith("{") && content.endsWith("}") && validJSON();
+    const isMarkdown = content.includes("#") || content.includes("```") || content.includes("*");
+    const [jsonMode, setJsonMode] = useState(false);
+    const [markdownMode, setMarkdownMode] = useState(false);
+
+    return (
+        <div className={className}>
+            <div className="preview-controls">
+                {isJSON && <button onClick={() => setJsonMode(!jsonMode)}>json</button>}
+                {isMarkdown && <button onClick={() => setMarkdownMode(!markdownMode)}>markdown</button>}
+            </div>
+
+            {jsonMode && isJSON ? (
+                <pre className="params-body">{JSON.stringify(JSON.parse(content), null, 2)}</pre>
+            ) : markdownMode && isMarkdown ? (
+                <div className="params-body markdown-body">
+                    <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
+                </div>
+            ) : (
+                <pre className="params-body">{content}</pre>
+            )}
+        </div>
+    );
+};
 export default MessageTool;
