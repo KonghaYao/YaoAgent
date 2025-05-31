@@ -32,5 +32,7 @@ describe("handleRequest", () => {
         expect(text).toContain("```javascript");
         // 图片的 data-src 需要替换为 src
         expect(text).toContain("![](https://mmbiz.qpic.cn/sz_mmbiz_png/AE74ia62XricEcVK7G4HbPIV5");
+        // 应该包含 metadata 数据
+        expect(text).toContain("  title: 首次全面复盘AI Agents记忆系统：3大类，6种操作！");
     });
 });

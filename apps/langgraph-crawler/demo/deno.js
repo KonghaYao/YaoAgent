@@ -1,3 +1,3 @@
-import { handleRequest } from "https://esm.sh/@langgraph-js/crawler";
+import { handleRequest } from "../src/index.ts";
 
 Deno.serve(handleRequest);

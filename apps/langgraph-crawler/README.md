@@ -1,6 +1,8 @@
-# LangGraph Crawler
+# Crawler for LLM
 
-A powerful web crawler designed specifically for LLM applications, capable of extracting clean, readable content from various web pages and converting it to Markdown format.
+> A universal web crawler for LLM frameworks, not limited to LangGraph
+
+A powerful web crawler designed specifically for LLM applications, capable of extracting clean, readable content from various web pages and converting it to Markdown format. This tool is essential for building knowledge bases, training data collection, and content aggregation for LLM applications.
 
 ## Features
 
@@ -12,6 +14,38 @@ A powerful web crawler designed specifically for LLM applications, capable of ex
 - **Character Encoding Support**: Handles various character encodings automatically
 - **Customizable Output**: Option to get raw HTML or Markdown format
 - **Modern Headers**: Includes proper User-Agent and other headers for better compatibility
+- **SEO MetaData Support**: Extracts and preserves important metadata
+- **Error Handling**: Robust error handling and retry mechanisms
+- **Rate Limiting**: Built-in rate limiting to prevent overloading target servers
+
+## Supported Websites
+
+> Note: This list is continuously expanding. Feel free to contribute by adding support for more websites.
+
+### Documentation & Development
+
+- [x] NPM
+- [x] Vitepress Base Website
+- [x] Github
+- [x] DEV Community (dev.to)
+- [x] MDN
+- [x] Medium
+- [ ] freeCodeCamp.org
+- [ ] Docker Hub
+- [ ] StackOverflow
+- [ ] Anthropic
+
+### Chinese Platforms
+
+- [x] WeChat Public Articles (微信公众号)
+- [x] Juejin (稀土掘金)
+- [x] The Paper (澎湃新闻)
+- [x] Jiemian (界面新闻)
+- [x] Huxiu (虎嗅网)
+- [x] UISDC (优设网)
+- [x] CNBlogs (博客园)
+- [x] SSPAI (少数派)
+- [ ] Zhihu (知乎)
 
 ## Installation
 
@@ -44,9 +78,10 @@ const response = await handleRequest(request);
 const content = await response.text();
 
 // you can use Hono, CloudFlare or Deno.serve like framework to build a server
+// Deno.serve(handleRequest);
 ```
 
-### API
+### API Reference
 
 The crawler accepts POST requests with the following JSON body:
 
@@ -64,15 +99,7 @@ The crawler accepts POST requests with the following JSON body:
 - **Error (405)**: Method not allowed (only POST is supported)
 - **Error (500)**: Server error with error message
 
-## Special Features
-
-### WeChat Article Support
-
-The crawler includes special handling for WeChat public articles:
-
-- Fixes image sources (converts `data-src` to `src`)
-- Handles code blocks properly
-- Maintains article formatting
+## Advanced Features
 
 ### Content Cleaning
 
@@ -81,10 +108,43 @@ The crawler uses a chain of responsibility pattern with specialized cleaners:
 1. First tries specialized cleaners (e.g., WeChatArticleCleaner)
 2. Falls back to general ReadableCleaner if no specialized cleaner matches
 
+### Performance Considerations
+
+- Implements caching mechanisms to prevent redundant requests
+- Supports concurrent requests with configurable limits
+- Optimized for large-scale crawling operations
+
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+We welcome contributions! Here's how you can help:
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Development Setup
+
+```bash
+# Install dependencies
+pnpm install
+
+# Run tests
+pnpm test
+
+# Build the project
+pnpm build
+```
 
 ## License
 
 Apache-2.0
+
+## Support
+
+If you encounter any issues or have questions, please:
+
+1. Check the [existing issues](https://github.com/your-repo/issues)
+2. Create a new issue if your problem isn't already reported
+3. Join our community chat for real-time support

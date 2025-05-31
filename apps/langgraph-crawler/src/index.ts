@@ -3,9 +3,11 @@ import { Readability } from "@mozilla/readability";
 import TurndownService from "turndown";
 import { Window } from "happy-dom";
 import iconv from "iconv-lite";
-import fs from "fs";
+// import fs from "node:fs";
+import { getMetaData, MetaData, metaDataToYaml } from "./getMetaData.js";
 
 const { decode } = iconv;
+
 const schema = z.object({
     url: z.string().url().describe("the url to crawl"),
     raw: z.boolean().optional().default(false).describe("return raw html"),
@@ -18,7 +20,7 @@ export abstract class HTMLCleaner {
         this.html = html;
         this.originUrl = originUrl;
     }
-    abstract getCleanContent(): string | Promise<string>;
+    abstract getCleanContent(): Promise<{ content: string; metaData: MetaData }>;
     abstract isMatch(url: string): boolean;
 }
 
@@ -37,12 +39,16 @@ export class ReadableCleaner extends HTMLCleaner {
             url: this.originUrl,
         });
         const doc = new window.DOMParser().parseFromString(this.html, "text/html");
+        const metaData = getMetaData(doc as unknown as Document);
         const parser = new Readability(doc as unknown as Document);
         const article = parser.parse();
         if (!article || !article.content) {
             throw new Error("No article found");
         }
-        return article.content;
+        return {
+            content: article.content,
+            metaData: metaData,
+        };
     }
 }
 
@@ -60,6 +66,7 @@ export class WeChatArticleCleaner extends HTMLCleaner {
         });
         const doc = new window.DOMParser().parseFromString(this.html, "text/html");
         const content = doc.getElementById("page-content");
+        const metaData = getMetaData(doc as unknown as Document);
 
         if (!content) {
             throw new Error("No content found");
@@ -84,7 +91,10 @@ export class WeChatArticleCleaner extends HTMLCleaner {
             }
         });
 
-        return content.innerHTML;
+        return {
+            content: content.innerHTML,
+            metaData: metaData,
+        };
     }
 }
 
@@ -130,9 +140,9 @@ export async function handleRequest(req: Request): Promise<Response> {
                 .toLowerCase();
             const htmlText = decodeCharset(await res.arrayBuffer(), charset);
             // fs.writeFileSync("html.html", htmlText as string);
-            const readableContent = (await extractReadableContent(htmlText as string, json.url as string)) ?? htmlText;
+            const { content, metaData } = (await extractReadableContent(htmlText as string, json.url as string)) ?? htmlText;
             if (json.raw) {
-                return new Response(readableContent as string, { status: 200 });
+                return new Response(content, { status: 200 });
             }
             // fs.writeFileSync("readable.html", readableContent as string);
             const turndownService = new TurndownService({
@@ -141,9 +151,9 @@ export async function handleRequest(req: Request): Promise<Response> {
                 fence: "```",
             });
 
-            const markdown = turndownService.turndown(readableContent as string);
+            const markdown = turndownService.turndown(content as string);
 
-            return new Response(markdown, { status: 200 });
+            return new Response(metaDataToYaml(metaData) + "\n---\n\n" + markdown, { status: 200 });
         } catch (error) {
             return new Response(JSON.stringify({ error: (error as Error).message }), {
                 status: 500,
