@@ -45,6 +45,7 @@ A powerful web crawler designed specifically for LLM applications, capable of ex
 - [x] UISDC (优设网)
 - [x] CNBlogs (博客园)
 - [x] SSPAI (少数派)
+- [x] InfoQ
 - [ ] Zhihu (知乎)
 
 ## Installation
