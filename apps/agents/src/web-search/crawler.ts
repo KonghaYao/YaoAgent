@@ -59,49 +59,29 @@ export const web_search_tool = tool(
         try {
             const params = new URLSearchParams({
                 q: query,
-                engines: process.env.SEARXNG_ENGINES || "",
-                categories: process.env.SEARXNG_CATEGORIES || "",
+                safesearch: "0",
+                category_general: "1",
                 pageno: String(options.page ?? 1),
-                format: "json",
+                theme: "simple",
+                language: options.lang ?? "all",
             });
-
-            if (options.lang) {
-                params.append("language", options.lang);
-            }
 
             const url = process.env.SEARXNG_ENDPOINT!;
             const cleanedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
             const finalUrl = cleanedUrl + "/search";
 
-            const response = await fetch(finalUrl + "?" + params.toString(), {
-                headers: {
-                    "Content-Type": "application/json",
-                },
+            const response = await fetch(`${process.env.SERVER_URL || "http://localhost:8123"}/website-to-md`, {
+                method: "POST",
+                body: JSON.stringify({
+                    url: finalUrl + "?" + params.toString(),
+                }),
             });
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const data = await response.json();
-
-            if (data && Array.isArray(data.results)) {
-                return {
-                    status: "success",
-                    results: data.results.map((a: any) => ({
-                        url: a.url,
-                        title: a.title,
-                        description: a.content,
-                    })),
-                    timestamp: new Date().toISOString(),
-                };
-            } else {
-                return {
-                    status: "success",
-                    results: [],
-                    timestamp: new Date().toISOString(),
-                };
-            }
+            return await response.text();
         } catch (error) {
             // logger.error(`There was an error searching for content`, { error });
             return {
@@ -113,11 +93,10 @@ export const web_search_tool = tool(
     },
     {
         name: "web_search_tool",
-        description: "使用 SearXNG 搜索引擎进行网络搜索",
+        description: "use english search engine to search the web, please use keywords to search the web",
         schema: z.object({
             query: z.string().describe("search keywords"),
             options: z.object({
-                lang: z.string().optional().describe("search language").default("zh-CN"),
                 page: z.number().optional().describe("page number").default(1),
                 num_results: z.number().describe("expected results number").default(10),
             }),

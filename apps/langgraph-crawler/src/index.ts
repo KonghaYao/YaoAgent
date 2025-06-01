@@ -56,7 +56,7 @@ export async function handleRequest(req: Request): Promise<Response> {
                 .split(",")[0]
                 .toLowerCase();
             const htmlText = decodeCharset(await res.arrayBuffer(), charset);
-            console.log(htmlText);
+            // console.log(htmlText);
             const { content, metaData } = (await extractReadableContent(htmlText as string, json.url as string)) ?? htmlText;
             if (json.raw) {
                 return new Response(content, { status: 200 });
