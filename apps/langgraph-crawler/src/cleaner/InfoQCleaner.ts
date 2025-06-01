@@ -1,7 +1,7 @@
-import { Window } from "happy-dom";
 import { HTMLCleaner } from "./HTMLCleaner.js";
 import { getMetaData } from "../getMetaData.js";
 import { tiptapJSONToHTML } from "../utils/tiptapJSONToHTML.js";
+import { DOMParser } from "../utils/DOMParser.js";
 export type Root = {
     type: string;
     content: Array<{
@@ -72,8 +72,6 @@ export type Root = {
 export class InfoQCleaner extends HTMLCleaner {
     constructor(html: string, originUrl: string) {
         super(html, originUrl);
-        this.html = html;
-        this.originUrl = originUrl;
     }
     isMatch(url: string): boolean {
         return url.includes("infoq.cn");
@@ -117,10 +115,8 @@ export class InfoQCleaner extends HTMLCleaner {
         } else {
             content = `<html><body>${await contentResponse.text()}</body></html>`;
         }
-        const window = new Window({
-            url: this.originUrl,
-        });
-        const doc = new window.DOMParser().parseFromString(this.html, "text/html");
+
+        const doc = new DOMParser().parseFromString(this.html, "text/html");
         const metaData = getMetaData(doc as unknown as Document);
 
         return {

@@ -1,6 +1,6 @@
-import { Window } from "happy-dom";
 import { HTMLCleaner } from "./HTMLCleaner.js";
 import { getMetaData, MetaData } from "../getMetaData.js";
+import { DOMParser } from "../utils/DOMParser.js";
 
 /** 专门处理微信公众号文章的 html 处理工具 */
 export class WeChatArticleCleaner extends HTMLCleaner {
@@ -11,10 +11,7 @@ export class WeChatArticleCleaner extends HTMLCleaner {
         return this.originUrl.includes("mp.weixin.qq.com");
     }
     async getCleanContent() {
-        const window = new Window({
-            url: this.originUrl,
-        });
-        const doc = new window.DOMParser().parseFromString(this.html, "text/html");
+        const doc = new DOMParser().parseFromString(this.html, "text/html");
         const content = doc.getElementById("page-content");
         const metaData = getMetaData(doc as unknown as Document);
 
@@ -37,7 +34,7 @@ export class WeChatArticleCleaner extends HTMLCleaner {
         pre.forEach((pre) => {
             const code = pre.querySelectorAll("code");
             if (code.length > 1) {
-                pre.innerHTML = `<code class="language-${pre.getAttribute("data-lang")}">${[...code].map((code: Element) => code.textContent ?? "").join("\n")}</code>`;
+                pre.innerHTML = `<code class="language-${pre.getAttribute("data-lang")}">${[...code].map((code) => code.textContent ?? "").join("\n")}</code>`;
             }
         });
 

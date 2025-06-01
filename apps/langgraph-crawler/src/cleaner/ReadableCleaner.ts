@@ -1,40 +1,41 @@
 import { Readability } from "@mozilla/readability";
-import { Window } from "happy-dom";
 import { HTMLCleaner } from "./HTMLCleaner.js";
 import { getMetaData, MetaData } from "../getMetaData.js";
 import Defuddle from "defuddle";
+import { DOMParser } from "../utils/DOMParser.js";
 
 /** 专门处理可读性好的 html 处理工具 */
 export class ReadableCleaner extends HTMLCleaner {
     constructor(html: string, originUrl: string) {
         super(html, originUrl);
-        this.html = html;
-        this.originUrl = originUrl;
     }
     isMatch(url: string): boolean {
         return true;
     }
     async getCleanContent() {
-        const window = new Window({
-            url: this.originUrl,
-        });
-        const doc = new window.DOMParser().parseFromString(this.html, "text/html");
-
+        const doc = new DOMParser().parseFromString(this.html, "text/html");
+        this.beforeClean(doc as unknown as Document);
         const metaData = getMetaData(doc as unknown as Document);
-        const parser = new Readability(doc as unknown as Document);
+        const parser = new Readability(doc as unknown as Document, {
+            keepClasses: true,
+        });
         const article = parser.parse();
         if (!article || !article.content) {
-            return this.getCleanContentUsingDefuddle(window, metaData);
+            return this.getCleanContentUsingDefuddle(metaData);
         }
         return {
             content: article.content,
             metaData,
         };
     }
-    async getCleanContentUsingDefuddle(window: Window, metaData: MetaData) {
-        const doc = new window.DOMParser().parseFromString(this.html, "text/html");
+    // 使用更加宽松的解析器，解析出内容
+    async getCleanContentUsingDefuddle(metaData: MetaData) {
+        const doc = new DOMParser().parseFromString(this.html, "text/html");
+        this.beforeClean(doc as unknown as Document);
         /** @ts-ignore */
-        const parser = new Defuddle(doc);
+        const parser = new Defuddle(doc, {
+            keepClasses: true,
+        });
         const article = parser.parse();
         if (!article || !article.content) {
             throw new Error("No article found");
@@ -44,4 +45,22 @@ export class ReadableCleaner extends HTMLCleaner {
             metaData,
         };
     }
+    plugins: Array<ReadableCleanerPlugin> = [];
+    addPlugin(plugin: ReadableCleanerPlugin) {
+        this.plugins.push(plugin);
+        return this;
+    }
+    beforeClean(doc: Document) {
+        this.plugins.forEach((plugin) => {
+            if (plugin.beforeClean) {
+                plugin.beforeClean(doc, this);
+            }
+        });
+    }
+}
+
+export interface ReadableCleanerPlugin {
+    name: string;
+    beforeClean?: (doc: Document, cleaner: ReadableCleaner) => void;
+    afterClean?: (doc: Document, cleaner: ReadableCleaner) => void;
 }

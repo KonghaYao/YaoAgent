@@ -14,7 +14,10 @@ describe("handleRequest", () => {
             })
         );
         expect(data.status).toBe(200);
-        expect(await data.text()).toContain("github.com/langchain-ai/langgraphjs");
+        const text = await data.text();
+        expect(text).toContain("github.com/langchain-ai/langgraphjs");
+        // 修补代码块缺失
+        expect(text).toContain("```ts");
     });
     // 测试爬取微信公众号
     test("should crawl wechat", async () => {

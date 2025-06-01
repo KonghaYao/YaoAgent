@@ -15,7 +15,23 @@ const schema = z.object({
 });
 
 async function extractReadableContent(html: string, originUrl: string) {
-    const cleaners = [new NoCleaner(html, originUrl, []), new InfoQCleaner(html, originUrl), new WeChatArticleCleaner(html, originUrl), new ReadableCleaner(html, originUrl)];
+    const cleaners = [
+        new NoCleaner(html, originUrl, []),
+        new InfoQCleaner(html, originUrl),
+        new WeChatArticleCleaner(html, originUrl),
+        new ReadableCleaner(html, originUrl).addPlugin({
+            name: "npmjs",
+            beforeClean: (doc, cleaner) => {
+                if (cleaner.originUrl.includes("npmjs.com")) {
+                    const codeBlocks = doc.querySelectorAll("div.highlight");
+                    codeBlocks.forEach((i) => {
+                        const lang = [...i.classList].find((name) => name.startsWith("highlight-source-"))?.replace("highlight-source-", "");
+                        i.innerHTML = `<pre class='language language-content'><code class="language-${lang?.trim()}">${i.textContent}</code></pre>`;
+                    });
+                }
+            },
+        }),
+    ];
     const cleaner = cleaners.find((cleaner) => cleaner.isMatch(originUrl))!;
     return await cleaner.getCleanContent();
 }
@@ -61,6 +77,7 @@ export async function handleRequest(req: Request): Promise<Response> {
             if (json.raw) {
                 return new Response(content, { status: 200 });
             }
+            // console.log(content);
             const turndownService = new TurndownService({
                 headingStyle: "atx",
                 codeBlockStyle: "fenced",
