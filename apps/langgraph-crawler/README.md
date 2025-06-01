@@ -30,6 +30,7 @@ A powerful web crawler designed specifically for LLM applications, capable of ex
 - [x] DEV Community (dev.to)
 - [x] MDN
 - [x] Medium
+- [x] SearXNG Search Result
 - [ ] freeCodeCamp.org
 - [ ] Docker Hub
 - [ ] StackOverflow

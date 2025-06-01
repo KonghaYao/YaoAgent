@@ -35,4 +35,16 @@ describe("handleRequest", () => {
         // 应该包含 metadata 数据
         expect(text).toContain("  title: 首次全面复盘AI Agents记忆系统：3大类，6种操作！");
     });
+    test("should crawl defuddle", async () => {
+        const data = await handleRequest(
+            new Request("https://www.npmjs.com", {
+                method: "POST",
+                body: JSON.stringify({
+                    url: "https://searx.bndkt.io/search?q=Hono+%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6+%E4%BC%98%E7%BC%BA%E7%82%B9&safesearch=0&category_general=1&pageno=1&theme=simple&language=all",
+                }),
+            })
+        );
+        expect(data.status).toBe(200);
+        expect(await data.text()).toContain("Hono框架");
+    });
 });

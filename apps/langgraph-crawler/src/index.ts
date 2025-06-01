@@ -5,6 +5,7 @@ import { getMetaData, metaDataToYaml } from "./getMetaData.js";
 import { WeChatArticleCleaner } from "./cleaner/WeChatArticleCleaner.js";
 import { ReadableCleaner } from "./cleaner/ReadableCleaner.js";
 import { InfoQCleaner } from "./cleaner/InfoQCleaner.js";
+import { NoCleaner } from "./cleaner/HTMLCleaner.js";
 
 const { decode } = iconv;
 
@@ -14,7 +15,7 @@ const schema = z.object({
 });
 
 async function extractReadableContent(html: string, originUrl: string) {
-    const cleaners = [new InfoQCleaner(html, originUrl), new WeChatArticleCleaner(html, originUrl), new ReadableCleaner(html, originUrl)];
+    const cleaners = [new NoCleaner(html, originUrl, []), new InfoQCleaner(html, originUrl), new WeChatArticleCleaner(html, originUrl), new ReadableCleaner(html, originUrl)];
     const cleaner = cleaners.find((cleaner) => cleaner.isMatch(originUrl))!;
     return await cleaner.getCleanContent();
 }
@@ -40,12 +41,13 @@ export async function handleRequest(req: Request): Promise<Response> {
             const res = await fetch(json.url, {
                 headers: {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                    Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+                    Accept: "*/*",
                     "Accept-Language": "zh-CN,zh;q=0.9",
                     "Accept-Encoding": "gzip, deflate, br",
                     Connection: "keep-alive",
                     Referer: json.url,
                     Host: new URL(json.url).host,
+                    "Upgrade-Insecure-Requests": "1",
                 },
             });
             const charset = res.headers
@@ -54,6 +56,7 @@ export async function handleRequest(req: Request): Promise<Response> {
                 .split(",")[0]
                 .toLowerCase();
             const htmlText = decodeCharset(await res.arrayBuffer(), charset);
+            console.log(htmlText);
             const { content, metaData } = (await extractReadableContent(htmlText as string, json.url as string)) ?? htmlText;
             if (json.raw) {
                 return new Response(content, { status: 200 });

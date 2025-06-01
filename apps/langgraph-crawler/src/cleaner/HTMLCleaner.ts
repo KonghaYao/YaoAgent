@@ -10,3 +10,21 @@ export abstract class HTMLCleaner {
     abstract getCleanContent(): Promise<{ content: string; metaData: MetaData }>;
     abstract isMatch(url: string): boolean;
 }
+
+export class NoCleaner extends HTMLCleaner {
+    private disabledURLs: string[];
+    constructor(html: string, originUrl: string, disabledURLs: string[]) {
+        super(html, originUrl);
+        this.disabledURLs = disabledURLs;
+    }
+
+    isMatch(url: string): boolean {
+        return this.disabledURLs.some((disabledURL) => url.includes(disabledURL));
+    }
+    async getCleanContent() {
+        return {
+            content: this.html,
+            metaData: {},
+        };
+    }
+}
