@@ -1,4 +1,4 @@
-import { DOMParser, Element } from "@b-fuze/deno-dom";
+import { DOMParser, Element } from "@b-fuze/deno-dom/wasm";
 
 // 为 Element 类添加 getAttributeNode 方法的 polyfill
 Element.prototype.getAttributeNode = function (name: string) {

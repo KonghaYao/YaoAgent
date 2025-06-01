@@ -4,6 +4,8 @@
 
 A powerful web crawler designed specifically for LLM applications, capable of extracting clean, readable content from various web pages and converting it to Markdown format. This tool is essential for building knowledge bases, training data collection, and content aggregation for LLM applications.
 
+> Support Nodejs | Deno | Bun
+
 ## Features
 
 - **Smart Content Extraction**: Uses Mozilla's Readability to extract the main content from web pages
@@ -81,6 +83,14 @@ const content = await response.text();
 
 // you can use Hono, CloudFlare or Deno.serve like framework to build a server
 // Deno.serve(handleRequest);
+```
+
+Deno usage is really SIMPLE!!!
+
+```ts
+import { handleRequest } from "https://esm.sh/@langgraph-js/crawler";
+
+Deno.serve(handleRequest);
 ```
 
 ### API Reference
