@@ -27,7 +27,7 @@
         "@langchain/openai": "^0.5.10",
         "@langchain/tavily": "^0.1.1",
         "@langgraph-js/api": "^0.2.39",
-        "@langgraph-js/crawler": "workspace:^1.1.0",
+        "@langgraph-js/crawler": "workspace:^1.4.1",
         "@langgraph-js/pro": "workspace:^1.6.1",
         "@modelcontextprotocol/sdk": "^1.11.4",
         "eventsource": "^3.0.7",

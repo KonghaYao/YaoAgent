@@ -1,7 +1,6 @@
 // Main graph
 import { START, StateGraph, END, LangGraphRunnableConfig, interrupt } from "@langchain/langgraph";
 import { createMCPNode } from "./tools/mcp.js";
-import { initializeTools } from "./tools/index.js";
 import { GraphState, ConfigurationState } from "./state.js";
 import { createLLM } from "../model/index.js";
 import { SequentialThinkingTool, createFeTools } from "@langgraph-js/pro";
@@ -12,8 +11,7 @@ import { ToolRunnableConfig } from "@langchain/core/tools";
 import z from "zod";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { crawler_tool, web_search_tool } from "../web-search/crawler.js";
-import { createLangSearchTool } from "src/web-search/langSearch.js";
-import { juejin_search_tool } from "src/web-search/juejin.js";
+
 const ask_user_for_approve = tool(
     async (input, _config: ToolRunnableConfig) => {
         const data = interrupt(JSON.stringify(input));
@@ -33,10 +31,8 @@ const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<typeof Config
     async (state, config, mcpTools) => {
         const feTools = createFeTools(state.fe_tools);
         const executorPrompt = await getPrompt("executor.md", false);
-        const normalTools = initializeTools(state, config);
 
         const tools = [
-            ...normalTools,
             ...mcpTools,
             ...feTools,
             web_search_tool,

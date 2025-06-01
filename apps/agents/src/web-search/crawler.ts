@@ -21,12 +21,7 @@ export const crawler_tool = tool(
             }
 
             const text = await response.text();
-            return {
-                status: "success",
-                content: text,
-                url,
-                timestamp: new Date().toISOString(),
-            };
+            return text;
         } catch (error) {
             return {
                 status: "error",
@@ -38,32 +33,24 @@ export const crawler_tool = tool(
     },
     {
         name: "crawl_tool",
-        description: "Use this to crawl a url and get a readable content in markdown format.",
+        description:
+            "A powerful web content extraction tool that retrieves and processes raw content from specified URLs, ideal for data collection, content analysis, and research tasks.",
         schema: z.object({
             url: z.string().url().describe("the url of the website"),
         }),
     }
 );
-interface SearchOptions {
-    tbs?: string;
-    filter?: string;
-    lang?: string;
-    country?: string;
-    location?: string;
-    num_results: number;
-    page?: number;
-}
 
 export const web_search_tool = tool(
-    async ({ query, options }: { query: string; options: SearchOptions }) => {
+    async ({ query, pageNo }) => {
         try {
             const params = new URLSearchParams({
                 q: query,
                 safesearch: "0",
                 category_general: "1",
-                pageno: String(options.page ?? 1),
+                pageno: String(pageNo ?? 1),
                 theme: "simple",
-                language: options.lang ?? "all",
+                language: "all",
             });
 
             const url = process.env.SEARXNG_ENDPOINT!;
@@ -93,13 +80,12 @@ export const web_search_tool = tool(
     },
     {
         name: "web_search_tool",
-        description: "use english search engine to search the web, please use keywords to search the web",
+        description:
+            "A powerful web search tool that provides comprehensive, real-time results using search engine. Returns relevant web content with customizable parameters for result count, content type, and domain filtering. Ideal for gathering current information, news, and detailed web content analysis.",
         schema: z.object({
             query: z.string().describe("search keywords"),
-            options: z.object({
-                page: z.number().optional().describe("page number").default(1),
-                num_results: z.number().describe("expected results number").default(10),
-            }),
+            pageNo: z.number().optional().describe("page number").default(1),
+            pageSize: z.number().describe("expected results number").default(10),
         }),
     }
 );
