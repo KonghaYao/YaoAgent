@@ -4,7 +4,7 @@
  */
 {
     "$schema": "node_modules/wrangler/config-schema.json",
-    "name": "dry-lake-f457",
+    "name": "langgraph-crawler",
     "main": "src/index.ts",
     "compatibility_date": "2025-06-01",
     "observability": {
