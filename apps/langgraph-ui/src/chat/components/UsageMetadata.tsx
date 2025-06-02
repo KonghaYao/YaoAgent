@@ -18,25 +18,27 @@ export const UsageMetadata: React.FC<UsageMetadataProps> = ({ usage_metadata, sp
     };
 
     return (
-        <div className="message-meta">
-            <div className="token-info">
-                <span className="token-item">
-                    <span className="token-emoji">📥</span>
+        <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
+            <div className="flex items-center gap-3">
+                <span className="flex items-center gap-1">
+                    <span>📥</span>
                     {formatTokens(usage_metadata.input_tokens || 0)}
                 </span>
-                <span className="token-item">
-                    <span className="token-emoji">📤</span>
+                <span className="flex items-center gap-1">
+                    <span>📤</span>
                     {formatTokens(usage_metadata.output_tokens || 0)}
                 </span>
-                <span className="token-item">
-                    <span className="token-emoji">📊</span>
+                <span className="flex items-center gap-1">
+                    <span>📊</span>
                     {formatTokens(usage_metadata.total_tokens || 0)}
                 </span>
             </div>
-            <div>{response_metadata?.model_name}</div>
-            <span className="message-time">{spend_time ? `${(spend_time / 1000).toFixed(2)}s` : ""}</span>
-            {tool_call_id && <span className="tool-call-id">Tool: {tool_call_id}</span>}
-            {id && <span className="message-id">ID: {id}</span>}
+            <div className="flex items-center gap-2">
+                {response_metadata?.model_name && <span className="text-gray-600">{response_metadata.model_name}</span>}
+                {spend_time && <span className="text-gray-500">{(spend_time / 1000).toFixed(2)}s</span>}
+                {tool_call_id && <span className="text-gray-500">Tool: {tool_call_id}</span>}
+                {id && <span className="text-gray-500">ID: {id}</span>}
+            </div>
         </div>
     );
 };

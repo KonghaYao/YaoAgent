@@ -18,21 +18,21 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, client, getMessageCo
     const { getToolUIRender } = useChat();
     const render = getToolUIRender(message.name!);
     return (
-        <div className="message tool">
+        <div className="flex flex-col w-full">
             {render ? (
                 (render(message) as JSX.Element)
             ) : (
-                <div className="tool-message">
-                    <div className="tool-header" onClick={onToggleCollapse}>
-                        <div className="tool-title" onClick={() => console.log(message)}>
+                <div className="flex flex-col w-full bg-white rounded-lg shadow-sm border border-gray-200">
+                    <div className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 transition-colors" onClick={onToggleCollapse}>
+                        <div className="text-sm font-medium text-gray-700" onClick={() => console.log(message)}>
                             {message.node_name} | {message.name}
                         </div>
                     </div>
 
                     {!isCollapsed && (
-                        <div className="tool-content">
-                            <Previewer className="tool-input" content={message.tool_input || ""} />
-                            <Previewer className="tool-output" content={getMessageContent(message.content)} />
+                        <div className="flex flex-col gap-4 p-4 border-t border-gray-100">
+                            <Previewer content={message.tool_input || ""} />
+                            <Previewer content={getMessageContent(message.content)} />
                             <UsageMetadata
                                 response_metadata={message.response_metadata as any}
                                 usage_metadata={message.usage_metadata || {}}
@@ -48,7 +48,7 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, client, getMessageCo
     );
 };
 
-const Previewer = ({ content, className }: { content: string; className: string }) => {
+const Previewer = ({ content }: { content: string }) => {
     const validJSON = () => {
         try {
             JSON.parse(content);
@@ -63,22 +63,33 @@ const Previewer = ({ content, className }: { content: string; className: string 
     const [markdownMode, setMarkdownMode] = useState(false);
 
     return (
-        <div className={className}>
-            <div className="preview-controls">
-                {isJSON && <button onClick={() => setJsonMode(!jsonMode)}>json</button>}
-                {isMarkdown && <button onClick={() => setMarkdownMode(!markdownMode)}>markdown</button>}
+        <div className={`flex flex-col`}>
+            <div className="flex gap-2 mb-2">
+                {isJSON && (
+                    <button onClick={() => setJsonMode(!jsonMode)} className="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors">
+                        json
+                    </button>
+                )}
+                {isMarkdown && (
+                    <button onClick={() => setMarkdownMode(!markdownMode)} className="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors">
+                        markdown
+                    </button>
+                )}
             </div>
 
-            {jsonMode && isJSON ? (
-                <pre className="params-body">{JSON.stringify(JSON.parse(content), null, 2)}</pre>
-            ) : markdownMode && isMarkdown ? (
-                <div className="params-body markdown-body">
-                    <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
-                </div>
-            ) : (
-                <pre className="params-body">{content}</pre>
-            )}
+            <div className="flex flex-col max-h-[300px] overflow-auto border border-gray-200 rounded p-2 w-full text-xs font-mono whitespace-pre-wrap">
+                {jsonMode && isJSON ? (
+                    <pre className="whitespace-pre-wrap">{JSON.stringify(JSON.parse(content), null, 2)}</pre>
+                ) : markdownMode && isMarkdown ? (
+                    <div className="markdown-body">
+                        <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
+                    </div>
+                ) : (
+                    <pre className="whitespace-pre-wrap">{content}</pre>
+                )}
+            </div>
         </div>
     );
 };
+
 export default MessageTool;

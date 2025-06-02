@@ -16,7 +16,7 @@ export const MessagesBox = ({
     client: LangGraphClient;
 }) => {
     return (
-        <>
+        <div className="flex flex-col gap-4 w-full">
             {renderMessages.map((message) =>
                 message.type === "human" ? (
                     <MessageHuman content={message.content} key={message.unique_id} />
@@ -34,6 +34,6 @@ export const MessagesBox = ({
                     <MessageAI key={message.unique_id} message={message} />
                 )
             )}
-        </>
+        </div>
     );
 };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { MessagesBox } from "../MessageBox";
-import "./JsonToMessage.css";
 import { RenderMessage } from "@langgraph-js/sdk";
+import { X } from "lucide-react";
 
 interface JsonToMessageProps {
     isOpen: boolean;
@@ -81,27 +81,33 @@ const JsonToMessage: React.FC<JsonToMessageProps> = ({ isOpen, onClose, initialJ
     }
 
     return (
-        <div className="json-to-message-overlay">
-            <div className="json-to-message-content">
-                <div className="json-to-message-header">
-                    <h2>JSON 消息预览</h2>
-                    <button onClick={onClose} className="close-button">
-                        ×
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl w-[90%] max-w-[1200px] h-[80vh] max-h-[800px] flex flex-col overflow-hidden">
+                <div className="flex justify-between items-center p-4 border-b border-gray-200">
+                    <h2 className="text-xl font-semibold text-gray-900">JSON 消息预览</h2>
+                    <button onClick={onClose} className="p-1.5 text-gray-500 hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-100">
+                        <X className="w-5 h-5" />
                     </button>
                 </div>
 
-                <div className="json-to-message-body">
-                    <div className="json-editor-pane">
-                        <textarea value={jsonString} onChange={(e) => setJsonString(e.target.value)} rows={20} placeholder="输入JSON消息格式..." />
-                        {error && <p className="error-message">{error}</p>}
+                <div className="flex flex-1 overflow-hidden">
+                    <div className="flex-1 p-4 flex flex-col border-r border-gray-200">
+                        <textarea
+                            value={jsonString}
+                            onChange={(e) => setJsonString(e.target.value)}
+                            rows={20}
+                            placeholder="输入JSON消息格式..."
+                            className="flex-1 font-mono text-sm p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                        />
+                        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
                     </div>
 
-                    <div className="message-preview-pane">
-                        <div className="preview-container chat-messages">
+                    <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
+                        <div className="bg-white rounded-lg p-4 min-h-full">
                             {previewMessages?.length > 0 ? (
                                 <MessagesBox renderMessages={previewMessages} collapsedTools={[]} toggleToolCollapse={() => {}} client={null as any} />
                             ) : (
-                                <div className="no-preview">请输入有效的JSON以查看消息预览</div>
+                                <div className="flex items-center justify-center h-full text-gray-500 italic">请输入有效的JSON以查看消息预览</div>
                             )}
                         </div>
                     </div>

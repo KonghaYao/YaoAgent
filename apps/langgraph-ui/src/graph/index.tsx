@@ -8,7 +8,7 @@ import { AssistantGraph } from "@langgraph-js/sdk";
 import "./flow.css";
 const nodeTypes = {
     group: ({ data }: { data: any }) => (
-        <div style={{ position: "absolute", bottom: "100%", left: 0 }}>
+        <div className="absolute bottom-full left-0">
             <span>{data.name}</span>
         </div>
     ),
@@ -24,7 +24,6 @@ const transformEdges = (edges: AssistantGraph["edges"], nodes: Node[]): Edge[] =
             id: `${sourceId}=${targetId}`,
             source: sourceId!,
             target: targetId!,
-            // type: edge.conditional ? "smoothstep" : "straight",
             animated: edge.conditional,
             label: edge.data,
             style: {
@@ -84,13 +83,17 @@ const LayoutFlow = () => {
         }
     }, [currentNodeName]);
     return (
-        <div style={{ width: "30%", height: "100%", position: "relative", overflow: "hidden" }}>
+        <div className="w-1/3 h-full relative overflow-hidden border-l">
             <ReactFlow nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} fitView className="w-full h-full" nodeTypes={nodeTypes}>
                 <Background />
                 <Controls />
-                <Panel position="top-right">
-                    <button onClick={() => onLayout("TB")}>垂直布局</button>
-                    <button onClick={() => onLayout("LR")}>水平布局</button>
+                <Panel position="top-right" className="flex gap-2">
+                    <button onClick={() => onLayout("TB")} className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        垂直布局
+                    </button>
+                    <button onClick={() => onLayout("LR")} className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        水平布局
+                    </button>
                 </Panel>
             </ReactFlow>
         </div>

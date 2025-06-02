@@ -1,27 +1,20 @@
 import React, { useState } from "react";
 import JsonToMessage from "./JsonToMessage";
+import { FileJson } from "lucide-react";
 
-interface JsonToMessageButtonProps {
-    buttonText?: string;
-    initialJson?: string | object;
-    className?: string;
-}
-
-const JsonToMessageButton: React.FC<JsonToMessageButtonProps> = ({ buttonText = "JSON 预览", initialJson, className = "" }) => {
+export const JsonToMessageButton: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
-
-    const openModal = () => setIsOpen(true);
-    const closeModal = () => setIsOpen(false);
 
     return (
         <>
-            <button className={`history-button ${className}`} onClick={openModal}>
-                {buttonText}
+            <button
+                onClick={() => setIsOpen(true)}
+                className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center gap-1.5"
+            >
+                <FileJson className="w-4 h-4" />
+                JSON 消息
             </button>
-
-            <JsonToMessage isOpen={isOpen} onClose={closeModal} initialJson={initialJson} />
+            <JsonToMessage isOpen={isOpen} onClose={() => setIsOpen(false)} />
         </>
     );
 };
-
-export default JsonToMessageButton;
