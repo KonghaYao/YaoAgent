@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { toFetchResponse, toReqRes } from "fetch-to-node";
 import context7 from "./context7.js";
-import { handleRequest } from "@langgraph-js/crawler";
+import { handleExtractRequest, handleRequest, handleSearchRequest } from "@langgraph-js/crawler";
 export const app = new Hono();
 
 const servers = {
@@ -23,6 +23,9 @@ app.post("/mcp/:name", async (c) => {
     return toFetchResponse(res);
 });
 
-app.post("/website-to-md", async (c) => {
-    return handleRequest(c.req.raw);
+app.post("/website-to-md/search", async (c) => {
+    return handleSearchRequest(c.req.raw);
+});
+app.post("/website-to-md/extract", async (c) => {
+    return handleExtractRequest(c.req.raw);
 });

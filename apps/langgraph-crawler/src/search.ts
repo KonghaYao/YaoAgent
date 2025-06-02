@@ -5,8 +5,11 @@ import { JuejinEngine } from "./engine/juejin.js";
 
 export const SearchSchema = z.object({
     query: z.string().describe("the query to search"),
-    topic: z.enum(["news", "code"]).default("news").describe("the topic to search"),
-    engines: z.array(z.string()).default(["basic"]).describe("the engines to use"),
+    // topic: z.enum(["news", "code"]).default("news").describe("the topic to search"),
+    engines: z
+        .array(z.enum(["basic", "npm", "juejin"]))
+        .default(["basic"])
+        .describe("the engines to use"),
     returnType: z.enum(["json", "markdown"]).default("json").describe("the content type to return"),
     withMetadata: z.boolean().default(true).describe("whether to include metadata in the search results"),
 });
@@ -36,7 +39,7 @@ export async function search({ query, engines, returnType, withMetadata }: z.inf
       }[]
     | string
 > {
-    const topicSupportedEngine = SupportedEngines.filter((engine) => engines.includes(engine.name));
+    const topicSupportedEngine = SupportedEngines.filter((engine) => engines.includes(engine.name as any));
     if (topicSupportedEngine.length === 0) {
         throw new Error("No engines found for topic");
     }
