@@ -27,7 +27,7 @@
     "resolutions": {
         "@langchain/core": "^0.3.42"
     },
-    "packageManager": "pnpm@10.10.0",
+    "packageManager": "pnpm@10.11.0",
     "dependencies": {
         "@langchain/core": "^0.3.49",
         "vite": "^6.3.5"

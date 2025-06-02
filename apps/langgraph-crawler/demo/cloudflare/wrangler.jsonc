@@ -7,10 +7,6 @@
     "name": "dry-lake-f457",
     "main": "src/index.ts",
     "compatibility_date": "2025-06-01",
-    "assets": {
-        "binding": "ASSETS",
-        "directory": "./public",
-    },
     "observability": {
         "enabled": true,
     },
