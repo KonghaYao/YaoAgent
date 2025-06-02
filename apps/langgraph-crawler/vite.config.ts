@@ -5,14 +5,17 @@ export default defineConfig({
     resolve: {
         alias: {
             turndown: "./node_modules/turndown/lib/turndown.es.js",
+            "@mixmark-io/domino": "./node_modules/@mixmark-io/domino/lib/index.js",
         },
     },
     plugins: [
         {
             name: "turndown",
+            enforce: "pre",
             transform(code, id) {
                 if (id.includes("turndown")) {
-                    return `import domino from '@mixmark-io/domino';\n` + code.replace("var domino = require('@mixmark-io/domino');", "");
+                    const originCode = code.replace("var domino = require('@mixmark-io/domino');", "");
+                    return `import domino from '@mixmark-io/domino';\n` + originCode;
                 }
             },
         },
