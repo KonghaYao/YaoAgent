@@ -2,10 +2,10 @@ import { z } from "zod";
 import TurndownService from "turndown";
 import iconv from "iconv-lite";
 import { getMetaData, metaDataToYaml } from "./getMetaData.js";
-import { WeChatArticleCleaner } from "./cleaner/WeChatArticleCleaner.js";
 import { ReadableCleaner } from "./cleaner/ReadableCleaner.js";
 import { InfoQCleaner } from "./cleaner/InfoQCleaner.js";
 import { NoCleaner } from "./cleaner/HTMLCleaner.js";
+import { npmPlugin, aTagCleanPlugin, wechatArticleCleanPlugin } from "./cleaner/readablePlugins/index.js";
 
 const { decode } = iconv;
 
@@ -18,19 +18,7 @@ async function extractReadableContent(html: string, originUrl: string) {
     const cleaners = [
         new NoCleaner(html, originUrl, []),
         new InfoQCleaner(html, originUrl),
-        new WeChatArticleCleaner(html, originUrl),
-        new ReadableCleaner(html, originUrl).addPlugin({
-            name: "npmjs",
-            beforeClean: (doc, cleaner) => {
-                if (cleaner.originUrl.includes("npmjs.com")) {
-                    const codeBlocks = doc.querySelectorAll("div.highlight");
-                    codeBlocks.forEach((i) => {
-                        const lang = [...i.classList].find((name) => name.startsWith("highlight-source-"))?.replace("highlight-source-", "");
-                        i.innerHTML = `<pre class='language language-content'><code class="language-${lang?.trim()}">${i.textContent}</code></pre>`;
-                    });
-                }
-            },
-        }),
+        new ReadableCleaner(html, originUrl).addPlugin(wechatArticleCleanPlugin).addPlugin(npmPlugin).addPlugin(aTagCleanPlugin),
     ];
     const cleaner = cleaners.find((cleaner) => cleaner.isMatch(originUrl))!;
     return await cleaner.getCleanContent();
