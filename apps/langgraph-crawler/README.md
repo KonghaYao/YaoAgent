@@ -10,8 +10,8 @@ A powerful web crawler designed specifically for LLM applications, capable of ex
 
 - **Smart Content Extraction**: Uses Mozilla's Readability to extract the main content from web pages
 - **Specialized Cleaners**:
-  - `ReadableCleaner`: General-purpose content extraction for most web pages
-  - `WeChatArticleCleaner`: Specialized cleaner for WeChat public articles
+    - `ReadableCleaner`: General-purpose content extraction for most web pages
+    - `WeChatArticleCleaner`: Specialized cleaner for WeChat public articles
 - **Markdown Conversion**: Converts HTML content to clean, well-formatted Markdown
 - **Character Encoding Support**: Handles various character encodings automatically
 - **Customizable Output**: Option to get raw HTML or Markdown format
@@ -19,6 +19,7 @@ A powerful web crawler designed specifically for LLM applications, capable of ex
 - **SEO MetaData Support**: Extracts and preserves important metadata
 - **Error Handling**: Robust error handling and retry mechanisms
 - **Rate Limiting**: Built-in rate limiting to prevent overloading target servers
+- **Search Engine Integration**: Support for multiple search engines (SearXNG, Juejin, etc.)
 
 ## Supported Websites
 
@@ -66,35 +67,75 @@ pnpm add @langgraph-js/crawler
 
 ### Basic Usage
 
-```typescript
-import { handleRequest } from '@langgraph-js/crawler';
+#### Content Extraction
 
-// Create a request object
-const request = new Request('http://your-api-endpoint', {
-  method: 'POST',
-  body: JSON.stringify({
-    url: 'https://example.com/article',
-    raw: false // Set to true if you want raw HTML instead of Markdown
-  })
+```typescript
+import { handleExtractRequest, extract } from "@langgraph-js/crawler";
+
+// 方式 1: 使用 HTTP 请求处理
+const request = new Request("http://your-api-endpoint", {
+    method: "POST",
+    body: JSON.stringify({
+        url: "https://example.com/article",
+        raw: false, // Set to true if you want raw HTML instead of Markdown
+    }),
 });
 
 // Handle the request
-const response = await handleRequest(request);
+const response = await handleExtractRequest(request);
 const content = await response.text();
 
-// you can use Hono, CloudFlare or Deno.serve like framework to build a server
-// Deno.serve(handleRequest);
+// 方式 2: 直接使用 extract 函数
+const content = await extract({
+    url: "https://example.com/article",
+    raw: false,
+});
 ```
 
-Deno usage is really SIMPLE!!!
+#### Search Functionality
+
+```typescript
+import { handleSearchRequest, search } from "@langgraph-js/crawler";
+
+// 方式 1: 使用 HTTP 请求处理
+const request = new Request("http://your-api-endpoint", {
+    method: "POST",
+    body: JSON.stringify({
+        query: "your search query",
+        topic: "code", // 'news' or 'code'
+        engines: ["basic", "juejin"], // specify which search engines to use
+        format: "markdown", // 'json' or 'markdown'
+    }),
+});
+
+// Handle the search request
+const response = await handleSearchRequest(request);
+const results = await response.text();
+
+// 方式 2: 直接使用 search 函数
+const results = await search({
+    query: "your search query",
+    engines: ["basic", "juejin"],
+    format: "markdown",
+});
+```
+
+### Deno Usage
 
 ```ts
-import { handleRequest } from "https://esm.sh/@langgraph-js/crawler";
+import { handleExtractRequest, handleSearchRequest } from "https://esm.sh/@langgraph-js/crawler";
+import { Hono } from "https://esm.sh/hono";
 
-Deno.serve(handleRequest);
+const app = new Hono();
+
+app.post("/extract", (c) => handleExtractRequest(c.req.raw));
+app.post("/search", (c) => handleSearchRequest(c.req.raw));
+Deno.serve(app.fetch);
 ```
 
 ### API Reference
+
+#### Content Extraction API
 
 The crawler accepts POST requests with the following JSON body:
 
@@ -105,12 +146,61 @@ The crawler accepts POST requests with the following JSON body:
 }
 ```
 
+#### Search API
+
+The search API accepts POST requests with the following JSON body:
+
+```typescript
+{
+  query: string;           // The search query
+  engines?: string[];      // Optional. Array of engine names to use， "basic","npm", "juejin"
+  format?: 'json' | 'markdown'; // Optional. Defaults to 'json'
+}
+```
+
 ### Response Format
+
+#### Content Extraction
 
 - **Success (200)**: Returns the content in Markdown format (or raw HTML if `raw: true`)
 - **Error (400)**: Invalid JSON or URL
 - **Error (405)**: Method not allowed (only POST is supported)
 - **Error (500)**: Server error with error message
+
+#### Search Results
+
+- **JSON Format**:
+
+```typescript
+{
+    engine: string;
+    results: Array<{
+        title: string;
+        url: string;
+        description: string;
+        updateTime: string;
+        metadata?: Record<string, any>;
+    }>;
+}
+[];
+```
+
+- **Markdown Format**:
+
+```markdown
+## [Title](URL)
+
+Description
+
+### Metadata
+
+- Author: Name (Company, Job)
+- Stats: Views, Likes, Comments, Collects
+- Category: Category
+- Tags: Tag1, Tag2, ...
+
+---
+```
 
 ## Advanced Features
 
@@ -120,6 +210,15 @@ The crawler uses a chain of responsibility pattern with specialized cleaners:
 
 1. First tries specialized cleaners (e.g., WeChatArticleCleaner)
 2. Falls back to general ReadableCleaner if no specialized cleaner matches
+
+### Search Engines
+
+Currently supported search engines:
+
+- `basic`: SearXNG-based general search
+- `juejin`: Juejin technical articles search
+- `npm`: NPM package search
+- More engines coming soon...
 
 ### Performance Considerations
 

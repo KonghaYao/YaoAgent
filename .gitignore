@@ -49,3 +49,4 @@ credentials.json
 build
 .docker
 cache
+deno.lock

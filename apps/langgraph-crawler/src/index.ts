@@ -1,30 +1,9 @@
-import { z } from "zod";
-import TurndownService from "turndown";
-import iconv from "iconv-lite";
-import { getMetaData, metaDataToYaml } from "./getMetaData.js";
-import { ReadableCleaner } from "./cleaner/ReadableCleaner.js";
-import { InfoQCleaner } from "./cleaner/InfoQCleaner.js";
-import { NoCleaner } from "./cleaner/HTMLCleaner.js";
-import { npmPlugin, aTagCleanPlugin, wechatArticleCleanPlugin } from "./cleaner/readablePlugins/index.js";
-
-const { decode } = iconv;
-
-const schema = z.object({
-    url: z.string().url().describe("the url to crawl"),
-    raw: z.boolean().optional().default(false).describe("return raw html"),
-});
-
-async function extractReadableContent(html: string, originUrl: string) {
-    const cleaners = [
-        new NoCleaner(html, originUrl, []),
-        new InfoQCleaner(html, originUrl),
-        new ReadableCleaner(html, originUrl).addPlugin(wechatArticleCleanPlugin).addPlugin(npmPlugin).addPlugin(aTagCleanPlugin),
-    ];
-    const cleaner = cleaners.find((cleaner) => cleaner.isMatch(originUrl))!;
-    return await cleaner.getCleanContent();
-}
-
-export async function handleRequest(req: Request): Promise<Response> {
+import { ExtractSchema } from "./extract.js";
+import { extract } from "./extract.js";
+import { search, SearchSchema } from "./search.js";
+export * from "./extract.js";
+export * from "./search.js";
+async function handleExtractRequest(req: Request): Promise<Response> {
     if (req.method === "POST") {
         let json;
         try {
@@ -35,46 +14,49 @@ export async function handleRequest(req: Request): Promise<Response> {
             });
         }
 
-        if (!schema.safeParse(json).success) {
+        if (!ExtractSchema.safeParse(json).success) {
             return new Response(JSON.stringify({ error: "Invalid URL" }), {
                 status: 400,
             });
         }
 
         try {
-            const res = await fetch(json.url, {
-                headers: {
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                    Accept: "*/*",
-                    "Accept-Language": "zh-CN,zh;q=0.9",
-                    "Accept-Encoding": "gzip, deflate, br",
-                    Connection: "keep-alive",
-                    Referer: json.url,
-                    Host: new URL(json.url).host,
-                    "Upgrade-Insecure-Requests": "1",
-                },
+            const content = await extract(json);
+            return new Response(content, { status: 200 });
+        } catch (error) {
+            console.error(error);
+            return new Response(JSON.stringify({ error: (error as Error).message }), {
+                status: 500,
             });
-            const charset = res.headers
-                .get("content-type")
-                ?.match(/charset=([^;]+)/)?.[1]
-                .split(",")[0]
-                .toLowerCase();
-            const htmlText = decodeCharset(await res.arrayBuffer(), charset);
-            // console.log(htmlText);
-            const { content, metaData } = (await extractReadableContent(htmlText as string, json.url as string)) ?? htmlText;
-            if (json.raw) {
-                return new Response(content, { status: 200 });
+        }
+    } else {
+        return new Response("Method not allowed", { status: 405 });
+    }
+}
+async function handleSearchRequest(req: Request): Promise<Response> {
+    if (req.method === "POST") {
+        let json;
+        try {
+            json = await req.json();
+        } catch (_) {
+            return new Response(JSON.stringify({ error: "Invalid JSON" }), {
+                status: 400,
+            });
+        }
+        const { success, data } = SearchSchema.safeParse(json);
+        if (!success) {
+            return new Response(JSON.stringify({ error: "Invalid URL" }), {
+                status: 400,
+            });
+        }
+
+        try {
+            const content = await search(data);
+            if (typeof content === "string") {
+                return new Response(content, { status: 200, headers: { "Content-Type": "text/markdown" } });
+            } else {
+                return new Response(JSON.stringify(content), { status: 200, headers: { "Content-Type": "application/json" } });
             }
-            // console.log(content);
-            const turndownService = new TurndownService({
-                headingStyle: "atx",
-                codeBlockStyle: "fenced",
-                fence: "```",
-            });
-
-            const markdown = turndownService.turndown(content as string);
-
-            return new Response(metaDataToYaml(metaData) + "\n---\n\n" + markdown, { status: 200 });
         } catch (error) {
             console.error(error);
             return new Response(JSON.stringify({ error: (error as Error).message }), {
@@ -86,11 +68,4 @@ export async function handleRequest(req: Request): Promise<Response> {
     }
 }
 
-function decodeCharset(text: ArrayBuffer, charset: string = "utf-8") {
-    try {
-        return decode(new Uint8Array(text) as unknown as Buffer, charset);
-    } catch (error) {
-        console.error(`Failed to decode text with charset ${charset}:`, error);
-        return text;
-    }
-}
+export { handleExtractRequest as handleRequest, handleExtractRequest, handleSearchRequest };
