@@ -3,7 +3,7 @@
     "scripts": {
         "dev": "wrangler dev",
         "build": "wrangler build",
-        "deploy": "wrangler deploy --minify",
+        "deploy": "wrangler deploy --no-bundle",
         "cf-typegen": "wrangler types --env-interface CloudflareBindings"
     },
     "dependencies": {
@@ -11,6 +11,8 @@
         "hono": "^4.7.11"
     },
     "devDependencies": {
+        "vite": "^6.3.5",
+        "vite-plugin-top-level-await": "^1.5.0",
         "wrangler": "^4.18.0"
     }
 }
