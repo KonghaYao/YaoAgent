@@ -15,7 +15,7 @@ import {
     SequentialThinkingTool,
 } from "@langgraph-js/pro";
 import z from "zod";
-import { crawler_tool, web_search_tool } from "src/web-search/crawler.js";
+import { crawler_tool, web_search_tool } from "../web-search/crawler.js";
 
 const llm = new ChatOpenAI({
     modelName: "gpt-4o-mini",
