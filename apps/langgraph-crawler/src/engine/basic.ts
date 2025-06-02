@@ -13,7 +13,9 @@ export const BasicEngine: SearchEngine = {
     name: "basic",
     topic: "news",
     search: async (query) => {
-        const html = await getHTMLContent(`${process.env.SEARCH_ENGINE_URL}/search?q=${encodeURIComponent(query)}&safesearch=0&category_general=1&pageno=1&theme=simple&language=all`);
+        const html = await getHTMLContent(
+            `${process.env.SEARCH_ENGINE_URL || "https://searx.bndkt.io"}/search?q=${encodeURIComponent(query)}&safesearch=0&category_general=1&pageno=1&theme=simple&language=all`
+        );
         const doc = new DOMParser().parseFromString(html, "text/html");
 
         const results: SearchResult[] = [];
