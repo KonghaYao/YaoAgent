@@ -7,6 +7,16 @@ export default defineConfig({
             turndown: "./node_modules/turndown/lib/turndown.es.js",
         },
     },
+    plugins: [
+        {
+            name: "turndown",
+            transform(code, id) {
+                if (id.includes("turndown")) {
+                    return `import domino from '@mixmark-io/domino';\n` + code.replace("var domino = require('@mixmark-io/domino');", "");
+                }
+            },
+        },
+    ],
     mode: "production",
     build: {
         target: "esnext",

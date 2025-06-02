@@ -1,6 +1,6 @@
 {
     "name": "@langgraph-js/crawler",
-    "version": "1.4.5",
+    "version": "1.4.6",
     "description": "A powerful web crawler designed specifically for LLM applications, capable of extracting clean, readable content from various web pages and converting it to Markdown format.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
