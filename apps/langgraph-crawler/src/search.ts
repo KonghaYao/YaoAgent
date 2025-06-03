@@ -2,12 +2,14 @@ import { z } from "zod";
 import { NpmEngine } from "./engine/npm.js";
 import { BasicEngine } from "./engine/basic.js";
 import { JuejinEngine } from "./engine/juejin.js";
+import { AnthropicEngine } from "./engine/authropic.js";
+import { GithubEngine } from "./engine/github.js";
 
 export const SearchSchema = z.object({
     query: z.string().describe("the query to search"),
     // topic: z.enum(["news", "code"]).default("news").describe("the topic to search"),
     engines: z
-        .array(z.enum(["basic", "npm", "juejin"]))
+        .array(z.enum(["basic", "npm", "juejin", "anthropic", "github"]))
         .default(["basic"])
         .describe("the engines to use"),
     returnType: z.enum(["json", "markdown"]).default("json").describe("the content type to return"),
@@ -30,7 +32,7 @@ export interface SearchEngine {
     search: (query: string) => Promise<SearchResult[]>;
 }
 
-const SupportedEngines = [BasicEngine, JuejinEngine, NpmEngine];
+const SupportedEngines = [BasicEngine, JuejinEngine, NpmEngine, AnthropicEngine, GithubEngine];
 /** 聚合搜索接口，提供可扩展的多个数据源接入 */
 export async function search({ query, engines, returnType, withMetadata }: z.infer<typeof SearchSchema>): Promise<
     | {

@@ -7,7 +7,7 @@ export abstract class HTMLCleaner {
         this.html = html;
         this.originUrl = originUrl;
     }
-    abstract getCleanContent(): Promise<{ content: string; metaData: MetaData }>;
+    abstract getCleanContent(): Promise<{ content: string; metaData: MetaData; isPureMarkdown?: boolean }>;
     abstract isMatch(url: string): boolean;
 }
 

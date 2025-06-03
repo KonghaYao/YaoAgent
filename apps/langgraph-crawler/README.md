@@ -27,31 +27,35 @@ A powerful web crawler designed specifically for LLM applications, capable of ex
 
 ### Documentation & Development
 
-- [x] NPM
-- [x] Vitepress Base Website
-- [x] Github
-- [x] DEV Community (dev.to)
-- [x] MDN
-- [x] Medium
-- [x] SearXNG Search Result
-- [ ] freeCodeCamp.org
-- [ ] Docker Hub
-- [ ] StackOverflow
-- [ ] Anthropic
+| WeiSite                | Extract | Search |
+| ---------------------- | ------- | ------ |
+| NPM                    | ✅      | ✅     |
+| Vitepress Base Website | ✅      | ❌     |
+| Github                 | ✅      | ✅     |
+| DEV Community (dev.to) | ✅      | ❌     |
+| MDN                    | ✅      | ❌     |
+| Medium                 | ✅      | ❌     |
+| SearXNG Search Result  | ✅      | ✅     |
+| freeCodeCamp.org       | ✅      | ❌     |
+| Docker Hub             | ✅      | ❌     |
+| StackOverflow          | ❌      | ❌     |
+| Anthropic              | ✅      | ✅     |
 
 ### Chinese Platforms
 
-- [x] WeChat Public Articles (微信公众号)
-- [x] Juejin (稀土掘金)
-- [x] The Paper (澎湃新闻)
-- [x] Jiemian (界面新闻)
-- [x] Huxiu (虎嗅网)
-- [x] UISDC (优设网)
-- [x] CNBlogs (博客园)
-- [x] SSPAI (少数派)
-- [x] InfoQ
-- [x] CSDN
-- [ ] Zhihu (知乎)
+| WeiSite    | Extract | Search |
+| ---------- | ------- | ------ |
+| 微信公众号 | ✅      | ❌     |
+| 稀土掘金   | ✅      | ✅     |
+| 澎湃新闻   | ✅      | ❌     |
+| 界面新闻   | ✅      | ❌     |
+| 虎嗅网     | ✅      | ❌     |
+| 优设网     | ✅      | ❌     |
+| 博客园     | ✅      | ❌     |
+| 少数派     | ✅      | ❌     |
+| InfoQ      | ✅      | ❌     |
+| CSDN       | ✅      | ❌     |
+| 知乎       | ❌      | ❌     |
 
 ## Installation
 

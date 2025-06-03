@@ -37,4 +37,18 @@ describe("extract", () => {
         });
         expect(text).toContain("Hono框架");
     });
+    test("should crawl dockerhub", async () => {
+        const text = await extract({
+            url: "https://hub.docker.com/r/oven/bun",
+            raw: false,
+        });
+        expect(text).toContain("oven/bun");
+    });
+    test("should crawl dockerhub", async () => {
+        const text = await extract({
+            url: "https://hub.docker.com/_/python",
+            raw: false,
+        });
+        expect(text).toContain("Python");
+    });
 });

@@ -43,9 +43,9 @@ async function handleSearchRequest(req: Request): Promise<Response> {
                 status: 400,
             });
         }
-        const { success, data } = SearchSchema.safeParse(json);
+        const { success, data, error } = SearchSchema.safeParse(json);
         if (!success) {
-            return new Response(JSON.stringify({ error: "Invalid URL" }), {
+            return new Response(JSON.stringify({ error: error.message }), {
                 status: 400,
             });
         }
