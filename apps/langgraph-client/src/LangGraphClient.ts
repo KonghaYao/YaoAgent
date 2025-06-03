@@ -394,6 +394,7 @@ export class LangGraphClient extends Client {
             }
         );
     }
+
     /**
      * @zh 注册流式更新的回调函数。
      * @en Registers a callback function for streaming updates.
@@ -407,6 +408,16 @@ export class LangGraphClient extends Client {
 
     private emitStreamingUpdate(event: StreamingUpdateEvent) {
         this.streamingCallbacks.forEach((callback) => callback(event));
+    }
+    /** 前端工具人机交互时，锁住面板 */
+    isFELocking(messages: RenderMessage[]) {
+        const lastMessage = messages[messages.length - 1];
+        if (!lastMessage) {
+            return false;
+        }
+        const tool = this.tools.getTool(lastMessage?.name!);
+        console.log(tool);
+        return tool && tool.onlyRender && lastMessage?.type === "tool" && !lastMessage?.additional_kwargs?.done;
     }
     graphState: any = {};
     currentRun?: { run_id: string };

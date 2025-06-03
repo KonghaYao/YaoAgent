@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { MessagesBox } from "./components/MessageBox";
 import HistoryList from "./components/HistoryList";
 import { ChatProvider, useChat } from "./context/ChatContext";
@@ -12,19 +12,53 @@ import { GraphPanel } from "../graph/GraphPanel";
 import { setLocalConfig } from "./store";
 import { History, Network, LogOut, FileJson } from "lucide-react";
 import "github-markdown-css/github-markdown.css";
+
 const ChatMessages: React.FC = () => {
-    const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse } = useChat();
+    const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse, isFELocking } = useChat();
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const MessageContainer = useRef<HTMLDivElement>(null);
+
+    // 检查是否足够接近底部（距离底部 30% 以内）
+    const isNearBottom = () => {
+        if (!MessageContainer.current) return false;
+
+        const container = MessageContainer.current;
+        const scrollPosition = container.scrollTop + container.clientHeight;
+        const scrollHeight = container.scrollHeight;
+
+        // 当距离底部不超过容器高度的 30% 时，认为足够接近底部
+        return scrollHeight - scrollPosition <= container.clientHeight * 0.3;
+    };
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        if (renderMessages.length > 0 && MessageContainer.current) {
+            // 切换消息时，自动滚动到底部
+            if (!loading) {
+                scrollToBottom();
+            }
+            // 只有当用户已经滚动到接近底部时，才自动滚动到底部
+            if (loading && isNearBottom()) {
+                scrollToBottom();
+            }
+        }
+    }, [renderMessages]);
 
     return (
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-4" ref={MessageContainer}>
             <MessagesBox renderMessages={renderMessages} collapsedTools={collapsedTools} toggleToolCollapse={toggleToolCollapse} client={client!} />
-            {loading && (
+            {isFELocking() && <div className="flex items-center justify-center py-4 text-gray-500">请你继续操作</div>}
+            {loading && !isFELocking() && (
                 <div className="flex items-center justify-center py-4 text-gray-500">
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent mr-2"></div>
                     正在思考中...
                 </div>
             )}
             {inChatError && <div className="p-4 text-sm text-red-600 bg-red-50 rounded-lg border border-red-200">{JSON.stringify(inChatError)}</div>}
+            <div ref={messagesEndRef} />
         </div>
     );
 };

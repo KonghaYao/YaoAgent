@@ -1,4 +1,4 @@
-import { atom } from "nanostores";
+import { atom, computed } from "nanostores";
 import { LangGraphClient, LangGraphClientConfig, RenderMessage, SendMessageOptions } from "../LangGraphClient.js";
 import { AssistantGraph, Message, Thread } from "@langchain/langgraph-sdk";
 import { rafDebounce } from "./rafDebounce.js";
@@ -205,6 +205,7 @@ export const createChatStore = (
         const tool = toolsDefine.find((i) => i.name === tool_name!)?.render;
         return tool ? (message: RenderMessage) => tool(new ToolRenderData(message, client.get()!)) : null;
     };
+
     return {
         data: {
             client,
@@ -222,6 +223,9 @@ export const createChatStore = (
             currentNodeName,
         },
         mutations: {
+            isFELocking() {
+                return client.get()?.isFELocking(renderMessages.get());
+            },
             initClient,
             sendMessage,
             stopGeneration,
