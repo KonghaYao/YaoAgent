@@ -48,7 +48,7 @@ const ChatMessages: React.FC = () => {
     }, [renderMessages]);
 
     return (
-        <div className="flex-1 overflow-y-auto p-4" ref={MessageContainer}>
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-4" ref={MessageContainer}>
             <MessagesBox renderMessages={renderMessages} collapsedTools={collapsedTools} toggleToolCollapse={toggleToolCollapse} client={client!} />
             {isFELocking() && <div className="flex items-center justify-center py-4 text-gray-500">请你继续操作</div>}
             {loading && !isFELocking() && (
@@ -159,9 +159,9 @@ const Chat: React.FC = () => {
     const { extraParams, setExtraParams } = useExtraParams();
 
     return (
-        <div className="flex h-full">
+        <div className="grid grid-cols-6 h-full w-full overflow-hidden">
             {showHistory && <HistoryList onClose={() => toggleHistoryVisible()} formatTime={formatTime} />}
-            <div className="flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col col-span-5 overflow-auto">
                 <div className="flex items-center gap-2 p-4 border-b border-gray-200 justify-end h-16">
                     <button
                         className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center gap-1.5"

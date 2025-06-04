@@ -11,7 +11,7 @@ interface HistoryListProps {
 const HistoryList: React.FC<HistoryListProps> = ({ onClose, formatTime }) => {
     const { historyList, currentChatId, refreshHistoryList, createNewChat, deleteHistoryChat, toHistoryChat } = useChat();
     return (
-        <div className="w-80 bg-white rounded-lg shadow-md h-full flex flex-col border-r">
+        <div className=" bg-white rounded-lg shadow-md h-full flex flex-col border-r">
             <div className="p-4 border-b border-gray-200 flex justify-between items-center h-16">
                 <div className="flex items-center gap-3">
                     <h3 className="m-0 text-lg text-gray-800">历史记录</h3>

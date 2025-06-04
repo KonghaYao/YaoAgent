@@ -34,7 +34,6 @@ export const UsageMetadata: React.FC<UsageMetadataProps> = ({ usage_metadata, sp
 };
 
 export const TokenPanel = ({ usage_metadata }: any) => {
-    console.log(usage_metadata);
     return (
         <div className="flex items-center gap-1">
             <span className="flex items-center gap-1 group relative">
