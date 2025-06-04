@@ -14,7 +14,7 @@ export interface UnionTool<Args extends ZodRawShape, Child extends Object = Obje
     execute: ToolCallback<Args>;
     /** 工具执行成功后触发的附加消息 */
     callbackMessage?: (result: CallToolResult) => Message[];
-    render?: <D>(tool: ToolRenderData<D>) => Child;
+    render?: <D>(tool: ToolRenderData<z.objectOutputType<Args, ZodTypeAny>, D>) => Child;
     onlyRender?: boolean;
     /** 只允许指定的 agent 使用该工具，如果未指定，则所有 agent 都可以使用 */
     allowAgent?: string[];
@@ -90,7 +90,7 @@ export const createMCPTool = <Args extends ZodRawShape>(tool: UnionTool<Args>) =
 export const createToolUI = <Args extends Parameter[] | [] = [], Child extends Object = {}>(
     tool: Action<Args> & {
         allowAgent?: string[];
-        render?: (tool: ToolRenderData<any>) => Child;
+        render?: (tool: ToolRenderData<any, any>) => Child;
         onlyRender?: boolean;
     }
 ) => {
