@@ -7,7 +7,7 @@ interface MessageHumanProps {
 const MessageHuman: React.FC<MessageHumanProps> = ({ content }) => {
     const renderContent = () => {
         if (typeof content === "string") {
-            return <div className="text-white">{content}</div>;
+            return <div className="text-white whitespace-pre-wrap">{content}</div>;
         }
 
         if (Array.isArray(content)) {
@@ -35,7 +35,7 @@ const MessageHuman: React.FC<MessageHumanProps> = ({ content }) => {
                         );
                     default:
                         return (
-                            <div key={index} className="text-white">
+                            <div key={index} className="text-white whitespace-pre-wrap">
                                 {JSON.stringify(item)}
                             </div>
                         );
@@ -43,13 +43,13 @@ const MessageHuman: React.FC<MessageHumanProps> = ({ content }) => {
             });
         }
 
-        return <div className="text-white">{JSON.stringify(content)}</div>;
+        return <div className="text-white whitespace-pre-wrap">{JSON.stringify(content)}</div>;
     };
 
     return (
         <div className="flex flex-row w-full justify-end">
             <div className="flex flex-col w-fit bg-blue-500 rounded-lg text-white border border-blue-100">
-                <div className="flex flex-col p-4">{renderContent()}</div>
+                <div className="flex flex-col p-4 ">{renderContent()}</div>
             </div>
         </div>
     );

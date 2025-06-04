@@ -19,9 +19,9 @@ export const ask_user_for_approve = createToolUI({
     ],
     onlyRender: true,
     handler: ToolManager.waitForUIDone,
-    render(tool: ToolRenderData<RenderResponse>) {
-        const data = tool.input || {};
-        const [feedback, setFeedback] = useState("");
+    render(tool: ToolRenderData<{ title: string }, RenderResponse>) {
+        const data = tool.getInputRepaired();
+        const [feedback, setFeedback] = useState(tool.getJSONOutputSafe()?.feedback || "");
 
         const handleApprove = () => {
             const result = {

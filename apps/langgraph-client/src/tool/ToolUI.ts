@@ -3,6 +3,10 @@ import { RenderMessage } from "../LangGraphClient.js";
 import { LangGraphClient } from "../LangGraphClient.js";
 import { getMessageContent } from "../ui-store/createChatStore.js";
 import { jsonrepair } from "jsonrepair";
+
+export type DeepPartial<T> = {
+    [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
 export class ToolRenderData<I, D> {
     constructor(
         public message: RenderMessage,
@@ -38,11 +42,11 @@ export class ToolRenderData<I, D> {
             return null;
         }
     }
-    getInputRepaired(): I | null {
+    getInputRepaired(): DeepPartial<I> {
         try {
             return JSON.parse(jsonrepair(this.message.tool_input || ""));
         } catch (e) {
-            return null;
+            return {};
         }
     }
     response(data: D) {

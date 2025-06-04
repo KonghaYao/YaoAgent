@@ -158,7 +158,7 @@ const reporter_agent = createReactAgent({
         return [
             new SystemMessage(prompt),
             getLastHumanMessage(state.messages),
-            new HumanMessage("请你根据下面内容生成总结"),
+            new HumanMessage("请使用下面的内容"),
             new HumanMessage({
                 content: JSON.stringify(state.current_plan),
             }),

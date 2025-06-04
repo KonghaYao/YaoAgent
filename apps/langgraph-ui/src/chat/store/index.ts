@@ -1,5 +1,5 @@
 import { createChatStore } from "@langgraph-js/sdk";
-import { ask_user_for_approve } from "../tools/index";
+import { ask_user_for_approve, update_plan } from "../tools/index";
 import { FullTextSearchService, OpenAIVectorizer, VecDB, createMemoryTool } from "../../memory/index";
 
 const F =
@@ -54,7 +54,7 @@ export const globalChatStore = createChatStore(
     {
         ...getLocalConfig(),
         onInit(client) {
-            client.tools.bindTools([ask_user_for_approve, memoryTool.manageMemory, memoryTool.searchMemory]);
+            client.tools.bindTools([ask_user_for_approve, update_plan, memoryTool.manageMemory, memoryTool.searchMemory]);
         },
     }
 );

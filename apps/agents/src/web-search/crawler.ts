@@ -4,33 +4,24 @@ import { z } from "zod";
 
 export const crawler_tool = tool(
     async ({ url }) => {
-        try {
-            if (!url) {
-                return {
-                    status: "error",
-                    error: "URL is required",
-                };
-            }
-
-            const response = await fetch(`${process.env.SERVER_URL || "http://localhost:8123"}/website-to-md/extract`, {
-                method: "POST",
-                body: JSON.stringify({ url }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const text = await response.text();
-            return text;
-        } catch (error) {
+        if (!url) {
             return {
                 status: "error",
-                error: error instanceof Error ? error.message : "Unknown error occurred",
-                url,
-                timestamp: new Date().toISOString(),
+                error: "URL is required",
             };
         }
+
+        const response = await fetch(`${process.env.SERVER_URL || "http://localhost:8123"}/website-to-md/extract`, {
+            method: "POST",
+            body: JSON.stringify({ url }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const text = await response.text();
+        return text;
     },
     {
         name: "crawl_tool",
@@ -42,28 +33,20 @@ export const crawler_tool = tool(
 
 export const web_search_tool = tool(
     async ({ query, engines }) => {
-        try {
-            const response = await fetch(`${process.env.SERVER_URL || "http://localhost:8123"}/website-to-md/search`, {
-                method: "POST",
-                body: JSON.stringify({
-                    query,
-                    engines,
-                    returnType: "markdown",
-                    withMetadata: true,
-                }),
-            });
+        const response = await fetch(`${process.env.SERVER_URL || "http://localhost:8123"}/website-to-md/search`, {
+            method: "POST",
+            body: JSON.stringify({
+                query,
+                engines,
+                returnType: "markdown",
+                withMetadata: true,
+            }),
+        });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return await response.json();
-        } catch (error) {
-            return {
-                status: "error",
-                error: error instanceof Error ? error.message : "Unknown error occurred",
-                timestamp: new Date().toISOString(),
-            };
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        return await response.text();
     },
     {
         name: "web_search_tool",
