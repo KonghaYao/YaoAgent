@@ -416,8 +416,7 @@ export class LangGraphClient extends Client {
             return false;
         }
         const tool = this.tools.getTool(lastMessage?.name!);
-        console.log(tool);
-        return tool && tool.onlyRender && lastMessage?.type === "tool" && !lastMessage?.additional_kwargs?.done;
+        return tool && tool.render && lastMessage?.type === "tool" && !lastMessage?.additional_kwargs?.done;
     }
     graphState: any = {};
     currentRun?: { run_id: string };

@@ -1,6 +1,6 @@
 {
     "name": "@langgraph-js/sdk",
-    "version": "1.6.4",
+    "version": "1.7.1",
     "description": "The UI SDK for LangGraph - seamlessly integrate your AI agents with frontend interfaces",
     "main": "dist/index.js",
     "type": "module",
