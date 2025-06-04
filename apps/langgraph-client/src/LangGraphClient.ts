@@ -307,6 +307,7 @@ export class LangGraphClient extends Client {
                     total_tokens: number;
                 };
                 message.usage_metadata = {
+                    ...usage,
                     input_tokens: usage.prompt_tokens,
                     output_tokens: usage.completion_tokens,
                     total_tokens: usage.total_tokens,
