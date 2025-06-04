@@ -40,6 +40,7 @@ export type RenderMessage = Message & {
         input_tokens: number;
         output_tokens: number;
     };
+    tool_call_id?: string;
     response_metadata?: {
         create_time: string;
     };
@@ -231,7 +232,7 @@ export class LangGraphClient extends Client {
         const closedToolCallIds = new Set<string>();
         const result: Message[] = [];
         const inputMessages = this.combineGraphMessagesWithStreamingMessages();
-        console.log(inputMessages);
+        // console.log(inputMessages);
         // 从后往前遍历，这样可以保证最新的消息在前面
         for (let i = inputMessages.length - 1; i >= 0; i--) {
             const message = this.cloneMessage(inputMessages[i]);
@@ -295,12 +296,9 @@ export class LangGraphClient extends Client {
         let lastMessage: RenderMessage | null = null;
         for (const message of result) {
             const createTime = message.response_metadata?.create_time || "";
-            try {
-                // 用长度作为渲染 id，长度变了就要重新渲染
-                message.unique_id = message.id! + JSON.stringify(message.content).length;
-            } catch (e) {
-                message.unique_id = message.id!;
-            }
+            // 工具必须要使用 tool_call_id 来保证一致性
+            message.unique_id = message.tool_call_id! || message.id!;
+
             message.spend_time = new Date(createTime).getTime() - new Date(lastMessage?.response_metadata?.create_time || createTime).getTime();
             if (!message.usage_metadata && (message as AIMessage).response_metadata?.usage) {
                 const usage = (message as AIMessage).response_metadata!.usage as {

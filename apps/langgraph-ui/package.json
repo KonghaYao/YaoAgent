@@ -29,6 +29,7 @@
         "idb": "^8.0.3",
         "lucide-react": "^0.511.0",
         "minisearch": "^7.1.2",
+        "motion": "^12.16.0",
         "nanostores": "^1.0.1",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
