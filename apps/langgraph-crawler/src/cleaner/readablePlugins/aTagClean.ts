@@ -4,7 +4,6 @@ import { ReadableCleanerPlugin } from "../ReadableCleaner.js";
 export const aTagCleanPlugin: ReadableCleanerPlugin = {
     name: "aTagClean",
     beforeClean: (doc, cleaner) => {
-        console.log([...doc.querySelectorAll("a p")]);
         doc.querySelectorAll("a div").forEach((pTag) => {
             const spanTag = doc.createElement("span");
             spanTag.innerHTML = pTag.innerHTML;

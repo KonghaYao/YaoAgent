@@ -7,6 +7,13 @@ export const createCommonHeaders = (url: string) => {
         Connection: "keep-alive",
         Referer: url,
         Host: new URL(url).host,
+        "sec-ch-ua": '"Chromium";v="136", "Google Chrome";v="136", "Not.A/Brand";v="99"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"macOS"',
+        "sec-fetch-dest": "document",
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-site": "none",
+        "sec-fetch-user": "?1",
         "Upgrade-Insecure-Requests": "1",
     };
 };

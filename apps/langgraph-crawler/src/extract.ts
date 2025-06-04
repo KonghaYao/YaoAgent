@@ -26,14 +26,21 @@ export async function extractReadableContent(html: string, originUrl: string) {
 }
 
 export const getHTMLContent = async (url: string): Promise<string> => {
+    const cancelToken = new AbortController();
     const res = await fetch(url, {
         headers: createCommonHeaders(url),
+        signal: cancelToken.signal,
     });
     const charset = res.headers
         .get("content-type")
         ?.match(/charset=([^;]+)/)?.[1]
         .split(",")[0]
         .toLowerCase();
+    // 所有二进制直接删除
+    if (res.headers.has("content-disposition") || res.headers.get("content-type")?.includes("application/pdf")) {
+        cancelToken.abort();
+        return "It's a binary file! can't extract content";
+    }
     const htmlText = decodeCharset(await res.arrayBuffer(), charset);
     return htmlText as string;
 };
