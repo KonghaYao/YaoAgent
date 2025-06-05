@@ -86,6 +86,7 @@ export class ToolManager {
      * @en Converts all tools to JSON definition format.
      */
     toJSON(graphId: string, remote = true) {
+        debugger;
         return Array.from(this.tools.values())
             .filter((i) => (remote ? !i.onlyRender : true))
             .filter((i) => !i.allowGraph || i.allowGraph.includes(graphId))
