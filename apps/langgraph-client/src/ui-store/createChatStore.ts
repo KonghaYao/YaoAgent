@@ -250,9 +250,6 @@ export const createChatStore = (
                     if (showHistory.get()) {
                         refreshHistoryList();
                     }
-                    if (showGraph.get()) {
-                        refreshGraph();
-                    }
                 });
             },
             toggleGraphVisible() {

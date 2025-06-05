@@ -18,6 +18,8 @@ export interface UnionTool<Args extends ZodRawShape, Child extends Object = Obje
     onlyRender?: boolean;
     /** 只允许指定的 agent 使用该工具，如果未指定，则所有 agent 都可以使用 */
     allowAgent?: string[];
+    /** 只允许指定的 Graph 使用该工具 */
+    allowGraph?: string[];
 }
 export type ToolCallback<Args extends ZodRawShape> = (args: z.objectOutputType<Args, ZodTypeAny>, context?: any) => CallToolResult | Promise<CallToolResult>;
 

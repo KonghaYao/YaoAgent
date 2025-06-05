@@ -465,7 +465,7 @@ export class LangGraphClient extends Client {
                     ...this.extraParams,
                     ...(extraParams || {}),
                     messages: messagesToSend,
-                    fe_tools: this.tools.toJSON(),
+                    fe_tools: this.tools.toJSON(this.currentAssistant.graph_id),
                 },
                 streamMode: ["messages", "values"],
                 streamSubgraphs: true,
