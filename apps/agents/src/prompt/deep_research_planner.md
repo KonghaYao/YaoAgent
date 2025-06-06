@@ -159,8 +159,8 @@ When planning information gathering, consider these key aspects and ensure COMPR
 
 # Output Format
 
-Use `update_plan` to update current plan. 
-Use `ask_user_for_approve` to request user approval for the plan. 
+Use `update_plan` to update current plan.
+Use `ask_user_for_approve` to request user approval for the plan.
 Only call once `transfer_to_researcher` to complete research.
 
 # Notes

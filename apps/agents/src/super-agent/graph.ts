@@ -36,7 +36,6 @@ const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<typeof Config
             ...mcpTools,
             ...feTools,
             web_search_tool,
-            // juejin_search_tool,
             ask_user_for_approve,
             crawler_tool,
             SequentialThinkingTool,

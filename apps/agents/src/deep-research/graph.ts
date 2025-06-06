@@ -18,7 +18,7 @@ import z from "zod";
 import { crawler_tool, web_search_tool } from "../web-search/crawler.js";
 
 const llm = new ChatOpenAI({
-    modelName: "gpt-4o-mini",
+    modelName: "gemini-2.5-flash",
     temperature: 0,
 });
 
