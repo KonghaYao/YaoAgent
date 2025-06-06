@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, ReactNode } from "react";
 import { MessagesBox } from "./components/MessageBox";
 import HistoryList from "./components/HistoryList";
 import { ChatProvider, useChat } from "./context/ChatContext";
@@ -13,7 +13,7 @@ import { setLocalConfig } from "./store";
 import { History, Network, LogOut, FileJson } from "lucide-react";
 import "github-markdown-css/github-markdown.css";
 
-const ChatMessages: React.FC = () => {
+export const ChatMessages: React.FC = () => {
     const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse, isFELocking } = useChat();
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const MessageContainer = useRef<HTMLDivElement>(null);
@@ -63,7 +63,7 @@ const ChatMessages: React.FC = () => {
     );
 };
 
-const ChatInput: React.FC = () => {
+export const ChatInput: React.FC = () => {
     const { userInput, setUserInput, loading, sendMessage, stopGeneration, currentAgent, setCurrentAgent, client } = useChat();
     const { extraParams } = useExtraParams();
     const [imageUrls, setImageUrls] = useState<string[]>([]);
@@ -146,17 +146,21 @@ const ChatInput: React.FC = () => {
                     {loading ? "中断" : "发送"}
                 </button>
             </div>
-            <div className="flex border-b border-gray-200 mt-4">
+            <div className="flex mt-4">
                 <UsageMetadata usage_metadata={client?.tokenCounter || {}} />
             </div>
         </div>
     );
 };
 
-const Chat: React.FC = () => {
+export const Chat: React.FC<{ children?: ReactNode }> = ({ children }) => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const { showHistory, toggleHistoryVisible, showGraph, toggleGraphVisible, renderMessages } = useChat();
     const { extraParams, setExtraParams } = useExtraParams();
+
+    if (children) {
+        return <>{children}</>;
+    }
 
     return (
         <div className="grid grid-cols-6 h-full w-full overflow-hidden">

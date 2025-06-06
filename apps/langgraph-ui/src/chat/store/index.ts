@@ -41,20 +41,24 @@ db.initialize();
 console.log(db);
 export const memoryTool = createMemoryTool(db);
 
-export const globalChatStore = createChatStore(
-    localStorage.getItem("agent_name") || "",
-    {
-        apiUrl: localStorage.getItem("apiUrl") || "http://localhost:8123",
-        defaultHeaders: JSON.parse(localStorage.getItem("code") || "{}"),
-        callerOptions: {
-            // 携带 cookie 的写法
-            fetch: F,
+export const createGlobalChatStore = () => {
+    const globalChatStore = createChatStore(
+        localStorage.getItem("agent_name") || "",
+        {
+            apiUrl: localStorage.getItem("apiUrl") || "http://localhost:8123",
+            defaultHeaders: JSON.parse(localStorage.getItem("code") || "{}"),
+            callerOptions: {
+                // 携带 cookie 的写法
+                fetch: F,
+            },
         },
-    },
-    {
-        ...getLocalConfig(),
-        onInit(client) {
-            client.tools.bindTools([ask_user_for_approve, update_plan, memoryTool.manageMemory, memoryTool.searchMemory]);
-        },
-    }
-);
+        {
+            ...getLocalConfig(),
+            onInit(client) {
+                client.tools.bindTools([ask_user_for_approve, update_plan, memoryTool.manageMemory, memoryTool.searchMemory]);
+            },
+        }
+    );
+    return globalChatStore;
+};
+export const globalChatStore = createGlobalChatStore();

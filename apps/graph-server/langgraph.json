@@ -1,0 +1,8 @@
+{
+    "node_version": "20",
+    "dependencies": ["."],
+    "graphs": {
+        "agent": "./src/endpoint/graph.ts:graph"
+    },
+    "env": ".env"
+}

@@ -36,6 +36,7 @@ export const createTool = <Args extends ZodRawShape>(tool: UnionTool<Args>) => {
 export const createFETool = <const T extends Parameter[], Args extends ZodRawShape>(
     tool: Action<T> & {
         allowAgent?: string[];
+        allowGraph?: string[];
     }
 ): UnionTool<Args> => {
     return {
@@ -45,6 +46,7 @@ export const createFETool = <const T extends Parameter[], Args extends ZodRawSha
         returnDirect: tool.returnDirect,
         callbackMessage: tool.callbackMessage,
         allowAgent: tool.allowAgent,
+        allowGraph: tool.allowGraph,
         async execute(args, context) {
             try {
                 const result = await tool.handler?.(args, context);
@@ -92,6 +94,7 @@ export const createMCPTool = <Args extends ZodRawShape>(tool: UnionTool<Args>) =
 export const createToolUI = <Args extends Parameter[] | [] = [], Child extends Object = {}>(
     tool: Action<Args> & {
         allowAgent?: string[];
+        allowGraph?: string[];
         render?: (tool: ToolRenderData<any, any>) => Child;
         onlyRender?: boolean;
     }

@@ -7,8 +7,14 @@ interface ExtraParamsContextType {
 
 const ExtraParamsContext = createContext<ExtraParamsContextType | undefined>(undefined);
 
-export const ExtraParamsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+interface ExtraParamsProviderProps {
+  children: ReactNode;
+  value?: object;
+}
+
+export const ExtraParamsProvider: React.FC<ExtraParamsProviderProps> = ({ children, value }) => {
   const [extraParams, setExtraParamsState] = useState<object>(() => {
+    if (value) return value;
     const savedParams = localStorage.getItem("extraParams");
     try {
       return savedParams ? JSON.parse(savedParams) : {};
@@ -17,6 +23,12 @@ export const ExtraParamsProvider: React.FC<{ children: ReactNode }> = ({ childre
       return {};
     }
   });
+
+  useEffect(() => {
+    if (value) {
+      setExtraParamsState(value);
+    }
+  }, [value]);
 
   useEffect(() => {
     localStorage.setItem("extraParams", JSON.stringify(extraParams));

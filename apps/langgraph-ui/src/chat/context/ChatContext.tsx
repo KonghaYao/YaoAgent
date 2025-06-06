@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from "react";
+import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect, useMemo } from "react";
 type ChatContextType = UnionStore<typeof globalChatStore>;
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -14,11 +14,13 @@ export const useChat = () => {
 interface ChatProviderProps {
     children: ReactNode;
 }
-import { globalChatStore } from "../store";
+import { createGlobalChatStore, globalChatStore } from "../store";
 import { UnionStore, useUnionStore } from "@langgraph-js/sdk";
 import { useStore } from "@nanostores/react";
 export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
+    const globalChatStore = useMemo(() => createGlobalChatStore(), []);
     const store = useUnionStore(globalChatStore, useStore);
+
     useEffect(() => {
         store.initClient().then((res) => {
             if (store.showHistory) {

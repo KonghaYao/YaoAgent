@@ -1,0 +1,23 @@
+{
+    "userInfo": "2222",
+    "graph_schema": {
+        "nodes": [
+            {
+                "name": "ReActNode1",
+                "type": "react_agent",
+                "prompt": "你是一个AI助手，请根据用户的问题进行回答。",
+                "llm": {
+                    "modelName": "gpt-4o-mini",
+                    "temperature": 0.3
+                },
+                "tools": [
+                    {
+                        "name": "SequentialThinkingTool"
+                    }
+                ]
+            }
+        ],
+        "edges": [],
+        "start_name": "ReActNode1"
+    }
+}
