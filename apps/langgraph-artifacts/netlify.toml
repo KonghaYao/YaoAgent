@@ -1,0 +1,6 @@
+[[headers]]
+# 匹配所有路径，如果你只想对特定路径设置，可以修改为 /some/path/* 等
+for = "/*" 
+  [headers.values]
+  Cross-Origin-Opener-Policy = "same-origin"
+  Cross-Origin-Embedder-Policy = "require-corp"
