@@ -6,14 +6,14 @@
         <title>Document</title>
     </head>
     <body>
-        <iframe src="./index.html" id="iframe"></iframe>
+        <iframe src="./index.html" style="width: 100%; height: 90vh" border="0" id="iframe"></iframe>
     </body>
     <script type="module">
         import { getIframeAPI } from "./src/parent.js";
         const iframe = document.getElementById("iframe");
         const iframeApi = await getIframeAPI(iframe);
-        const code = await fetch("/test-react.tsx").then((res) => res.text());
-        await iframeApi.run(code, "test-react.tsx");
+        const code = await fetch("/test/motion.jsx").then((res) => res.text());
+        await iframeApi.run(code, "test/motion.jsx", "application/javascript");
         console.log("done");
     </script>
 </html>

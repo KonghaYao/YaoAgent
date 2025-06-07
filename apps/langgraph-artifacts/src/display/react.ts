@@ -12,9 +12,10 @@ import ReactDOM from "react-dom";
 import 'unocss-browser';
 import * as m from '${url}'
 
-const App = m.default||m.App||Object.values(m)[0];
-
-ReactDOM.createRoot(document.getElementById("root")!).render(<App></App>);
+const App = m.default || m.App || Object.values(m)[0];
+if(App) {
+    ReactDOM.createRoot(document.getElementById("root")!).render(<App></App>);
+}
     `).code;
     }
     async run(code: string) {

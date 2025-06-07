@@ -11,7 +11,7 @@ export abstract class ArtifactDisplay {
         script.textContent = JSON.stringify(importMap);
         document.head.appendChild(script);
     }
-    shouldRun(code: string) {
+    shouldRun(code: string, filename: string, filetype: string) {
         return true;
     }
     async runESMCode(code: string) {

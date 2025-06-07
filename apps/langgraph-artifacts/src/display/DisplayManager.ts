@@ -9,8 +9,8 @@ export class DisplayManager {
             this.displays.push(display);
         }
     }
-    runCode(code: string) {
-        const display = this.displays.find((display) => display.shouldRun(code));
+    runCode(code: string, filename: string, filetype: string) {
+        const display = this.displays.find((display) => display.shouldRun(code, filename, filetype));
         if (!display) {
             throw new Error(`Display not found`);
         }
