@@ -1,0 +1,4 @@
+# 文件路径，可以是相对路径或通配符
+/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp
