@@ -1,0 +1,41 @@
+{
+    "name": "@langgraph-js/sdk",
+    "version": "1.7.6",
+    "description": "The UI SDK for LangGraph - seamlessly integrate your AI agents with frontend interfaces",
+    "main": "dist/index.js",
+    "type": "module",
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/",
+        "access": "public"
+    },
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc",
+        "prepublish": "pnpm build"
+    },
+    "keywords": [
+        "langgraph",
+        "ui",
+        "sdk",
+        "frontend",
+        "ai",
+        "agents",
+        "langchain",
+        "react"
+    ],
+    "author": "LangGraph Team",
+    "license": "Apache-2.0",
+    "packageManager": "pnpm@10.6.3",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/KonghaYao/YaoAgent.git"
+    },
+    "homepage": "https://langgraph-js.netlify.app",
+    "bugs": {
+        "url": "https://github.com/KonghaYao/YaoAgent/issues"
+    },
+    "dependencies": {
+        "@napi-rs/wasm-runtime": "^0.2.10",
+        "@rolldown/browser": "1.0.0-beta.12"
+    }
+}
