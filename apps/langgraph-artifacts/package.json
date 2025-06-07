@@ -1,5 +1,5 @@
 {
-    "name": "@langgraph-js/sdk",
+    "name": "@langgraph-js/artifacts",
     "version": "1.7.6",
     "description": "The UI SDK for LangGraph - seamlessly integrate your AI agents with frontend interfaces",
     "main": "dist/index.js",
