@@ -42,7 +42,7 @@ export const ArtifactViewer: React.FC = () => {
         setIsLoading(true);
         try {
             const iframeApi: any = await getIframeAPI(iframeRef.current);
-            await iframeApi.run(currentArtifact?.code, currentArtifact?.filename);
+            await iframeApi.run(currentArtifact?.code, currentArtifact?.filename, currentArtifact?.filetype);
         } catch (error) {
             console.error("Failed to run code:", error);
         } finally {

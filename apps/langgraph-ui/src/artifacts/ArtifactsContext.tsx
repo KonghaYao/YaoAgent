@@ -6,6 +6,7 @@ interface Artifact {
     id: string;
     code: string;
     filename: string;
+    filetype: string;
     version: number;
 }
 
@@ -69,6 +70,7 @@ export const ArtifactsProvider: React.FC<ArtifactsProviderProps> = ({ children }
                 code: content.code,
                 filename: filename,
                 version: newVersion,
+                filetype: content.filetype,
             };
         });
 
