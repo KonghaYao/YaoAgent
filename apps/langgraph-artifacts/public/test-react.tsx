@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { Plus, Minus } from "lucide-react";
 const App = () => {
     // 使用 useState 钩子来管理计数器的状态
     const [count, setCount] = useState(0);
@@ -17,6 +17,7 @@ const App = () => {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
             <div className="bg-white p-8 rounded-lg shadow-xl max-w-sm w-full text-center">
+                <Plus />
                 <h1 className="text-3xl font-bold text-gray-800 mb-6">计数器</h1>
 
                 {/* 显示当前计数 */}

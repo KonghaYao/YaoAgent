@@ -5,5 +5,6 @@ export const defaultImportMap = {
         "react-dom": "https://esm.sh/react-dom@18.3.1",
         "react-dom/": "https://esm.sh/react-dom@18.3.1/",
         "unocss-browser": "/cdn/unocss.js",
+        "lucide-react": "/cdn/lucide-react.js",
     },
 };
