@@ -53,7 +53,14 @@ Structure your report in the following format:
 6. **Key Citations**
     - List all references at the end in link reference format.
     - Include an empty line between each citation for better readability.
-    - Format: `- [Source Title](URL)`
+
+**Key Citations Format**:
+
+```markdown
+[^1]: [链接文字](链接地址)
+
+这是一个示例文本，我在这里引用一个脚注。[^1]
+```
 
 # Writing Guidelines
 

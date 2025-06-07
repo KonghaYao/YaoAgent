@@ -25,6 +25,7 @@
         "@vitejs/plugin-basic-ssl": "^2.0.0",
         "@vitejs/plugin-react": "^4.3.4",
         "@xyflow/react": "^12.6.4",
+        "comlink": "^4.4.2",
         "github-markdown-css": "^5.8.1",
         "idb": "^8.0.3",
         "lucide-react": "^0.511.0",

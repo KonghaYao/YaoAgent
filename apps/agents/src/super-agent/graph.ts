@@ -11,6 +11,7 @@ import { ToolRunnableConfig } from "@langchain/core/tools";
 import z from "zod";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { crawler_tool, web_search_tool } from "../web-search/crawler.js";
+import { createArtifactsTool } from "./tools/artifacts.js";
 
 const ask_user_for_approve = tool(
     async (input, _config: ToolRunnableConfig) => {
@@ -31,6 +32,7 @@ const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<typeof Config
     async (state, config, mcpTools) => {
         const feTools = createFeTools(state.fe_tools);
         const executorPrompt = await getPrompt("executor.md", false);
+        const artifactsPrompt = await getPrompt("artifacts-usage.md", false);
 
         const tools = [
             ...mcpTools,
@@ -39,13 +41,14 @@ const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<typeof Config
             ask_user_for_approve,
             crawler_tool,
             SequentialThinkingTool,
+            createArtifactsTool,
         ];
         const llm = await createLLM(state, "main_model");
 
         const agent = createReactAgent({
             llm,
             tools,
-            prompt: executorPrompt,
+            prompt: executorPrompt + "\n" + artifactsPrompt,
         });
 
         const response = await agent.invoke({

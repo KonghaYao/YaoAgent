@@ -336,6 +336,9 @@ importers:
       '@xyflow/react':
         specifier: ^12.6.4
         version: 12.6.4(@types/react@19.1.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      comlink:
+        specifier: ^4.4.2
+        version: 4.4.2
       github-markdown-css:
         specifier: ^5.8.1
         version: 5.8.1

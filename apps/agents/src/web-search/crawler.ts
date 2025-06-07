@@ -38,7 +38,7 @@ export const web_search_tool = tool(
             body: JSON.stringify({
                 query,
                 engines,
-                returnType: "markdown",
+                returnType: "json",
                 withMetadata: true,
             }),
         });

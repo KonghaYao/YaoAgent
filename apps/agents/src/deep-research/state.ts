@@ -6,7 +6,7 @@ import { createReactAgentAnnotation } from "@langchain/langgraph/prebuilt";
 import { Annotation } from "@langchain/langgraph";
 
 export const DeepResearchState = createState(createReactAgentAnnotation(), ModelState, SwarmState).build({
-    locale: createDefaultAnnotation(() => "en-US"),
+    locale: createDefaultAnnotation(() => "zh_CN"),
     observations: createDefaultAnnotation<string[]>(() => []),
     plan_iterations: createDefaultAnnotation(() => 0),
     current_plan: Annotation<Plan>,

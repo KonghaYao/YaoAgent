@@ -10,8 +10,10 @@ import JsonEditorPopup from "./components/JsonEditorPopup";
 import { JsonToMessageButton } from "./components/JsonToMessage";
 import { GraphPanel } from "../graph/GraphPanel";
 import { setLocalConfig } from "./store";
-import { History, Network, LogOut, FileJson } from "lucide-react";
+import { History, Network, LogOut, FileJson, Code } from "lucide-react";
+import { ArtifactViewer } from "../artifacts/ArtifactViewer";
 import "github-markdown-css/github-markdown.css";
+import { ArtifactsProvider, useArtifacts } from "../artifacts/ArtifactsContext";
 
 const ChatMessages: React.FC = () => {
     const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse, isFELocking } = useChat();
@@ -157,11 +159,12 @@ const Chat: React.FC = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const { showHistory, toggleHistoryVisible, showGraph, toggleGraphVisible, renderMessages } = useChat();
     const { extraParams, setExtraParams } = useExtraParams();
+    const { showArtifact, setShowArtifact } = useArtifacts();
 
     return (
-        <div className="grid grid-cols-6 h-full w-full overflow-hidden">
+        <div className="flex h-full w-full overflow-hidden">
             {showHistory && <HistoryList onClose={() => toggleHistoryVisible()} formatTime={formatTime} />}
-            <div className="flex-1 flex flex-col col-span-5 overflow-auto">
+            <div className="flex-1 flex flex-col overflow-auto">
                 <div className="flex items-center gap-2 p-4 border-b border-gray-200 justify-end h-16">
                     <button
                         className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center gap-1.5"
@@ -216,7 +219,12 @@ const Chat: React.FC = () => {
                 <ChatInput />
                 <JsonEditorPopup isOpen={isPopupOpen} initialJson={extraParams} onClose={() => setIsPopupOpen(false)} onSave={setExtraParams} />
             </div>
-            {showGraph && <GraphPanel />}
+            {(showGraph || showArtifact) && (
+                <div className="overflow-hidden flex-1">
+                    {showGraph && <GraphPanel />}
+                    {showArtifact && <ArtifactViewer />}
+                </div>
+            )}
         </div>
     );
 };
@@ -225,7 +233,9 @@ const ChatWrapper: React.FC = () => {
     return (
         <ChatProvider>
             <ExtraParamsProvider>
-                <Chat />
+                <ArtifactsProvider>
+                    <Chat />
+                </ArtifactsProvider>
             </ExtraParamsProvider>
         </ChatProvider>
     );
