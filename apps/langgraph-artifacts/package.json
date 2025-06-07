@@ -36,6 +36,7 @@
     },
     "dependencies": {
         "@napi-rs/wasm-runtime": "^0.2.10",
-        "@rolldown/browser": "1.0.0-beta.12"
+        "@rolldown/browser": "1.0.0-beta.12",
+        "comlink": "^4.4.2"
     }
 }

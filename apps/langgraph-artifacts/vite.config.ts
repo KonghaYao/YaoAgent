@@ -5,6 +5,7 @@ export default defineConfig(({ mode }) => {
         optimizeDeps: {
             exclude: ["@rolldown/browser"],
         },
+        base: "./",
         build: {
             target: "esnext",
         },
