@@ -12,8 +12,8 @@
         import { getIframeAPI } from "./src/parent.js";
         const iframe = document.getElementById("iframe");
         const iframeApi = await getIframeAPI(iframe);
-        const code = await fetch("/test/react.jsx").then((res) => res.text());
-        const data = await iframeApi.run(code, "test/react.jsx", "application/javascript");
+        const code = await fetch("/test/shadcn.js").then((res) => res.text());
+        const data = await iframeApi.run(code, "test/shadcn.js", "application/javascript");
         console.log("done", data);
     </script>
 </html>
