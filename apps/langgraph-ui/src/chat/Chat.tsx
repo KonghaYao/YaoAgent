@@ -52,7 +52,7 @@ const ChatMessages: React.FC = () => {
     return (
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-4" ref={MessageContainer}>
             <MessagesBox renderMessages={renderMessages} collapsedTools={collapsedTools} toggleToolCollapse={toggleToolCollapse} client={client!} />
-            {isFELocking() && <div className="flex items-center justify-center py-4 text-gray-500">请你继续操作</div>}
+            {/* {isFELocking() && <div className="flex items-center justify-center py-4 text-gray-500">请你继续操作</div>} */}
             {loading && !isFELocking() && (
                 <div className="flex items-center justify-center py-4 text-gray-500">
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent mr-2"></div>

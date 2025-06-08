@@ -33,7 +33,7 @@ const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<typeof Config
         const feTools = createFeTools(state.fe_tools);
         const executorPrompt = await getPrompt("executor.md", false);
         const artifactsPrompt = await getPrompt("artifacts-usage.md", false);
-
+        const stylePrompt = await getPrompt("style.md", false);
         const tools = [
             ...mcpTools,
             ...feTools,
@@ -48,7 +48,7 @@ const mainNode = createMCPNode<GraphState, LangGraphRunnableConfig<typeof Config
         const agent = createReactAgent({
             llm,
             tools,
-            prompt: executorPrompt + "\n" + artifactsPrompt,
+            prompt: executorPrompt + "\n" + artifactsPrompt + "\n" + stylePrompt,
         });
 
         const response = await agent.invoke({

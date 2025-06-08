@@ -28,7 +28,7 @@ export const ArtifactViewer: React.FC = () => {
                             if (await iframeApi.init()) {
                                 resolve(index);
                             }
-                        }, 50 * index);
+                        }, 100 * index);
                     });
                 })
         );
@@ -37,6 +37,7 @@ export const ArtifactViewer: React.FC = () => {
     };
 
     const runCode = async () => {
+        console.log(iframeKey);
         if (!iframeRef.current) return;
 
         setIsLoading(true);
@@ -54,11 +55,11 @@ export const ArtifactViewer: React.FC = () => {
         setIframeKey((prev) => prev + 1);
     };
 
-    useEffect(() => {
-        if (currentArtifact) {
-            setIframeKey((prev) => prev + 1);
-        }
-    }, [currentArtifact]);
+    // useEffect(() => {
+    //     if (currentArtifact && iframeRef.current) {
+    //         setIframeKey((prev) => prev + 1);
+    //     }
+    // }, [currentArtifact?.id]);
 
     useEffect(() => {
         if (iframeRef.current) {

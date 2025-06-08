@@ -16,7 +16,7 @@ export const ExtractSchema = z.object({
 
 export async function extractReadableContent(html: string, originUrl: string) {
     const cleaners: HTMLCleaner[] = [
-        new NoCleaner(html, originUrl, []),
+        new NoCleaner(html, originUrl, [/\/\/tophub\.today\/c\/news/]),
         new DockerHubCleaner(html, originUrl),
         new InfoQCleaner(html, originUrl),
         new ReadableCleaner(html, originUrl).addPlugin(wechatArticleCleanPlugin).addPlugin(npmPlugin).addPlugin(aTagCleanPlugin),

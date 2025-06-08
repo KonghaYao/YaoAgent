@@ -24,7 +24,7 @@ export const crawler_tool = tool(
         return text;
     },
     {
-        name: "crawl_tool",
+        name: "read_web_page",
         description:
             "A powerful web content extraction tool that retrieves and processes raw content from specified URLs, ideal for data collection, content analysis, and research tasks.",
         schema: z.object(ExtractSchema.shape),
@@ -49,7 +49,7 @@ export const web_search_tool = tool(
         return await response.text();
     },
     {
-        name: "web_search_tool",
+        name: "web_search",
         description:
             "A powerful web search tool that provides comprehensive, real-time results using search engine. Returns relevant web content with customizable parameters for result count, content type, and domain filtering. Ideal for gathering current information, news, and detailed web content analysis.",
         schema: z.object(SearchSchema.shape),

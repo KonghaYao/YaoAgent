@@ -12,14 +12,14 @@ export abstract class HTMLCleaner {
 }
 
 export class NoCleaner extends HTMLCleaner {
-    private disabledURLs: string[];
-    constructor(html: string, originUrl: string, disabledURLs: string[]) {
+    private disabledURLs: RegExp[];
+    constructor(html: string, originUrl: string, disabledURLs: RegExp[]) {
         super(html, originUrl);
         this.disabledURLs = disabledURLs;
     }
 
     isMatch(url: string): boolean {
-        return this.disabledURLs.some((disabledURL) => url.includes(disabledURL));
+        return this.disabledURLs.some((disabledURL) => disabledURL.test(url));
     }
     async getCleanContent() {
         return {
