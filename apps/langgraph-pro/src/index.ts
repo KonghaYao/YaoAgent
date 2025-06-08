@@ -3,3 +3,4 @@ export * from "./feTools.js";
 export * from "./tools/index.js";
 export * from "./messages/index.js";
 export * from "./swarm/index.js";
+export * from "./createModelHelper.js";
