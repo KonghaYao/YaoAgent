@@ -10,7 +10,7 @@ import { tool } from "@langchain/core/tools";
 import { ToolRunnableConfig } from "@langchain/core/tools";
 import z from "zod";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
-import { crawler_tool, web_search_tool } from "../web-search/crawler.js";
+import { crawler_tool, web_search_tool } from "@langgraph-js/pro";
 import { createArtifactsTool } from "./tools/artifacts.js";
 
 const ask_user_for_approve = tool(

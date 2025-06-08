@@ -1,7 +1,8 @@
 packages:
-    - apps/*
-    - "!**/demo/*"
-    - "!**/test/*"
+  - apps/*
+  - '!**/demo/*'
+  - '!**/test/*'
 onlyBuiltDependencies:
-    - "@tailwindcss/oxide"
-    - esbuild
+  - '@rolldown/browser'
+  - '@tailwindcss/oxide'
+  - esbuild
