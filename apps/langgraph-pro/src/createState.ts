@@ -1,6 +1,4 @@
 import { Annotation, AnnotationRoot, StateDefinition } from "@langchain/langgraph";
-import { createReactAgentAnnotation } from "@langchain/langgraph/prebuilt";
-
 /**
  * create state for langgraph, like python version
  * @example

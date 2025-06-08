@@ -15,7 +15,7 @@ import {
     SequentialThinkingTool,
 } from "@langgraph-js/pro";
 import z from "zod";
-import { crawler_tool, web_search_tool } from "../web-search/crawler.js";
+import { crawler_tool, web_search_tool } from "@langgraph-js/pro";
 
 const llm = new ChatOpenAI({
     modelName: "gemini-2.5-flash",
