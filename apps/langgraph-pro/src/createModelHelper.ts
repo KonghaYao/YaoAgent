@@ -15,7 +15,7 @@ import { ChatOpenAI } from "@langchain/openai";
  * const GraphState = createState(ModelState).build({});
  * const llm = await createLLM(state, "main_model");
  */
-export const createModelHelper = (ModelAllow: Record<string, string[]>) => {
+export const createModelHelper = <const T extends Record<string, string[]>>(ModelAllow: T) => {
     const ModelState = createState(createReactAgentAnnotation()).build({
         ...(Object.fromEntries(Object.entries(ModelAllow).map(([key, value]) => [key, createDefaultAnnotation(() => value[0])])) as Record<keyof typeof ModelAllow, BinaryOperatorAggregate<string>>),
     });
