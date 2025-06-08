@@ -21,6 +21,7 @@ if(App) {
     async run(code: string) {
         this.injectImportMap(this.importMap);
         const mainCode = this.createESMJsURL(this.transformCode(code).code);
+        console.log(this.transformCode(code).code);
         return await this.runESMCode(this.wrapper(mainCode));
     }
 }

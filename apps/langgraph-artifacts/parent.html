@@ -12,8 +12,8 @@
         import { getIframeAPI } from "./src/parent.js";
         const iframe = document.getElementById("iframe");
         const iframeApi = await getIframeAPI(iframe);
-        const code = await fetch("/test/motion.jsx").then((res) => res.text());
-        await iframeApi.run(code, "test/motion.jsx", "application/javascript");
+        const code = await fetch("/test/react-three.jsx").then((res) => res.text());
+        await iframeApi.run(code, "test/react-three.jsx", "application/javascript");
         console.log("done");
     </script>
 </html>
