@@ -16,7 +16,7 @@ export abstract class ArtifactDisplay {
     }
     async runESMCode(code: string) {
         const url = this.createESMJsURL(code);
-        return await import(url);
+        return await import(/* @vite-ignore */ url);
     }
     createESMJsURL(code: string) {
         const file = new File([code], "index.js", { type: "text/javascript" });
@@ -27,5 +27,25 @@ export abstract class ArtifactDisplay {
     destroy() {
         this.urls.forEach((url) => URL.revokeObjectURL(url));
     }
-    abstract run(code: string): Promise<void>;
+    abstract run(code: string): Promise<
+        | {
+              status: "success";
+              data?: any;
+          }
+        | {
+              status: "error";
+              errors?: any;
+          }
+    >;
 }
+
+export interface ArtifactRunSuccess {
+    status: "success";
+    data?: any;
+}
+
+export interface ArtifactRunError {
+    status: "error";
+    errors?: any;
+}
+export type ArtifactRunResult = ArtifactRunSuccess | ArtifactRunError;

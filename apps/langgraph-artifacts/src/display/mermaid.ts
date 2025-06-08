@@ -1,4 +1,4 @@
-import { ArtifactDisplay } from "./Display.js";
+import { ArtifactDisplay, ArtifactRunResult } from "./Display.js";
 
 export class MermaidDisplay extends ArtifactDisplay {
     shouldRun(code: string, filename: string, filetype: string) {
@@ -25,8 +25,12 @@ async function renderDiagram() {
 
 renderDiagram();`).code;
     }
-    async run(code: string) {
+    async run(code: string): Promise<ArtifactRunResult> {
         this.injectImportMap(this.importMap);
-        return await this.runESMCode(this.wrapper(code));
+        const data = await this.runESMCode(this.wrapper(code));
+        return {
+            status: "success",
+            data: JSON.stringify(data),
+        };
     }
 }

@@ -1,4 +1,4 @@
-import { ArtifactDisplay } from "./Display.js";
+import { ArtifactDisplay, ArtifactRunResult } from "./Display.js";
 
 export class ReactDisplay extends ArtifactDisplay {
     shouldRun(code: string) {
@@ -18,10 +18,21 @@ if(App) {
 }
     `).code;
     }
-    async run(code: string) {
+    async run(code: string): Promise<ArtifactRunResult> {
         this.injectImportMap(this.importMap);
-        const mainCode = this.createESMJsURL(this.transformCode(code).code);
-        console.log(this.transformCode(code).code);
-        return await this.runESMCode(this.wrapper(mainCode));
+        const { code: compiledCode, errors } = this.transformCode(code);
+        if (!compiledCode) {
+            console.error(errors);
+            return {
+                status: "error",
+                errors,
+            };
+        }
+        const mainCode = this.createESMJsURL(compiledCode);
+        const data = await this.runESMCode(this.wrapper(mainCode));
+        return {
+            status: "success",
+            data: JSON.stringify(data),
+        };
     }
 }
