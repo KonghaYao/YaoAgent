@@ -1,11 +1,10 @@
 import { AIMessage, HumanMessage, RemoveMessage, SystemMessage, trimMessages } from "@langchain/core/messages";
-import { Annotation } from "@langchain/langgraph";
 import { createLLM } from "../model/llm.js";
 import { ModelState } from "../model/states.js";
-import { createDefaultAnnotation } from "@langgraph-js/pro";
+import { createDefaultAnnotation, createState } from "@langgraph-js/pro";
+import { createReactAgentAnnotation } from "@langchain/langgraph/prebuilt";
 
-export const MemoryState = Annotation.Root({
-    ...ModelState.spec,
+export const MemoryState = createState(createReactAgentAnnotation(), ModelState).build({
     max_memory_count: createDefaultAnnotation(() => 12),
 });
 export type MemoryState = typeof MemoryState.State;

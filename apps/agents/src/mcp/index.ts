@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { toFetchResponse, toReqRes } from "fetch-to-node";
 import context7 from "./context7.js";
-import { handleExtractRequest, handleRequest, handleSearchRequest } from "@langgraph-js/crawler";
+import { handleExtractRequest, handleSearchRequest } from "@langgraph-js/crawler";
 export const app = new Hono();
 
 const servers = {
