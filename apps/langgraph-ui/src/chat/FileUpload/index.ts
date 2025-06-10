@@ -81,7 +81,7 @@ abstract class FileUploadClient {
 export class TmpFilesClient extends FileUploadClient {
     constructor(options: FileUploadClientOptions = {}) {
         super({
-            apiUrl: options.apiUrl || "https://tmpfiles.org/api/v1"
+            apiUrl: options.apiUrl || "https://tmpfiles.org/api/v1",
         });
     }
 
@@ -91,15 +91,11 @@ export class TmpFilesClient extends FileUploadClient {
 
     protected processResponse(response: FileUploadResponse): FileUploadResponse {
         if (response.data?.url) {
-            response.data.url = response.data.url.replace("https://tmpfiles.org/", "https://tmpfiles.org/dl/");
+            response.data.url = response.data.url.replace("//tmpfiles.org/", "//tmpfiles.org/dl/");
         }
         return response;
     }
 }
 
 // Export types for external use
-export type {
-    FileUploadClientOptions,
-    FileUploadOptions,
-    FileUploadResponse
-};
+export type { FileUploadClientOptions, FileUploadOptions, FileUploadResponse };
