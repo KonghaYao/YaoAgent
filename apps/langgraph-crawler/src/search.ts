@@ -4,13 +4,14 @@ import { BasicEngine } from "./engine/basic.js";
 import { JuejinEngine } from "./engine/juejin.js";
 import { AnthropicEngine } from "./engine/authropic.js";
 import { GithubEngine } from "./engine/github.js";
+import { BingEngine } from "./engine/bing.js";
 
 export const SearchSchema = z.object({
     query: z.string().describe("the query to search"),
     // topic: z.enum(["news", "code"]).default("news").describe("the topic to search"),
     engines: z
-        .array(z.enum(["basic", "npm", "juejin", "anthropic", "github"]))
-        .default(["basic"])
+        .array(z.enum(["basic", "npm", "juejin", "anthropic", "github", "bing"]))
+        .default(["bing"])
         .describe("the engines to use"),
     returnType: z.enum(["json", "markdown"]).default("json").describe("the content type to return"),
     withMetadata: z.boolean().default(true).describe("whether to include metadata in the search results"),
@@ -32,7 +33,7 @@ export interface SearchEngine {
     search: (query: string) => Promise<SearchResult[]>;
 }
 
-const SupportedEngines = [BasicEngine, JuejinEngine, NpmEngine, AnthropicEngine, GithubEngine];
+const SupportedEngines = [BasicEngine, JuejinEngine, NpmEngine, AnthropicEngine, GithubEngine, BingEngine];
 /** 聚合搜索接口，提供可扩展的多个数据源接入 */
 export async function search({ query, engines, returnType, withMetadata }: z.infer<typeof SearchSchema>): Promise<
     | {
