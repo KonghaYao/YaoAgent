@@ -5,16 +5,17 @@ import { zodToJsonSchema } from "zod-to-json-schema";
 import { Message } from "@langchain/langgraph-sdk";
 import { ToolRenderData } from "./ToolUI.js";
 
-export interface UnionTool<Args extends ZodRawShape, Child extends Object = Object> {
+export interface UnionTool<Args extends ZodRawShape, Child extends Object = Object, D = any> {
     name: string;
     description: string;
     parameters: Args;
     /** 是否直接返回工具结果，而不是通过消息返回 */
     returnDirect?: boolean;
-    execute: ToolCallback<Args>;
+    execute?: ToolCallback<Args>;
     /** 工具执行成功后触发的附加消息 */
     callbackMessage?: (result: CallToolResult) => Message[];
-    render?: <D>(tool: ToolRenderData<z.objectOutputType<Args, ZodTypeAny>, D>) => Child;
+    handler?: (args: z.objectOutputType<Args, ZodTypeAny>, context?: any) => D | Promise<D>;
+    render?: (tool: ToolRenderData<z.objectOutputType<Args, ZodTypeAny>, D>) => Child;
     onlyRender?: boolean;
     /** 只允许指定的 agent 使用该工具，如果未指定，则所有 agent 都可以使用 */
     allowAgent?: string[];
@@ -30,16 +31,41 @@ export const createTool = <Args extends ZodRawShape>(tool: UnionTool<Args>) => {
     return tool;
 };
 
-/** 提供一种兼容 copilotkit 的定义方式，简化定义形式
+/**
+ * create Type Safe Tool with zod and UI Render Feature
+ */
+export const createUITool = <Args extends ZodRawShape, Child extends Object = {}>(tool: UnionTool<Args, Child>): UnionTool<Args, Child> => {
+    return {
+        ...tool,
+        async execute(args, context) {
+            try {
+                const result = await tool.handler?.(args, context);
+                if (typeof result === "string") {
+                    return [{ type: "text", text: result }];
+                }
+                return [{ type: "text", text: JSON.stringify(result) }];
+            } catch (error) {
+                return [{ type: "text", text: `Error: ${error}` }];
+            }
+        },
+    };
+};
+
+/**
+ * 提供一种兼容 copilotkit 的定义方式，简化定义形式
  * 来自 copilotkit 的 frontend action
  */
-export const createFETool = <const T extends Parameter[], Args extends ZodRawShape>(
+export const createFETool = <const T extends Parameter[], Args extends ZodRawShape, Child extends Object = {}>(
     tool: Action<T> & {
         allowAgent?: string[];
         allowGraph?: string[];
+        render?: (tool: ToolRenderData<any, any>) => Child;
+        onlyRender?: boolean;
     }
 ): UnionTool<Args> => {
     return {
+        render: tool.render,
+        onlyRender: tool.onlyRender,
         name: tool.name,
         description: tool.description || "",
         parameters: convertJsonSchemaToZodRawShape(actionParametersToJsonSchema(tool.parameters || [])) as any,
@@ -77,7 +103,7 @@ export const createMCPTool = <Args extends ZodRawShape>(tool: UnionTool<Args>) =
         tool.parameters,
         async (args: z.objectOutputType<Args, ZodTypeAny>) => {
             try {
-                const result = await tool.execute(args);
+                const result = await tool.execute?.(args);
                 if (typeof result === "string") {
                     return { content: [{ type: "text", text: result }] };
                 }
@@ -91,17 +117,7 @@ export const createMCPTool = <Args extends ZodRawShape>(tool: UnionTool<Args>) =
     ];
 };
 
-export const createToolUI = <Args extends Parameter[] | [] = [], Child extends Object = {}>(
-    tool: Action<Args> & {
-        allowAgent?: string[];
-        render?: (tool: ToolRenderData<any, any>) => Child;
-        onlyRender?: boolean;
-        allowGraph?: string[];
-    }
-) => {
-    return {
-        ...createFETool(tool),
-        render: tool.render,
-        onlyRender: tool.onlyRender,
-    };
-};
+/**
+ * @deprecated Use createUITool instead
+ */
+export const createToolUI = createFETool;

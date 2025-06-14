@@ -591,6 +591,9 @@ export class LangGraphClient extends Client {
     private async callFETool(message: ToolMessage, args: any) {
         const that = this; // 防止 this 被错误解析
         const result = await this.tools.callTool(message.name!, args, { client: that, message });
+        if (!result) {
+            return;
+        }
         return this.resume(result);
     }
     extraParams: Record<string, any> = {};

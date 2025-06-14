@@ -78,7 +78,7 @@ export class ToolManager {
         if (!tool) {
             throw new Error(`Tool with name ${name} not found`);
         }
-        return await tool.execute(args, context);
+        return await tool.execute?.(args, context);
     }
 
     /**
