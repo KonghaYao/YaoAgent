@@ -54,7 +54,7 @@ export async function extract({ url, raw }: z.infer<typeof ExtractSchema>): Prom
     }
 
     const markdown = isPureMarkdown ? content : HTMLToMarkdown(content as string);
-    return metaDataToYaml(metaData) + "\n---\n\n" + markdown;
+    return "---\n" + metaDataToYaml(metaData) + "\n---\n\n" + markdown;
 }
 
 export const HTMLToMarkdown = (html: string) => {

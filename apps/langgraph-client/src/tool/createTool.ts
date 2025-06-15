@@ -5,7 +5,7 @@ import { zodToJsonSchema } from "zod-to-json-schema";
 import { Message } from "@langchain/langgraph-sdk";
 import { ToolRenderData } from "./ToolUI.js";
 
-export interface UnionTool<Args extends ZodRawShape, Child extends Object = Object, D = any> {
+export interface UnionTool<Args extends ZodRawShape, Child extends Object = Object, ResponseType = any> {
     name: string;
     description: string;
     parameters: Args;
@@ -14,8 +14,8 @@ export interface UnionTool<Args extends ZodRawShape, Child extends Object = Obje
     execute?: ToolCallback<Args>;
     /** 工具执行成功后触发的附加消息 */
     callbackMessage?: (result: CallToolResult) => Message[];
-    handler?: (args: z.objectOutputType<Args, ZodTypeAny>, context?: any) => D | Promise<D>;
-    render?: (tool: ToolRenderData<z.objectOutputType<Args, ZodTypeAny>, D>) => Child;
+    handler?: (args: z.objectOutputType<Args, ZodTypeAny>, context?: any) => ResponseType | Promise<ResponseType>;
+    render?: (tool: ToolRenderData<z.objectOutputType<Args, ZodTypeAny>, ResponseType>) => Child;
     onlyRender?: boolean;
     /** 只允许指定的 agent 使用该工具，如果未指定，则所有 agent 都可以使用 */
     allowAgent?: string[];
@@ -35,9 +35,9 @@ export const createTool = <Args extends ZodRawShape>(tool: UnionTool<Args>) => {
  * create Type Safe Tool with zod and UI Render Feature
  */
 export const createUITool = <Args extends ZodRawShape, Child extends Object = {}>(tool: UnionTool<Args, Child>): UnionTool<Args, Child> => {
-    return {
-        ...tool,
-        async execute(args, context) {
+    const execute =
+        tool.execute ||
+        (async (args, context) => {
             try {
                 const result = await tool.handler?.(args, context);
                 if (typeof result === "string") {
@@ -47,7 +47,10 @@ export const createUITool = <Args extends ZodRawShape, Child extends Object = {}
             } catch (error) {
                 return [{ type: "text", text: `Error: ${error}` }];
             }
-        },
+        });
+    return {
+        ...tool,
+        execute,
     };
 };
 
