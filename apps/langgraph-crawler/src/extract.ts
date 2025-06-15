@@ -37,7 +37,7 @@ export const getHTMLContent = async (url: string): Promise<string> => {
         .split(",")[0]
         .toLowerCase();
     // 所有二进制直接删除
-    if (res.headers.has("content-disposition") || res.headers.get("content-type")?.includes("application/pdf")) {
+    if (res.headers.get("content-type")?.includes("application/pdf")) {
         cancelToken.abort();
         return "It's a binary file! can't extract content";
     }

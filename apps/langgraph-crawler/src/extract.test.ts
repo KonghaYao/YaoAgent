@@ -51,4 +51,11 @@ describe("extract", () => {
         });
         expect(text).toContain("Python");
     });
+    test("should crawl with content header", async () => {
+        const text = await extract({
+            url: "https://ai-sdk.dev/docs/guides/openai-responses",
+            raw: false,
+        });
+        expect(text).toContain("OpenAI Responses API");
+    });
 });
