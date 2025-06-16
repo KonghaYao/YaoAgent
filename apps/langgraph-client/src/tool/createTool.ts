@@ -21,6 +21,8 @@ export interface UnionTool<Args extends ZodRawShape, Child extends Object = Obje
     allowAgent?: string[];
     /** 只允许指定的 Graph 使用该工具 */
     allowGraph?: string[];
+    /** 是否是纯净的 json schema 参数，而不是 zod 参数 */
+    isPureParams?: boolean;
 }
 export type ToolCallback<Args extends ZodRawShape> = (args: z.objectOutputType<Args, ZodTypeAny>, context?: any) => CallToolResult | Promise<CallToolResult>;
 
@@ -95,7 +97,7 @@ export const createJSONDefineTool = <Args extends ZodRawShape>(tool: UnionTool<A
     return {
         name: tool.name,
         description: tool.description,
-        parameters: zodToJsonSchema(z.object(tool.parameters)),
+        parameters: tool.isPureParams ? tool.parameters : zodToJsonSchema(z.object(tool.parameters)),
     };
 };
 

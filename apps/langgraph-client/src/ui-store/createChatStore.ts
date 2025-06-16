@@ -3,6 +3,7 @@ import { LangGraphClient, LangGraphClientConfig, RenderMessage, SendMessageOptio
 import { AssistantGraph, Message, Thread } from "@langchain/langgraph-sdk";
 import { rafDebounce } from "./rafDebounce.js";
 import { ToolRenderData } from "../tool/ToolUI.js";
+import { UnionTool } from "../tool/createTool.js";
 
 /**
  * @zh 格式化日期对象为时间字符串。
@@ -82,6 +83,14 @@ export const createChatStore = (
     const currentChatId = atom<string | null>(null);
     const currentNodeName = atom<string>("__start__");
 
+    const tools = atom<UnionTool<any>[]>([]);
+    const refreshTools = async () => {
+        const c = client.get();
+        if (!c) return;
+        c.tools.clearTools();
+        c.tools.bindTools(tools.get());
+    };
+
     // 显示 langgraph 可视化图
     const showGraph = atom<boolean>(context.showGraph ?? false);
     const graphVisualize = atom<AssistantGraph | null>(null);
@@ -129,6 +138,7 @@ export const createChatStore = (
         newClient.graphState = {};
         client.set(newClient);
         if (showGraph.get()) refreshGraph();
+        refreshTools();
         return newClient;
     }
 
@@ -221,8 +231,14 @@ export const createChatStore = (
             showGraph,
             graphVisualize,
             currentNodeName,
+            tools,
         },
         mutations: {
+            refreshTools,
+            setTools(new_tools: UnionTool<any>[]) {
+                tools.set(new_tools);
+                refreshTools();
+            },
             isFELocking() {
                 return client.get()?.isFELocking(renderMessages.get());
             },

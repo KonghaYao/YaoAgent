@@ -10,7 +10,6 @@ export class ToolManager {
     private tools: Map<string, UnionTool<any>> = new Map();
     // === 专门为前端设计的异步触发结构
     private waitingMap: Map<string, (value: CallToolResult) => void> = new Map();
-
     /**
      * @zh 注册一个工具。
      * @en Registers a tool.
@@ -85,7 +84,7 @@ export class ToolManager {
      * @zh 将所有工具转换为 JSON 定义格式。
      * @en Converts all tools to JSON definition format.
      */
-    toJSON(graphId: string, remote = true) {
+    async toJSON(graphId: string, remote = true) {
         return Array.from(this.tools.values())
             .filter((i) => (remote ? !i.onlyRender : true))
             .filter((i) => !i.allowGraph || i.allowGraph.includes(graphId))
