@@ -2,7 +2,7 @@ import "./react.js";
 import "prop-types";
 await new Promise((resolve) => {
     const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/recharts@2.15.3/umd/Recharts.js";
+    script.src = "https://unpkg.com/recharts@2.15.3/umd/Recharts.js";
     script.onload = resolve;
     document.head.appendChild(script);
 });

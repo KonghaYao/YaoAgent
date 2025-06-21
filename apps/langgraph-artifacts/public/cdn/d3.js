@@ -1,4 +1,4 @@
-import "https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js";
+import "https://unpkg.com/d3@7.9.0/dist/d3.min.js";
 const _ = globalThis.d3;
 export const Adder = _.Adder;
 export const Delaunay = _.Delaunay;

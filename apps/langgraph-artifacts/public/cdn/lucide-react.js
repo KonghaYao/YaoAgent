@@ -1,5 +1,5 @@
 import "./react.js";
-import "https://cdn.jsdelivr.net/npm/lucide-react@0.513.0/dist/umd/lucide-react.min.js";
+import "https://unpkg.com/lucide-react@0.513.0/dist/umd/lucide-react.min.js";
 const a = LucideReact;
 export const AArrowDown = a.AArrowDown;
 export const AArrowDownIcon = a.AArrowDownIcon;
