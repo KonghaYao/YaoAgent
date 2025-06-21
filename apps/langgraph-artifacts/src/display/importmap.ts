@@ -45,6 +45,7 @@ const shadcn = {
     "@/components/ui/toggle-group": "https://unpkg.com/@hatemhosny/shadcdn@0.0.14/build/shadcdn.js",
     "@/components/ui/toggle": "https://unpkg.com/@hatemhosny/shadcdn@0.0.14/build/shadcdn.js",
     "@/components/ui/tooltip": "https://unpkg.com/@hatemhosny/shadcdn@0.0.14/build/shadcdn.js",
+    "@/components/ui": "https://unpkg.com/@hatemhosny/shadcdn@0.0.14/build/shadcdn.js",
 };
 export const defaultImportMap = {
     imports: {
@@ -61,7 +62,7 @@ export const defaultImportMap = {
         p5: "https://unpkg.com/p5@2.0.3/lib/p5.esm.min.js",
         "@react-three/fiber": "https://unpkg.com/@react-three/fiber@9.1.2/dist/react-three-fiber.esm.js",
         "react-use-measure": "https://unpkg.com/react-use-measure@2.1.7/dist/index.js",
-        "its-fine": "https://unpkg.com/its-fine@2.0.0/dist/index.min.js",
+        "its-fine": "https://unpkg.com/its-fine@2.0.0/dist/index.js",
         scheduler: "https://esm.sh/scheduler@0.23.2",
         "suspend-react": "https://unpkg.com/suspend-react@0.1.3/index.js",
         "react-reconciler": "https://esm.sh/react-reconciler@0.29.2",

@@ -1,5 +1,5 @@
 import "./react.js";
-import "https://unpkg.com/framer-motion@12.16.0/dist/framer-motion.min.js";
+import "https://unpkg.com/framer-motion@12.16.0/dist/framer-motion.js";
 export default globalThis.Motion;
 const _ = globalThis.Motion;
 export const AnimatePresence = _.AnimatePresence;

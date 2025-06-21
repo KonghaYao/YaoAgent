@@ -1,4 +1,4 @@
-import "https://unpkg.com/chart.js@4.4.9/dist/chart.umd.min.js";
+import "https://unpkg.com/chart.js@4.4.9/dist/chart.umd.js";
 const _ = globalThis.Chart;
 export default _;
 export const instances = _.instances;

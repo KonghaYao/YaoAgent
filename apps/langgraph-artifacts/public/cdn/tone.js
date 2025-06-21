@@ -1,4 +1,4 @@
-import "https://unpkg.com/tone@15.1.22/build/Tone.min.js";
+import "https://unpkg.com/tone@15.1.22/build/Tone.js";
 const _ = globalThis.Tone;
 export default _;
 export const AMOscillator = _.AMOscillator;
