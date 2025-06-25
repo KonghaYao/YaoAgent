@@ -6,3 +6,4 @@ onlyBuiltDependencies:
   - '@rolldown/browser'
   - '@tailwindcss/oxide'
   - esbuild
+  - protobufjs

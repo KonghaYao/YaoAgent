@@ -1,3 +1,4 @@
+import { analyzeImports } from "../utils/analyzeImports.js";
 import { ArtifactDisplay, ArtifactRunResult } from "./Display.js";
 
 export class ReactDisplay extends ArtifactDisplay {
@@ -19,7 +20,14 @@ if(App) {
     `).code;
     }
     async run(code: string): Promise<ArtifactRunResult> {
-        this.injectImportMap(this.importMap);
+        const imports = analyzeImports(code);
+        const importMap = {
+            imports: {
+                ...Object.fromEntries(imports.map((i) => [i, "https://esm.sh/" + i])),
+                ...this.importMap.imports,
+            },
+        };
+        this.injectImportMap(importMap);
         const { code: compiledCode, errors } = this.transformCode(code);
         if (!compiledCode) {
             console.error(errors);

@@ -1,5 +1,6 @@
 import React from "react";
-
+import FlexSearch from "flexsearch";
+console.log(FlexSearch);
 const AINewsSummary = () => {
     const newsData = [
         {
