@@ -1,7 +1,7 @@
 import { atom, computed } from "nanostores";
 import { LangGraphClient, LangGraphClientConfig, RenderMessage, SendMessageOptions } from "../LangGraphClient.js";
 import { AssistantGraph, Message, Thread } from "@langchain/langgraph-sdk";
-import { rafDebounce } from "./rafDebounce.js";
+import { debounce } from "ts-debounce";
 import { ToolRenderData } from "../tool/ToolUI.js";
 import { UnionTool } from "../tool/createTool.js";
 
@@ -97,14 +97,14 @@ export const createChatStore = (
     const refreshGraph = async () => {
         if (showGraph.get()) graphVisualize.set((await client.get()?.graphVisualize()) || null);
     };
-    const updateUI = rafDebounce((newClient: LangGraphClient) => {
+    const updateUI = debounce((newClient: LangGraphClient) => {
         const messages = newClient.renderMessage;
         const lastMessage = messages[messages.length - 1];
 
         currentNodeName.set(lastMessage?.node_name || lastMessage?.name || "__start__");
 
         renderMessages.set(messages);
-    });
+    }, 10);
     /**
      * @zh 初始化 LangGraph 客户端。
      * @en Initializes the LangGraph client.

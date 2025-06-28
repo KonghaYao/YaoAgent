@@ -98,10 +98,10 @@ importers:
         version: 4.7.11
       langchain:
         specifier: ^0.3.26
-        version: 0.3.27(@langchain/anthropic@0.3.19(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/cohere@0.3.3(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56)))(axios@1.9.0(debug@4.4.1))(cheerio@1.0.0)(openai@4.104.0(ws@8.18.2)(zod@3.25.56))(ws@8.18.2)
+        version: 0.3.27(@langchain/anthropic@0.3.19(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/cohere@0.3.3(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56)))(axios@1.9.0)(cheerio@1.0.0)(openai@4.104.0(ws@8.18.2)(zod@3.25.56))(ws@8.18.2)
       langfuse-langchain:
         specifier: ^3.37.2
-        version: 3.37.4(langchain@0.3.27(@langchain/anthropic@0.3.19(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/cohere@0.3.3(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56)))(axios@1.9.0(debug@4.4.1))(cheerio@1.0.0)(openai@4.104.0(ws@8.18.2)(zod@3.25.56))(ws@8.18.2))
+        version: 3.37.4(langchain@0.3.27(@langchain/anthropic@0.3.19(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/cohere@0.3.3(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56)))(axios@1.9.0)(cheerio@1.0.0)(openai@4.104.0(ws@8.18.2)(zod@3.25.56))(ws@8.18.2))
       openai:
         specifier: ^4.100.0
         version: 4.104.0(ws@8.18.2)(zod@3.25.56)
@@ -190,6 +190,9 @@ importers:
       nanostores:
         specifier: ^1.0.1
         version: 1.0.1
+      ts-debounce:
+        specifier: ^4.0.0
+        version: 4.0.0
       zod:
         specifier: ^3.25.17
         version: 3.25.56
@@ -5700,6 +5703,9 @@ packages:
   trough@2.2.0:
     resolution: {integrity: sha512-tmMpK00BjZiUyVyvrBK7knerNgmgvcV/KLVyuma/SC+TQN167GrMRciANTz09+k3zW8L8t60jWO1GpfkZdjTaw==}
 
+  ts-debounce@4.0.0:
+    resolution: {integrity: sha512-+1iDGY6NmOGidq7i7xZGA4cm8DAa6fqdYcvO5Z6yBevH++Bdo9Qt/mN0TzHUgcCcKv1gmh9+W5dHqz8pMWbCbg==}
+
   ts-error@1.0.6:
     resolution: {integrity: sha512-tLJxacIQUM82IR7JO1UUkKlYuUTmoY9HBJAmNWFzheSlDS5SPMcNIepejHJa4BpPQLAcbRhRf3GDJzyj6rbKvA==}
 
@@ -7592,7 +7598,7 @@ snapshots:
       flat: 5.0.2
       ibm-cloud-sdk-core: 5.3.2
       js-yaml: 4.1.0
-      langchain: 0.3.27(@langchain/anthropic@0.3.19(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/cohere@0.3.3(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56)))(axios@1.9.0(debug@4.4.1))(cheerio@1.0.0)(openai@4.104.0(ws@8.18.2)(zod@3.25.56))(ws@8.18.2)
+      langchain: 0.3.27(@langchain/anthropic@0.3.19(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/cohere@0.3.3(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56)))(axios@1.9.0)(cheerio@1.0.0)(openai@4.104.0(ws@8.18.2)(zod@3.25.56))(ws@8.18.2)
       langsmith: 0.3.30(openai@4.104.0(ws@8.18.2)(zod@3.25.56))
       openai: 4.104.0(ws@8.18.2)(zod@3.25.56)
       uuid: 10.0.0
@@ -8987,14 +8993,6 @@ snapshots:
       chai: 5.2.0
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.2.2(vite@6.3.5(@types/node@20.19.0)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.19.4)(yaml@2.8.0))':
-    dependencies:
-      '@vitest/spy': 3.2.2
-      estree-walker: 3.0.3
-      magic-string: 0.30.17
-    optionalDependencies:
-      vite: 6.3.5(@types/node@20.19.0)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.19.4)(yaml@2.8.0)
-
   '@vitest/mocker@3.2.2(vite@6.3.5(@types/node@22.15.30)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.19.4)(yaml@2.8.0))':
     dependencies:
       '@vitest/spy': 3.2.2
@@ -10367,7 +10365,7 @@ snapshots:
       isstream: 0.1.2
       jsonwebtoken: 9.0.2
       mime-types: 2.1.35
-      retry-axios: 2.6.0(axios@1.9.0(debug@4.4.1))
+      retry-axios: 2.6.0(axios@1.9.0)
       tough-cookie: 4.1.4
     transitivePeerDependencies:
       - supports-color
@@ -10663,7 +10661,7 @@ snapshots:
 
   kuler@2.0.0: {}
 
-  langchain@0.3.27(@langchain/anthropic@0.3.19(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/cohere@0.3.3(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56)))(axios@1.9.0(debug@4.4.1))(cheerio@1.0.0)(openai@4.104.0(ws@8.18.2)(zod@3.25.56))(ws@8.18.2):
+  langchain@0.3.27(@langchain/anthropic@0.3.19(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/cohere@0.3.3(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56)))(axios@1.9.0)(cheerio@1.0.0)(openai@4.104.0(ws@8.18.2)(zod@3.25.56))(ws@8.18.2):
     dependencies:
       '@langchain/core': 0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))
       '@langchain/openai': 0.5.12(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56)))(ws@8.18.2)
@@ -10692,9 +10690,9 @@ snapshots:
     dependencies:
       mustache: 4.2.0
 
-  langfuse-langchain@3.37.4(langchain@0.3.27(@langchain/anthropic@0.3.19(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/cohere@0.3.3(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56)))(axios@1.9.0(debug@4.4.1))(cheerio@1.0.0)(openai@4.104.0(ws@8.18.2)(zod@3.25.56))(ws@8.18.2)):
+  langfuse-langchain@3.37.4(langchain@0.3.27(@langchain/anthropic@0.3.19(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/cohere@0.3.3(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56)))(axios@1.9.0)(cheerio@1.0.0)(openai@4.104.0(ws@8.18.2)(zod@3.25.56))(ws@8.18.2)):
     dependencies:
-      langchain: 0.3.27(@langchain/anthropic@0.3.19(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/cohere@0.3.3(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56)))(axios@1.9.0(debug@4.4.1))(cheerio@1.0.0)(openai@4.104.0(ws@8.18.2)(zod@3.25.56))(ws@8.18.2)
+      langchain: 0.3.27(@langchain/anthropic@0.3.19(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/cohere@0.3.3(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56))))(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56)))(axios@1.9.0)(cheerio@1.0.0)(openai@4.104.0(ws@8.18.2)(zod@3.25.56))(ws@8.18.2)
       langfuse: 3.37.4
       langfuse-core: 3.37.4
 
@@ -11904,7 +11902,7 @@ snapshots:
 
   resolve-pkg-maps@1.0.0: {}
 
-  retry-axios@2.6.0(axios@1.9.0(debug@4.4.1)):
+  retry-axios@2.6.0(axios@1.9.0):
     dependencies:
       axios: 1.9.0(debug@4.4.1)
 
@@ -12304,6 +12302,8 @@ snapshots:
 
   trough@2.2.0: {}
 
+  ts-debounce@4.0.0: {}
+
   ts-error@1.0.6: {}
 
   tslib@1.14.1:
@@ -12647,7 +12647,7 @@ snapshots:
     dependencies:
       '@types/chai': 5.2.2
       '@vitest/expect': 3.2.2
-      '@vitest/mocker': 3.2.2(vite@6.3.5(@types/node@20.19.0)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.19.4)(yaml@2.8.0))
+      '@vitest/mocker': 3.2.2(vite@6.3.5(@types/node@22.15.30)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.19.4)(yaml@2.8.0))
       '@vitest/pretty-format': 3.2.2
       '@vitest/runner': 3.2.2
       '@vitest/snapshot': 3.2.2
