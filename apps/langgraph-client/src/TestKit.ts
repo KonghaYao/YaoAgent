@@ -3,7 +3,6 @@ import { Message } from "@langchain/langgraph-sdk";
 import { CallToolResult, UnionTool } from "./tool/createTool.js";
 import { ToolRenderData } from "./tool/ToolUI.js";
 import { createChatStore } from "./ui-store/createChatStore.js";
-
 /**
  * @zh 测试任务接口
  * @en Test task interface
@@ -17,6 +16,27 @@ interface TestTask {
     fail: () => void;
 }
 
+export class TestLogger {
+    info(message: string) {
+        console.log(message);
+    }
+    logMessage(message: RenderMessage) {
+        const emoji = message.type === "ai" ? "🤖" : message.type === "human" ? "👤" : "🔧";
+
+        const header = `${emoji} ${message.type} | ${message.name ?? "null"} | ${message.id}`;
+        if (message.type === "tool") {
+            return `${header}
+🔧 Input: ${message.tool_input?.slice(0, 100) ?? ""}
+💬 Output: ${message.content?.slice(0, 100) ?? ""}
+`;
+        }
+
+        console.log(`---
+${header}
+💬 Output: ${message.content?.slice(0, 100) ?? ""}
+`);
+    }
+}
 /**
  * @zh LangGraph 测试工具，可以配合 vitest 等常用框架进行测试
  * @en LangGraph test tool, can be used with vitest and other common frameworks for testing
@@ -37,7 +57,8 @@ export class TestLangGraphChat {
     private lastLength = 0;
     /** 待处理的测试任务列表 */
     protected processFunc: TestTask[] = [];
-
+    /** 自定义日志器 */
+    private logger: TestLogger;
     /**
      * @zh 构造函数，初始化测试环境
      * @en Constructor, initialize test environment
@@ -47,9 +68,11 @@ export class TestLangGraphChat {
         options: {
             debug?: boolean;
             tools?: UnionTool<any, any, any>[];
+            logger?: TestLogger;
         }
     ) {
         this.debug = options.debug ?? false;
+        this.logger = options.logger ?? new TestLogger();
         options.tools && this.addTools(options.tools);
         const renderMessages = this.store.data.renderMessages;
 
@@ -96,6 +119,22 @@ export class TestLangGraphChat {
     }
 
     /**
+     * @zh 设置额外参数
+     * @en Set extra states to LangGraph
+     *
+     * @example
+     * ```typescript
+     * testChat.setExtraParams({
+     *     extraParam: "value",
+     * });
+     */
+    setExtraParams(extraParams: Record<string, any>) {
+        const client = this.store.data.client.get();
+        if (client) {
+            client.extraParams = extraParams;
+        }
+    }
+    /**
      * @zh 检查所有待处理的测试任务，只有在消息数量发生变化时才执行检查
      * @en Check all pending test tasks, only executes when message count changes
      */
@@ -112,21 +151,22 @@ export class TestLangGraphChat {
         }
 
         // 调试模式下打印最新消息
-        if (this.debug) {
-            console.log(messages[messages.length - (options.skipLengthCheck ? 1 : 2)]);
+        const item = messages[messages.length - (options.skipLengthCheck ? 1 : 2)];
+        if (this.debug && item) {
+            this.logger.logMessage(item);
         }
     }
 
-    private readited = false
+    private readited = false;
     /**
      * @zh 准备测试环境，初始化客户端连接
      * @en Prepare test environment, initialize client connection
      */
     ready() {
         if (this.readited) {
-            return
+            return;
         }
-        this.readited = true
+        this.readited = true;
         return this.store.mutations.initClient();
     }
 
