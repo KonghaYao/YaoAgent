@@ -117,11 +117,16 @@ export class TestLangGraphChat {
         }
     }
 
+    private readited = false
     /**
      * @zh 准备测试环境，初始化客户端连接
      * @en Prepare test environment, initialize client connection
      */
     ready() {
+        if (this.readited) {
+            return
+        }
+        this.readited = true
         return this.store.mutations.initClient();
     }
 
@@ -152,7 +157,9 @@ export class TestLangGraphChat {
                         content: text,
                     },
                 ])
-                .then(() => {
+                .then(async () => {
+                    // messages 有 10 ms 的 debounce，我们需要稍等一下
+                    await new Promise((resolve) => setTimeout(resolve, 20));
                     this.checkAllTask(this.getMessages(), {
                         skipLengthCheck: true,
                     });
