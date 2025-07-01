@@ -25,10 +25,10 @@ export class TestLogger {
 
         const header = `${emoji} ${message.type} | ${message.name ?? "null"} | ${message.id}`;
         if (message.type === "tool") {
-            return `${header}
+            return console.log(`${header}
 🔧 Input: ${message.tool_input?.slice(0, 100) ?? ""}
 💬 Output: ${message.content?.slice(0, 100) ?? ""}
-`;
+`);
         }
 
         console.log(`---
@@ -199,7 +199,7 @@ export class TestLangGraphChat {
                 ])
                 .then(async () => {
                     // messages 有 10 ms 的 debounce，我们需要稍等一下
-                    await new Promise((resolve) => setTimeout(resolve, 20));
+                    await new Promise((resolve) => setTimeout(resolve, 100));
                     this.checkAllTask(this.getMessages(), {
                         skipLengthCheck: true,
                     });
