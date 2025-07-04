@@ -58,4 +58,11 @@ describe("extract", () => {
         });
         expect(text).toContain("OpenAI Responses API");
     });
+    test("should crawl juejin", async () => {
+        const text = await extract({
+            url: "https://juejin.cn/post/7476665749126742025",
+            raw: false,
+        });
+        expect(text).toContain("Juejin");
+    });
 });

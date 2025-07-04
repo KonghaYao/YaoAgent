@@ -110,7 +110,7 @@ export class TestLangGraphChat {
                         this.checkAllTask(this.getMessages(), {
                             skipLengthCheck: true,
                         });
-                    }, 100);
+                    }, 10);
                     return oldExecute!(...args);
                 };
             }

@@ -3,6 +3,8 @@ import { extract } from "./extract.js";
 import { search, SearchSchema } from "./search.js";
 export * from "./extract.js";
 export * from "./search.js";
+export * from "./favicons.js";
+
 async function handleExtractRequest(req: Request): Promise<Response> {
     if (req.method === "POST") {
         let json;

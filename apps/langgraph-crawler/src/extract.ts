@@ -27,9 +27,13 @@ export async function extractReadableContent(html: string, originUrl: string) {
 
 export const getHTMLContent = async (url: string): Promise<string> => {
     const cancelToken = new AbortController();
+    const headers = createCommonHeaders(url);
+    console.log(url, headers);
     const res = await fetch(url, {
-        headers: createCommonHeaders(url),
+        headers,
+        method: "GET",
         signal: cancelToken.signal,
+        redirect: "follow",
     });
     const charset = res.headers
         .get("content-type")
@@ -47,6 +51,7 @@ export const getHTMLContent = async (url: string): Promise<string> => {
 
 export async function extract({ url, raw }: z.infer<typeof ExtractSchema>): Promise<string> {
     const htmlText = await getHTMLContent(url);
+    console.log(htmlText);
     const { content = htmlText, metaData, isPureMarkdown } = await extractReadableContent(htmlText as string, url);
 
     if (raw) {
