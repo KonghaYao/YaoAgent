@@ -28,7 +28,6 @@ export async function extractReadableContent(html: string, originUrl: string) {
 export const getHTMLContent = async (url: string): Promise<string> => {
     const cancelToken = new AbortController();
     const headers = createCommonHeaders(url);
-    console.log(url, headers);
     const res = await fetch(url, {
         headers,
         method: "GET",
