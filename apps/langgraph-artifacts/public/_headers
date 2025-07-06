@@ -3,3 +3,5 @@
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Embedder-Policy: require-corp
   Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=36000, immutable
+  

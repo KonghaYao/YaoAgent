@@ -1,5 +1,6 @@
 import React from "react";
 import FlexSearch from "flexsearch";
+import { Github } from "lucide-react";
 console.log(FlexSearch);
 const AINewsSummary = () => {
     const newsData = [
@@ -58,7 +59,10 @@ const AINewsSummary = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-gray-100 p-8 font-sans">
             <header className="mb-12 text-center">
-                <h1 className="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 drop-shadow-lg animate-pulse">今日AI最新资讯汇总 🚀</h1>
+                <h1 className="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 drop-shadow-lg animate-pulse">
+                    <Github className="w-10 h-10" />
+                    今日AI最新资讯汇总 🚀
+                </h1>
                 <p className="text-2xl mt-4 text-gray-400">每日精选，洞察人工智能前沿动态</p>
             </header>
 
