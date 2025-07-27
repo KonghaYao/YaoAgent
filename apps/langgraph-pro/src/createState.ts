@@ -35,3 +35,18 @@ export const createDefaultAnnotation = <T>(defaultValue: () => T) =>
         reducer: (_, a) => a,
         default: defaultValue,
     });
+
+/**
+ * 创建一个数组注解
+ * @example
+ * const state = createState().build({
+ *   current_plan: createArrayAnnotation<Plan>(),
+ *   current_tags: createArrayAnnotation<Plan>(() => ['tag1', 'tag2']),
+ * });
+ */
+export const createArrayAnnotation = <T>(defaultValue?: T[] | (() => T[])) => {
+    return Annotation<T[]>({
+        reducer: (x, y) => x.concat(y),
+        default: () => (defaultValue ? (typeof defaultValue === "function" ? defaultValue() : defaultValue) : []),
+    });
+};

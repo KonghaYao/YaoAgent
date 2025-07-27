@@ -1,6 +1,6 @@
 {
     "name": "@langgraph-js/pro",
-    "version": "1.7.2",
+    "version": "1.8.0",
     "description": "The Pro SDK for LangGraph - seamlessly integrate your AI agents with frontend interfaces and build complex AI workflows",
     "main": "dist/index.js",
     "type": "module",
