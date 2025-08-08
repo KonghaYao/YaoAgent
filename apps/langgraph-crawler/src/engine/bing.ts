@@ -13,7 +13,7 @@ export const BingEngine: SearchEngine = {
     name: "bing",
     topic: "general",
     search: async (query) => {
-        const html = await getHTMLContent(`https://cn.bing.com/search?q=${encodeURIComponent(query)}`);
+        const html = await getHTMLContent(`https://www.bing.com/search?q=${encodeURIComponent(query)}`);
         const doc = new DOMParser().parseFromString(html, "text/html");
 
         const results: SearchResult[] = [];

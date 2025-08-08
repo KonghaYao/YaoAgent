@@ -50,7 +50,6 @@ export const getHTMLContent = async (url: string): Promise<string> => {
 
 export async function extract({ url, raw }: z.infer<typeof ExtractSchema>): Promise<string> {
     const htmlText = await getHTMLContent(url);
-    console.log(htmlText);
     const { content = htmlText, metaData, isPureMarkdown } = await extractReadableContent(htmlText as string, url);
 
     if (raw) {
