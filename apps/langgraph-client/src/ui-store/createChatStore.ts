@@ -117,6 +117,7 @@ export const createChatStore = (
         // await newClient.createThread();
         inChatError.set(null);
         newClient.onStreamingUpdate((event) => {
+            currentChatId.set(newClient.getCurrentThread()?.thread_id || null);
             if (event.type === "start") loading.set(true);
             if (event.type === "thread" || event.type === "done") {
                 // console.log(event.data);
