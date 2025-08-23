@@ -14,6 +14,7 @@ import { History, Network, LogOut, FileJson, Code } from "lucide-react";
 import { ArtifactViewer } from "../artifacts/ArtifactViewer";
 import "github-markdown-css/github-markdown.css";
 import { ArtifactsProvider, useArtifacts } from "../artifacts/ArtifactsContext";
+import "./index.css";
 
 const ChatMessages: React.FC = () => {
     const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse, isFELocking } = useChat();
@@ -28,12 +29,11 @@ const ChatMessages: React.FC = () => {
         const scrollPosition = container.scrollTop + container.clientHeight;
         const scrollHeight = container.scrollHeight;
 
-        // 当距离底部不超过容器高度的 30% 时，认为足够接近底部
-        return scrollHeight - scrollPosition <= container.clientHeight * 0.3;
+        return scrollHeight - scrollPosition <= 50;
     };
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
     };
 
     useEffect(() => {
@@ -66,7 +66,7 @@ const ChatMessages: React.FC = () => {
 };
 
 const ChatInput: React.FC = () => {
-    const { userInput, setUserInput, loading, sendMessage, stopGeneration, currentAgent, setCurrentAgent, client } = useChat();
+    const { userInput, setUserInput, loading, sendMessage, stopGeneration, currentAgent, setCurrentAgent, client, currentChatId } = useChat();
     const { extraParams } = useExtraParams();
     const [imageUrls, setImageUrls] = useState<string[]>([]);
 
@@ -148,8 +148,9 @@ const ChatInput: React.FC = () => {
                     {loading ? "中断" : "发送"}
                 </button>
             </div>
-            <div className="flex border-b border-gray-200 mt-4">
+            <div className="flex border-b border-gray-200 mt-4 gap-2 justify-between">
                 <UsageMetadata usage_metadata={client?.tokenCounter || {}} />
+                <span className="text-sm text-gray-500">会话 ID: {currentChatId}</span>
             </div>
         </div>
     );
@@ -162,7 +163,7 @@ const Chat: React.FC = () => {
     const { showArtifact, setShowArtifact } = useArtifacts();
 
     return (
-        <div className="flex h-full w-full overflow-hidden">
+        <div className="langgraph-chat-container flex h-full w-full overflow-hidden">
             {showHistory && <HistoryList onClose={() => toggleHistoryVisible()} formatTime={formatTime} />}
             <div className="flex-1 flex flex-col overflow-auto">
                 <div className="flex items-center gap-2 p-4 border-b border-gray-200 justify-end h-16">

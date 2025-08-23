@@ -1,0 +1,4 @@
+.langgraph-chat-container .token-line {
+    white-space: pre-wrap;
+    overflow: hidden;
+}
