@@ -55,6 +55,7 @@ export type SendMessageOptions = {
     extraParams?: Record<string, any>;
     _debug?: { streamResponse?: any };
     command?: Command;
+    joinRunId?: string;
 };
 export interface LangGraphClientConfig {
     apiUrl?: string;
@@ -182,7 +183,7 @@ export class LangGraphClient extends Client {
         await this.initAssistant(agent);
         this.currentThread = await this.threads.get(threadId);
         this.graphState = this.currentThread.values;
-        this.graphMessages = this.graphState.messages;
+        this.graphMessages = this.graphState?.messages || [];
         this.emitStreamingUpdate({
             type: "value",
             data: {
@@ -192,6 +193,15 @@ export class LangGraphClient extends Client {
                 },
             },
         });
+        return this.currentThread;
+    }
+    // 从历史中恢复时，应该恢复流式状态
+    async resetStream() {
+        const runs = await this.runs.list(this.currentThread!.thread_id);
+        const runningRun = runs?.find((run) => run.status === "running" || run.status === "pending");
+        if (runningRun) {
+            await this.sendMessage([], { joinRunId: runningRun.run_id });
+        }
     }
 
     streamingMessage: RenderMessage[] = [];
@@ -432,7 +442,7 @@ export class LangGraphClient extends Client {
      * @zh 发送消息到 LangGraph 后端。
      * @en Sends a message to the LangGraph backend.
      */
-    async sendMessage(input: string | Message[], { extraParams, _debug, command }: SendMessageOptions = {}) {
+    async sendMessage(input: string | Message[], { joinRunId, extraParams, _debug, command }: SendMessageOptions = {}) {
         if (!this.currentAssistant) {
             throw new Error("Thread or Assistant not initialized");
         }
@@ -457,20 +467,29 @@ export class LangGraphClient extends Client {
                       content: input,
                   } as HumanMessage,
               ];
-        const streamResponse =
-            _debug?.streamResponse ||
-            this.runs.stream(this.currentThread!.thread_id, this.currentAssistant.assistant_id, {
+        const createStreamResponse = async () => {
+            if (_debug?.streamResponse) {
+                return _debug.streamResponse;
+            }
+            if (joinRunId) {
+                return this.runs.joinStream(this.currentThread!.thread_id, joinRunId);
+            }
+
+            return this.runs.stream(this.currentThread!.thread_id, this.currentAssistant!.assistant_id, {
                 input: {
                     ...this.graphState,
                     ...this.extraParams,
                     ...(extraParams || {}),
                     messages: messagesToSend,
-                    fe_tools: await this.tools.toJSON(this.currentAssistant.graph_id),
+                    fe_tools: await this.tools.toJSON(this.currentAssistant!.graph_id),
                 },
                 streamMode: ["messages", "values"],
                 streamSubgraphs: true,
                 command,
             });
+        };
+        const streamResponse = await createStreamResponse();
+
         const streamRecord: any[] = [];
         this.emitStreamingUpdate({
             type: "start",

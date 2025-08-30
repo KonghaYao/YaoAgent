@@ -289,14 +289,18 @@ export const createChatStore = (
              * @zh 切换到指定的历史聊天会话。
              * @en Switches to the specified historical chat session.
              */
-            toHistoryChat(
+            async toHistoryChat(
                 thread: Thread<{
                     messages: Message[];
                 }>
             ) {
                 inChatError.set(null);
                 loading.set(false);
-                client.get()?.resetThread(thread.metadata?.graph_id as string, thread.thread_id);
+                const nowThread = await client.get()?.resetThread(thread.metadata?.graph_id as string, thread.thread_id);
+                if (nowThread) {
+                    client.get()?.resetStream();
+                }
+                return nowThread;
             },
             /**
              * @zh 删除指定的历史聊天会话。
