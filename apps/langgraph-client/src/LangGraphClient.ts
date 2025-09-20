@@ -307,7 +307,7 @@ export class LangGraphClient extends Client {
         if (!origin_task_store) return messages;
 
         const task_store = JSON.parse(JSON.stringify(origin_task_store));
-        console.log(messages);
+
         /** 获取 subAgent 消息的 id，用于流式过程中对数据进行标记 */
         messages
             .filter((i) => {

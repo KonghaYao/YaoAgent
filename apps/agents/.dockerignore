@@ -1,9 +1,0 @@
-node_modules
-dist
-.turbo
-.env
-.env.local
-.env.development.local
-.env.test.local
-.langgraph_api
-.docker
