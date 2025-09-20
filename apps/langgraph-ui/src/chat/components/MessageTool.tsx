@@ -5,6 +5,7 @@ import { useChat } from "../context/ChatContext";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Highlight, themes } from "prism-react-renderer";
+import { MessagesBox } from "./MessageBox";
 
 const TOOL_COLORS = ["border-red-400", "border-blue-400", "border-green-500", "border-yellow-400", "border-purple-400", "border-pink-400", "border-indigo-400"];
 
@@ -55,6 +56,11 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, client, getMessageCo
                             />
                         </div>
                     )}
+                </div>
+            )}
+            {message.sub_agent_messages && (
+                <div className="flex flex-col pl-4 py-2 border-l border-gray-300">
+                    <MessagesBox renderMessages={message.sub_agent_messages} collapsedTools={[]} toggleToolCollapse={(id) => {}} client={client} />
                 </div>
             )}
         </div>

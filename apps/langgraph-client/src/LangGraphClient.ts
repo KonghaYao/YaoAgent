@@ -35,6 +35,7 @@ export type RenderMessage = Message & {
             };
         }[];
     };
+    sub_agent_messages?: RenderMessage[];
     usage_metadata?: {
         total_tokens: number;
         input_tokens: number;
@@ -102,6 +103,8 @@ export class LangGraphClient extends Client {
     private streamingCallbacks: Set<StreamingUpdateCallback> = new Set();
     tools: ToolManager = new ToolManager();
     stopController: AbortController | null = null;
+    /** 用于存储 subAgent 状态数据的键 */
+    subAgentsKey = "task_store";
 
     constructor(config: LangGraphClientConfig) {
         super(config);
@@ -296,7 +299,54 @@ export class LangGraphClient extends Client {
             }
         }
 
-        return this.attachInfoForMessage(this.composeToolMessages(result as RenderMessage[]));
+        return this.convertSubAgentMessages(this.attachInfoForMessage(this.composeToolMessages(result as RenderMessage[])));
+    }
+    /** 转换 subAgent 消息为工具的子消息 */
+    private convertSubAgentMessages(messages: RenderMessage[]) {
+        const origin_task_store = this.graphState[this.subAgentsKey];
+        if (!origin_task_store) return messages;
+
+        const task_store = JSON.parse(JSON.stringify(origin_task_store));
+        console.log(messages);
+        /** 获取 subAgent 消息的 id，用于流式过程中对数据进行标记 */
+        messages
+            .filter((i) => {
+                return i.node_name?.startsWith("subagent_");
+            })
+            .forEach((i) => {
+                const tool_call_id = i.node_name!.replace("subagent_", "");
+                const store = task_store[tool_call_id];
+                if (store) {
+                    // 根据 id 进行去重
+                    const exists = (store.messages as RenderMessage[]).some((msg) => msg.id === i.id);
+                    if (!exists) {
+                        (store.messages as RenderMessage[]).push(i);
+                    }
+                } else {
+                    task_store[tool_call_id] = {
+                        messages: [i],
+                    };
+                }
+            });
+
+        const ignoreIds = new Set<string>();
+        Object.values(task_store).forEach((task: any) => {
+            task.messages.forEach((message: RenderMessage) => {
+                ignoreIds.add(message.id!);
+            });
+        });
+        const result: RenderMessage[] = [];
+        for (const message of messages) {
+            if (message.type === "tool" && message.tool_call_id) {
+                const task = task_store[message.tool_call_id];
+                if (task) {
+                    message.sub_agent_messages = this.attachInfoForMessage(this.composeToolMessages(task.messages));
+                }
+            }
+            if (message.id && ignoreIds.has(message.id)) continue;
+            result.push(message);
+        }
+        return result;
     }
     /**
      * @zh 为消息附加额外的信息，如耗时、唯一 ID 等。
