@@ -1,9 +1,10 @@
 import { atom, computed } from "nanostores";
 import { LangGraphClient, LangGraphClientConfig, RenderMessage, SendMessageOptions } from "../LangGraphClient.js";
-import { AssistantGraph, Message, Thread } from "@langchain/langgraph-sdk";
+import { AssistantGraph, Client, Message, Thread } from "@langchain/langgraph-sdk";
 import { debounce } from "ts-debounce";
 import { ToolRenderData } from "../tool/ToolUI.js";
 import { UnionTool } from "../tool/createTool.js";
+import { createLangGraphServerClient } from "../client/LanggraphServer.js";
 
 /**
  * @zh 格式化日期对象为时间字符串。
@@ -110,29 +111,48 @@ export const createChatStore = (
      * @en Initializes the LangGraph client.
      */
     async function initClient() {
-        const newClient = new LangGraphClient(config);
+        const newClient = new LangGraphClient({
+            ...config,
+            client: config.client ?? (await createLangGraphServerClient()),
+        });
         await newClient.initAssistant(currentAgent.get());
         currentAgent.set(newClient.getCurrentAssistant()!.graph_id);
         // 不再需要创建，sendMessage 会自动创建
         // await newClient.createThread();
         inChatError.set(null);
-        newClient.onStreamingUpdate((event) => {
-            currentChatId.set(newClient.getCurrentThread()?.thread_id || null);
-            if (event.type === "start") loading.set(true);
-            if (event.type === "thread" || event.type === "done") {
-                // console.log(event.data);
-                // 创建新流程时，默认为 __start__
-                currentNodeName.set("__start__");
-                if (event.type === "done") loading.set(false);
-                // 创建新会话时，需要自动刷新历史面板
-                return refreshHistoryList();
-            }
-            if (event.type === "error") {
-                loading.set(false);
-                inChatError.set(event.data);
-            }
-            // console.log(newClient.renderMessage);
+        // 监听流开始事件
+        newClient.on("start", () => {
+            loading.set(true);
+        });
 
+        // 监听 Thread 创建和流完成事件
+        newClient.on("thread", () => {
+            currentChatId.set(newClient.getCurrentThread()?.thread_id || null);
+            // 创建新流程时，默认为 __start__
+            currentNodeName.set("__start__");
+            // 创建新会话时，需要自动刷新历史面板
+            refreshHistoryList();
+        });
+
+        newClient.on("done", () => {
+            loading.set(false);
+            updateUI(newClient);
+        });
+
+        // 监听错误事件
+        newClient.on("error", (event) => {
+            loading.set(false);
+            inChatError.set(event.data);
+        });
+
+        // 监听消息和值更新事件
+        newClient.on("message", () => {
+            currentChatId.set(newClient.getCurrentThread()?.thread_id || null);
+            updateUI(newClient);
+        });
+
+        newClient.on("value", () => {
+            currentChatId.set(newClient.getCurrentThread()?.thread_id || null);
             updateUI(newClient);
         });
         context.onInit?.(newClient);
@@ -196,8 +216,8 @@ export const createChatStore = (
     const refreshHistoryList = async () => {
         if (!client.get() || !showHistory.get()) return;
         try {
-            const response = await client.get()?.listThreads<{ messages: Message[] }>();
-            historyList.set(response || []);
+            const response = await client.get()?.listThreads();
+            historyList.set((response as Thread<{ messages: Message[] }>[]) || []);
         } catch (error) {
             console.error("Failed to fetch threads:", error);
         }
@@ -307,7 +327,7 @@ export const createChatStore = (
              * @en Deletes the specified historical chat session.
              */
             async deleteHistoryChat(thread: Thread<{ messages: Message[] }>) {
-                await client.get()?.threads.delete(thread.thread_id);
+                await client.get()?.deleteThread(thread.thread_id);
                 await refreshHistoryList();
             },
             getToolUIRender,

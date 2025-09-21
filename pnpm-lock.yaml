@@ -75,6 +75,9 @@ importers:
       '@langchain/langgraph-sdk':
         specifier: ^0.0.77
         version: 0.0.77(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.56)))(react@19.1.0)
+      eventemitter3:
+        specifier: ^5.0.1
+        version: 5.0.1
       jsonrepair:
         specifier: ^3.12.0
         version: 3.12.0
@@ -246,6 +249,9 @@ importers:
       comlink:
         specifier: ^4.4.2
         version: 4.4.2
+      eventemitter3:
+        specifier: ^5.0.1
+        version: 5.0.1
       github-markdown-css:
         specifier: ^5.8.1
         version: 5.8.1
@@ -2094,6 +2100,9 @@ packages:
 
   eventemitter3@4.0.7:
     resolution: {integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==}
+
+  eventemitter3@5.0.1:
+    resolution: {integrity: sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==}
 
   eventsource-parser@3.0.2:
     resolution: {integrity: sha512-6RxOBZ/cYgd8usLwsEl+EC09Au/9BcmCKYF2/xbml6DNczf7nv0MQb+7BA2F+li6//I+28VNlQR37XfQtcAJuA==}
@@ -5610,6 +5619,8 @@ snapshots:
   event-target-shim@5.0.1: {}
 
   eventemitter3@4.0.7: {}
+
+  eventemitter3@5.0.1: {}
 
   eventsource-parser@3.0.2: {}
 

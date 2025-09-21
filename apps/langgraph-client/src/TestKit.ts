@@ -1,5 +1,5 @@
 import { RenderMessage } from "./LangGraphClient.js";
-import { Message } from "@langchain/langgraph-sdk";
+import type { Message } from "@langchain/langgraph-sdk";
 import { CallToolResult, UnionTool } from "./tool/createTool.js";
 import { ToolRenderData } from "./tool/ToolUI.js";
 import { createChatStore } from "./ui-store/createChatStore.js";

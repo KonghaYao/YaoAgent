@@ -1,25 +1,10 @@
-import { Client, Thread, Message, Assistant, HumanMessage, AIMessage, ToolMessage, Command } from "@langchain/langgraph-sdk";
+import type { Thread, Message, Assistant, HumanMessage, AIMessage, ToolMessage, Command } from "@langchain/langgraph-sdk";
+import { EventEmitter } from "eventemitter3";
 import { ToolManager } from "./ToolManager.js";
 import { CallToolResult } from "./tool/createTool.js";
-interface AsyncCallerParams {
-    /**
-     * The maximum number of concurrent calls that can be made.
-     * Defaults to `Infinity`, which means no limit.
-     */
-    maxConcurrency?: number;
-    /**
-     * The maximum number of retries that can be made for a single call,
-     * with an exponential backoff between each attempt. Defaults to 6.
-     */
-    maxRetries?: number;
-    onFailedResponseHook?: any;
-    /**
-     * Specify a custom fetch implementation.
-     *
-     * By default we expect the `fetch` is available in the global scope.
-     */
-    fetch?: typeof fetch | ((...args: any[]) => any);
-}
+import { ILangGraphClient } from "./types.js";
+import { MessageProcessor } from "./MessageProcessor.js";
+
 export type RenderMessage = Message & {
     /** 对于 AIMessage 来说是节点名称，对于工具节点来说是工具名称 */
     name?: string;
@@ -61,53 +46,81 @@ export type SendMessageOptions = {
 export interface LangGraphClientConfig {
     apiUrl?: string;
     apiKey?: string;
-    callerOptions?: AsyncCallerParams;
+    callerOptions?: {
+        /**
+         * The maximum number of concurrent calls that can be made.
+         * Defaults to `Infinity`, which means no limit.
+         */
+        maxConcurrency?: number;
+        /**
+         * The maximum number of retries that can be made for a single call,
+         * with an exponential backoff between each attempt. Defaults to 6.
+         */
+        maxRetries?: number;
+        onFailedResponseHook?: any;
+        /**
+         * Specify a custom fetch implementation.
+         *
+         * By default we expect the `fetch` is available in the global scope.
+         */
+        fetch?: typeof fetch | ((...args: any[]) => any);
+    };
     timeoutMs?: number;
     defaultHeaders?: Record<string, string | null | undefined>;
+    /** 自定义客户端实现，如果不提供则使用官方 Client */
+    client: ILangGraphClient;
 }
 
-/**
- * @zh StreamingMessageType 类用于判断消息的类型。
- * @en The StreamingMessageType class is used to determine the type of a message.
- */
-export class StreamingMessageType {
-    static isUser(m: Message): m is HumanMessage {
-        return m.type === "human";
-    }
-    static isTool(m: Message): m is ToolMessage {
-        return m.type === "tool";
-    }
-    static isAssistant(m: Message): m is AIMessage {
-        return m.type === "ai" && !this.isToolAssistant(m);
-    }
-    static isToolAssistant(m: Message): m is AIMessage {
-        /** @ts-ignore */
-        return m.type === "ai" && (m.tool_calls?.length || m.tool_call_chunks?.length);
-    }
+// 定义事件数据类型
+export interface LangGraphEvents {
+    /** 流开始事件 */
+    start: { event: "start" };
+    /** 消息部分更新事件 */
+    message: { event: "messages/partial"; data: Message[] };
+    /** 值更新事件 */
+    value: { event: "messages/partial" | "values"; data: { messages?: Message[] } };
+    /** 错误事件 */
+    error: { event: "error"; data: any };
+    /** Thread 创建事件 */
+    thread: { event: "thread/create"; data: { thread: Thread } };
+    /** 流完成事件 */
+    done: { event: "done" };
 }
-
-type StreamingUpdateEvent = {
-    type: "message" | "value" | "update" | "error" | "thread" | "done" | "start";
-    data: any;
-};
-
-type StreamingUpdateCallback = (event: StreamingUpdateEvent) => void;
 
 /**
  * @zh LangGraphClient 类是与 LangGraph 后端交互的主要客户端。
  * @en The LangGraphClient class is the main client for interacting with the LangGraph backend.
  */
-export class LangGraphClient extends Client {
+export class LangGraphClient<TStateType = unknown, TUpdateType = TStateType> extends EventEmitter<LangGraphEvents> {
+    private client: ILangGraphClient<TStateType, TUpdateType>;
     private currentAssistant: Assistant | null = null;
-    private currentThread: Thread | null = null;
-    private streamingCallbacks: Set<StreamingUpdateCallback> = new Set();
+    private currentThread: Thread<TStateType> | null = null;
     tools: ToolManager = new ToolManager();
     stopController: AbortController | null = null;
     /** 用于存储 subAgent 状态数据的键 */
     subAgentsKey = "task_store";
+    /** Message 处理器 */
+    private messageProcessor: MessageProcessor;
 
     constructor(config: LangGraphClientConfig) {
-        super(config);
+        super();
+        this.client = config.client;
+        this.messageProcessor = new MessageProcessor(this.subAgentsKey);
+    }
+
+    /** 代理 assistants 属性到内部 client */
+    get assistants() {
+        return this.client.assistants;
+    }
+
+    /** 代理 threads 属性到内部 client */
+    get threads() {
+        return this.client.threads;
+    }
+
+    /** 代理 runs 属性到内部 client */
+    get runs() {
+        return this.client.runs;
     }
     availableAssistants: Assistant[] = [];
     private listAssistants() {
@@ -127,7 +140,7 @@ export class LangGraphClient extends Client {
             this.availableAssistants = assistants;
             if (assistants.length > 0) {
                 if (agentName) {
-                    this.currentAssistant = assistants.find((assistant) => assistant.graph_id === agentName) || null;
+                    this.currentAssistant = assistants.find((assistant: any) => assistant.graph_id === agentName) || null;
                     if (!this.currentAssistant) {
                         throw new Error("Agent not found: " + agentName);
                     }
@@ -164,7 +177,7 @@ export class LangGraphClient extends Client {
     }
 
     graphVisualize() {
-        return this.assistants.getGraph(this.currentAssistant?.assistant_id!, {
+        return this.assistants.getGraph((this.currentAssistant as any)?.assistant_id!, {
             xray: true,
         });
     }
@@ -172,10 +185,13 @@ export class LangGraphClient extends Client {
      * @zh 列出所有的 Thread。
      * @en Lists all Threads.
      */
-    async listThreads<T>() {
-        return this.threads.search<T>({
+    async listThreads() {
+        return this.threads.search({
             sortOrder: "desc",
         });
+    }
+    async deleteThread(threadId: string) {
+        return this.threads.delete(threadId);
     }
 
     /**
@@ -185,249 +201,42 @@ export class LangGraphClient extends Client {
     async resetThread(agent: string, threadId: string) {
         await this.initAssistant(agent);
         this.currentThread = await this.threads.get(threadId);
-        this.graphState = this.currentThread.values;
-        this.graphMessages = this.graphState?.messages || [];
-        this.emitStreamingUpdate({
-            type: "value",
+        this.graphState = (this.currentThread as any).values;
+        const graphMessages = this.graphState?.messages || [];
+        this.messageProcessor.setGraphMessages(graphMessages);
+        this.emit("value", {
+            event: "messages/partial",
             data: {
-                event: "messages/partial",
-                data: {
-                    messages: this.graphMessages,
-                },
+                messages: this.messageProcessor.getGraphMessages(),
             },
         });
         return this.currentThread;
     }
     // 从历史中恢复时，应该恢复流式状态
     async resetStream() {
-        const runs = await this.runs.list(this.currentThread!.thread_id);
-        const runningRun = runs?.find((run) => run.status === "running" || run.status === "pending");
+        const runs = await this.runs.list((this.currentThread as any)!.thread_id);
+        const runningRun = runs?.find((run: any) => run.status === "running" || run.status === "pending");
         if (runningRun) {
             await this.sendMessage([], { joinRunId: runningRun.run_id });
         }
     }
 
-    streamingMessage: RenderMessage[] = [];
-    /** 图发过来的更新信息 */
-    graphMessages: RenderMessage[] = [];
     cloneMessage(message: Message): Message {
-        return JSON.parse(JSON.stringify(message));
-    }
-    private updateStreamingMessage(message: RenderMessage) {
-        const lastMessage = this.streamingMessage[this.streamingMessage.length - 1];
-        if (!lastMessage?.id || message.id !== lastMessage.id) {
-            this.streamingMessage.push(message);
-            return;
-        }
-        this.streamingMessage[this.streamingMessage.length - 1] = message;
-    }
-    /** 将 graphMessages 和 streamingMessage 合并，并返回新的消息数组 */
-    private combineGraphMessagesWithStreamingMessages() {
-        const idMap = new Map<string, RenderMessage>(this.streamingMessage.map((i) => [i.id!, i]));
-        return [
-            ...this.graphMessages.map((i) => {
-                if (idMap.has(i.id!)) {
-                    const newValue = idMap.get(i.id!)!;
-                    idMap.delete(i.id!);
-                    return newValue;
-                }
-                return i;
-            }),
-            ...idMap.values(),
-        ];
+        return this.messageProcessor.cloneMessage(message);
     }
     /**
      * @zh 用于 UI 中的流式渲染中的消息。
      * @en Messages used for streaming rendering in the UI.
      */
     get renderMessage() {
-        const previousMessage = new Map<string, Message>();
-        const closedToolCallIds = new Set<string>();
-        const result: Message[] = [];
-        const inputMessages = this.combineGraphMessagesWithStreamingMessages();
-        // console.log(inputMessages);
-        // 从后往前遍历，这样可以保证最新的消息在前面
-        for (let i = inputMessages.length - 1; i >= 0; i--) {
-            const message = this.cloneMessage(inputMessages[i]);
-
-            if (!message.id) {
-                result.unshift(message);
-                continue;
-            }
-            if (message.type === "ai") {
-                /** @ts-ignore */
-                if (!message.name) message.name = this.getGraphNodeNow().name;
-            }
-            if (StreamingMessageType.isToolAssistant(message)) {
-                const m = message;
-                // 记录这个 id 的消息，并添加到结果中
-                previousMessage.set(message.id, m);
-
-                /** @ts-ignore */
-                const tool_calls: NonNullable<AIMessage["tool_calls"]> = (m as AIMessage).tool_calls?.length ? (m as AIMessage).tool_calls : (m as RenderMessage).tool_call_chunks;
-                const new_tool_calls = tool_calls
-                    .filter((i) => {
-                        return !closedToolCallIds.has(i.id!);
-                    })!
-                    .map((tool, index) => {
-                        return {
-                            type: "tool",
-                            additional_kwargs: {},
-                            /** @ts-ignore */
-                            tool_input: m.additional_kwargs?.tool_calls?.[index]?.function?.arguments,
-                            id: tool.id,
-                            name: tool.name,
-                            response_metadata: {},
-                            tool_call_id: tool.id!,
-                            content: "",
-                        } as ToolMessage;
-                    });
-                for (const tool of new_tool_calls) {
-                    if (!previousMessage.has(tool.id!)) {
-                        result.unshift(tool);
-                        previousMessage.set(tool.id!, tool);
-                    }
-                }
-                result.unshift(m);
-            } else {
-                if (message.type === "tool" && message.tool_call_id) {
-                    closedToolCallIds.add(message.tool_call_id);
-                }
-
-                previousMessage.set(message.id, message);
-                result.unshift(message);
-            }
-        }
-
-        return this.convertSubAgentMessages(this.attachInfoForMessage(this.composeToolMessages(result as RenderMessage[])));
-    }
-    /** 转换 subAgent 消息为工具的子消息 */
-    private convertSubAgentMessages(messages: RenderMessage[]) {
-        const origin_task_store = this.graphState[this.subAgentsKey];
-        if (!origin_task_store) return messages;
-
-        const task_store = JSON.parse(JSON.stringify(origin_task_store));
-
-        /** 获取 subAgent 消息的 id，用于流式过程中对数据进行标记 */
-        messages
-            .filter((i) => {
-                return i.node_name?.startsWith("subagent_");
-            })
-            .forEach((i) => {
-                const tool_call_id = i.node_name!.replace("subagent_", "");
-                const store = task_store[tool_call_id];
-                if (store) {
-                    // 根据 id 进行去重
-                    const exists = (store.messages as RenderMessage[]).some((msg) => msg.id === i.id);
-                    if (!exists) {
-                        (store.messages as RenderMessage[]).push(i);
-                    }
-                } else {
-                    task_store[tool_call_id] = {
-                        messages: [i],
-                    };
-                }
-            });
-
-        const ignoreIds = new Set<string>();
-        Object.values(task_store).forEach((task: any) => {
-            task.messages.forEach((message: RenderMessage) => {
-                ignoreIds.add(message.id!);
-            });
-        });
-        const result: RenderMessage[] = [];
-        for (const message of messages) {
-            if (message.type === "tool" && message.tool_call_id) {
-                const task = task_store[message.tool_call_id];
-                if (task) {
-                    message.sub_agent_messages = this.attachInfoForMessage(this.composeToolMessages(task.messages));
-                }
-            }
-            if (message.id && ignoreIds.has(message.id)) continue;
-            result.push(message);
-        }
-        return result;
-    }
-    /**
-     * @zh 为消息附加额外的信息，如耗时、唯一 ID 等。
-     * @en Attaches additional information to messages, such as spend time, unique ID, etc.
-     */
-    private attachInfoForMessage(result: RenderMessage[]) {
-        let lastMessage: RenderMessage | null = null;
-        for (const message of result) {
-            const createTime = message.response_metadata?.create_time || "";
-            // 工具必须要使用 tool_call_id 来保证一致性
-            message.unique_id = message.tool_call_id! || message.id!;
-
-            message.spend_time = new Date(createTime).getTime() - new Date(lastMessage?.response_metadata?.create_time || createTime).getTime();
-            if (!message.usage_metadata && (message as AIMessage).response_metadata?.usage) {
-                const usage = (message as AIMessage).response_metadata!.usage as {
-                    prompt_tokens: number;
-                    completion_tokens: number;
-                    total_tokens: number;
-                };
-                message.usage_metadata = {
-                    ...usage,
-                    input_tokens: usage.prompt_tokens,
-                    output_tokens: usage.completion_tokens,
-                    total_tokens: usage.total_tokens,
-                };
-            }
-            lastMessage = message;
-        }
-        return result;
-    }
-    /**
-     * @zh 组合工具消息，将 AI 的工具调用和工具的执行结果关联起来。
-     * @en Composes tool messages, associating AI tool calls with tool execution results.
-     */
-    private composeToolMessages(messages: RenderMessage[]): RenderMessage[] {
-        const result: RenderMessage[] = [];
-        const assistantToolMessages = new Map<string, { args: string }>();
-        const toolParentMessage = new Map<string, RenderMessage>();
-        for (const message of messages) {
-            if (StreamingMessageType.isToolAssistant(message)) {
-                /** @ts-ignore 只有 tool_call_chunks 的 args 才是文本 */
-                (message.tool_calls || message.tool_call_chunks)?.forEach((element) => {
-                    assistantToolMessages.set(element.id!, element);
-                    toolParentMessage.set(element.id!, message);
-                });
-                if (!message.content) continue;
-            }
-            if (StreamingMessageType.isTool(message) && !message.tool_input) {
-                const assistantToolMessage = assistantToolMessages.get(message.tool_call_id!);
-                const parentMessage = toolParentMessage.get(message.tool_call_id!);
-                if (assistantToolMessage) {
-                    message.tool_input = typeof assistantToolMessage.args !== "string" ? JSON.stringify(assistantToolMessage.args) : assistantToolMessage.args;
-                    if (message.additional_kwargs) {
-                        message.additional_kwargs.done = true;
-                        message.done = true;
-                    } else {
-                        message.done = true;
-                        message.additional_kwargs = {
-                            done: true,
-                        };
-                    }
-                }
-                if (parentMessage) {
-                    message.usage_metadata = parentMessage.usage_metadata;
-                    message.node_name = parentMessage.name;
-                    // 修补特殊情况下，tool name 丢失的问题
-                    if (!message.name) {
-                        message.name = (parentMessage as AIMessage).tool_calls!.find((i) => i.id === message.tool_call_id)?.name;
-                    }
-                }
-            }
-            result.push(message);
-        }
-        return result;
+        return this.messageProcessor.renderMessages(this.graphState, () => this.getGraphNodeNow());
     }
     /**
      * @zh 获取 Token 计数器信息。
      * @en Gets the Token counter information.
      */
     get tokenCounter() {
-        return this.graphMessages.reduce(
+        return this.messageProcessor.getGraphMessages().reduce(
             (acc, message) => {
                 if (message.usage_metadata) {
                     acc.total_tokens += message.usage_metadata?.total_tokens || 0;
@@ -454,20 +263,6 @@ export class LangGraphClient extends Client {
         );
     }
 
-    /**
-     * @zh 注册流式更新的回调函数。
-     * @en Registers a callback function for streaming updates.
-     */
-    onStreamingUpdate(callback: StreamingUpdateCallback) {
-        this.streamingCallbacks.add(callback);
-        return () => {
-            this.streamingCallbacks.delete(callback);
-        };
-    }
-
-    private emitStreamingUpdate(event: StreamingUpdateEvent) {
-        this.streamingCallbacks.forEach((callback) => callback(event));
-    }
     /** 前端工具人机交互时，锁住面板 */
     isFELocking(messages: RenderMessage[]) {
         const lastMessage = messages[messages.length - 1];
@@ -484,8 +279,8 @@ export class LangGraphClient extends Client {
      * @en Cancels the current Run.
      */
     cancelRun() {
-        if (this.currentThread?.thread_id && this.currentRun?.run_id) {
-            this.runs.cancel(this.currentThread!.thread_id, this.currentRun.run_id);
+        if ((this.currentThread as any)?.thread_id && this.currentRun?.run_id) {
+            this.runs.cancel((this.currentThread as any)!.thread_id, this.currentRun.run_id);
         }
     }
     /**
@@ -498,13 +293,10 @@ export class LangGraphClient extends Client {
         }
         if (!this.currentThread) {
             await this.createThread();
-            this.emitStreamingUpdate({
-                type: "thread",
+            this.emit("thread", {
+                event: "thread/create",
                 data: {
-                    event: "thread/create",
-                    data: {
-                        thread: this.currentThread,
-                    },
+                    thread: this.currentThread,
                 },
             });
         }
@@ -541,43 +333,31 @@ export class LangGraphClient extends Client {
         const streamResponse = await createStreamResponse();
 
         const streamRecord: any[] = [];
-        this.emitStreamingUpdate({
-            type: "start",
-            data: {
-                event: "start",
-            },
+        this.emit("start", {
+            event: "start",
         });
         for await (const chunk of streamResponse) {
             streamRecord.push(chunk);
             if (chunk.event === "metadata") {
                 this.currentRun = chunk.data;
             } else if (chunk.event === "error") {
-                this.emitStreamingUpdate({
-                    type: "error",
-                    data: chunk,
-                });
+                this.emit("error", chunk);
             } else if (chunk.event === "messages/partial") {
                 for (const message of chunk.data) {
-                    this.updateStreamingMessage(message);
+                    this.messageProcessor.updateStreamingMessage(message);
                 }
-                this.emitStreamingUpdate({
-                    type: "message",
-                    data: chunk,
-                });
+                this.emit("message", chunk);
                 continue;
             } else if (chunk.event === "values") {
                 const data = chunk.data as { messages: Message[] };
 
                 if (data.messages) {
                     const isResume = !!command?.resume;
-                    const isLongerThanLocal = data.messages.length >= this.graphMessages.length;
+                    const isLongerThanLocal = data.messages.length >= this.messageProcessor.getGraphMessages().length;
                     // resume 情况下，长度低于前端 message 的统统不接受
                     if (!isResume || (isResume && isLongerThanLocal)) {
-                        this.graphMessages = data.messages as RenderMessage[];
-                        this.emitStreamingUpdate({
-                            type: "value",
-                            data: chunk,
-                        });
+                        this.messageProcessor.setGraphMessages(data.messages as RenderMessage[]);
+                        this.emit("value", chunk);
                     }
                     this.graphState = chunk.data;
                 }
@@ -585,20 +365,17 @@ export class LangGraphClient extends Client {
             } else if (chunk.event.startsWith("values|")) {
                 // 这个 values 必然是子 values
                 if (chunk.data?.messages) {
-                    this.mergeSubGraphMessagesToStreamingMessages(chunk.data.messages);
+                    this.messageProcessor.mergeSubGraphMessagesToStreamingMessages(chunk.data.messages);
                 }
                 this.graphPosition = chunk.event.split("|")[1];
             }
         }
         const data = await this.runFETool();
         if (data) streamRecord.push(...data);
-        this.emitStreamingUpdate({
-            type: "done",
-            data: {
-                event: "done",
-            },
+        this.emit("done", {
+            event: "done",
         });
-        this.streamingMessage = [];
+        this.messageProcessor.clearStreamingMessages();
         return streamRecord;
     }
     /** 当前子图位置，但是依赖 stream，不太适合稳定使用*/
@@ -616,26 +393,9 @@ export class LangGraphClient extends Client {
         const position = this.getGraphPosition();
         return position[position.length - 1];
     }
-    /** 子图的数据需要通过 merge 的方式重新进行合并更新 */
-    private mergeSubGraphMessagesToStreamingMessages(messages: Message[]) {
-        const map = new Map(messages.filter((i) => i.id).map((i) => [i.id!, i]));
-        this.streamingMessage.forEach((i) => {
-            if (map.has(i.id!)) {
-                const newValue = map.get(i.id!)!;
-                Object.assign(i, newValue);
-                map.delete(i.id!);
-            }
-        });
-        // 剩余的 message 一定不在 streamMessage 中
-        map.forEach((i) => {
-            if (i.type === "tool" && i.tool_call_id) {
-                this.streamingMessage.push(i as RenderMessage);
-            }
-        });
-    }
 
     private runFETool() {
-        const data = this.streamingMessage; // 需要保证不被清理
+        const data = this.messageProcessor.getStreamingMessages(); // 需要保证不被清理
         const lastMessage = data[data.length - 1];
         if (!lastMessage) return;
         // 如果最后一条消息是前端工具消息，则调用工具
@@ -713,14 +473,14 @@ export class LangGraphClient extends Client {
         await this.initAssistant(this.currentAssistant?.graph_id!);
         this.currentThread = null;
         this.graphState = {};
-        this.graphMessages = [];
-        this.streamingMessage = [];
+        this.messageProcessor.setGraphMessages([]);
+        this.messageProcessor.clearStreamingMessages();
         this.currentRun = undefined;
         this.tools.clearWaiting();
-        this.emitStreamingUpdate({
-            type: "value",
+        this.emit("value", {
+            event: "messages/partial",
             data: {
-                event: "messages/partial",
+                messages: [],
             },
         });
     }

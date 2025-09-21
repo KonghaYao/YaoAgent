@@ -1,4 +1,6 @@
 export * from "./LangGraphClient.js";
+export * from "./MessageProcessor.js";
+export * from "./types.js";
 export * from "./tool/index.js";
 export * from "@langchain/langgraph-sdk";
 export * from "./ui-store/index.js";
