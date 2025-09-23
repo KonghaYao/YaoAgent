@@ -12,8 +12,11 @@
         import { getIframeAPI } from "./src/parent.js";
         const iframe = document.getElementById("iframe");
         const iframeApi = await getIframeAPI(iframe);
-        const code = await fetch("/test/react.jsx").then((res) => res.text());
-        const data = await iframeApi.run(code, "test/react.jsx", "application/javascript");
+        console.log("iframeApi", iframeApi);
+        // 从 hash 中获取路径，默认为 /test/motion.jsx
+        const path = location.hash ? location.hash.slice(1) : "/test/motion.jsx";
+        const code = await fetch(path).then((res) => res.text());
+        const data = await iframeApi.run(code, path.replace(/^\//, ""), "application/javascript");
         console.log("done", data);
     </script>
 </html>

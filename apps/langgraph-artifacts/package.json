@@ -10,7 +10,7 @@
     },
     "scripts": {
         "dev": "vite",
-        "build": "vite build",
+        "build": "vite build && vite build --config vite.config.lib.ts",
         "prepublish": "pnpm build"
     },
     "keywords": [
@@ -38,5 +38,23 @@
         "@napi-rs/wasm-runtime": "^0.2.10",
         "@rolldown/browser": "1.0.0-beta.19",
         "comlink": "^4.4.2"
+    },
+    "devDependencies": {
+        "@hatemhosny/shadcdn": "^0.0.14",
+        "chart.js": "^4.5.0",
+        "framer-motion": "^12.23.19",
+        "lodash-es": "^4.17.21",
+        "lucide-react": "^0.544.0",
+        "mathjs": "^14.7.0",
+        "motion": "^12.16.0",
+        "p5": "^2.0.5",
+        "papaparse": "^5.5.3",
+        "plotly": "^1.0.6",
+        "react": "^18",
+        "react-dom": "^18",
+        "recharts": "^3.2.1",
+        "tone": "^15.1.22",
+        "xlsx": "^0.18.5",
+        "zustand": "^5.0.8"
     }
 }

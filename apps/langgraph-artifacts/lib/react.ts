@@ -1,0 +1,43 @@
+export * from "framer-motion";
+export {
+    Children,
+    Component,
+    Fragment,
+    Profiler,
+    PureComponent,
+    StrictMode,
+    Suspense,
+    cloneElement,
+    createContext,
+    // createElement,
+    createFactory,
+    createRef,
+    forwardRef,
+    isValidElement,
+    lazy,
+    memo,
+    startTransition,
+    unstable_act,
+    unstable_batchedUpdates,
+    unstable_useTransition,
+    useCallback,
+    useContext,
+    useDebugValue,
+    useDeferredValue,
+    useEffect,
+    useId,
+    useImperativeHandle,
+    useInsertionEffect,
+    useLayoutEffect,
+    useMemo,
+    useReducer,
+    useRef,
+    useState,
+    useSyncExternalStore,
+    useTransition,
+    version,
+} from "react";
+import ReactDom from "react-dom";
+export { jsx, jsxs, createElement } from "react/jsx-runtime";
+import React from "react";
+export default Object.assign(React, ReactDom);

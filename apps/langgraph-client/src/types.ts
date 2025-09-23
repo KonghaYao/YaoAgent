@@ -34,13 +34,7 @@ export type OnCompletionBehavior = "complete" | "continue";
 export type CancelAction = "interrupt" | "rollback";
 
 // 流式异步生成器类型
-export type TypedAsyncGenerator<
-    TStreamMode extends StreamMode | StreamMode[] = [],
-    TSubgraphs extends boolean = false,
-    TStateType = unknown,
-    TUpdateType = TStateType,
-    TCustomType = unknown,
-> = AsyncGenerator<
+export type TypedAsyncGenerator<TStateType = unknown, TUpdateType = TStateType, TCustomType = unknown> = AsyncGenerator<
     | {
           values: ValuesStreamEvent<TStateType>;
           updates: UpdatesStreamEvent<TUpdateType>;
@@ -49,7 +43,7 @@ export type TypedAsyncGenerator<
           messages: MessagesStreamEvent;
           "messages-tuple": MessagesTupleStreamEvent;
           events: EventsStreamEvent;
-      }[TStreamMode extends StreamMode[] ? TStreamMode[number] : TStreamMode]
+      }[StreamMode]
     | ErrorStreamEvent
     | MetadataStreamEvent
     | FeedbackStreamEvent
@@ -64,7 +58,7 @@ export interface ILangGraphClient<TStateType = unknown, TUpdateType = TStateType
         getGraph(assistantId: string, options?: { xray?: boolean | number }): Promise<AssistantGraph>;
     };
     threads: {
-        create<ValuesType = TStateType>(payload?: {
+        create(payload?: {
             metadata?: Metadata;
             threadId?: string;
             ifExists?: OnConflictBehavior;
@@ -76,16 +70,9 @@ export interface ILangGraphClient<TStateType = unknown, TUpdateType = TStateType
                     asNode: string;
                 }>;
             }>;
-        }): Promise<Thread<ValuesType>>;
-        search<ValuesType = TStateType>(query?: {
-            metadata?: Metadata;
-            limit?: number;
-            offset?: number;
-            status?: ThreadStatus;
-            sortBy?: ThreadSortBy;
-            sortOrder?: SortOrder;
-        }): Promise<Thread<ValuesType>[]>;
-        get<ValuesType = TStateType>(threadId: string): Promise<Thread<ValuesType>>;
+        }): Promise<Thread<TStateType>>;
+        search(query?: { metadata?: Metadata; limit?: number; offset?: number; status?: ThreadStatus; sortBy?: ThreadSortBy; sortOrder?: SortOrder }): Promise<Thread<TStateType>[]>;
+        get(threadId: string): Promise<Thread<TStateType>>;
         delete(threadId: string): Promise<void>;
     };
     runs: {
@@ -97,32 +84,8 @@ export interface ILangGraphClient<TStateType = unknown, TUpdateType = TStateType
                 status?: RunStatus;
             }
         ): Promise<Run[]>;
-        stream<TStreamMode extends StreamMode | StreamMode[] = StreamMode, TSubgraphs extends boolean = false>(
-            threadId: null,
-            assistantId: string,
-            payload?: {
-                input?: Record<string, unknown> | null;
-                metadata?: Metadata;
-                config?: Config;
-                checkpointId?: string;
-                checkpoint?: Omit<Checkpoint, "thread_id">;
-                checkpointDuring?: boolean;
-                interruptBefore?: "*" | string[];
-                interruptAfter?: "*" | string[];
-                signal?: AbortController["signal"];
-                webhook?: string;
-                onDisconnect?: DisconnectMode;
-                afterSeconds?: number;
-                ifNotExists?: "create" | "reject";
-                command?: Command;
-                onRunCreated?: (params: { run_id: string; thread_id?: string }) => void;
-                streamMode?: TStreamMode;
-                streamSubgraphs?: TSubgraphs;
-                streamResumable?: boolean;
-                feedbackKeys?: string[];
-            }
-        ): TypedAsyncGenerator<TStreamMode, TSubgraphs, TStateType, TUpdateType>;
-        stream<TStreamMode extends StreamMode | StreamMode[] = StreamMode, TSubgraphs extends boolean = false>(
+
+        stream<TSubgraphs extends boolean = false>(
             threadId: string,
             assistantId: string,
             payload?: {
@@ -143,14 +106,14 @@ export interface ILangGraphClient<TStateType = unknown, TUpdateType = TStateType
                 ifNotExists?: "create" | "reject";
                 command?: Command;
                 onRunCreated?: (params: { run_id: string; thread_id?: string }) => void;
-                streamMode?: TStreamMode;
+                streamMode?: StreamMode[];
                 streamSubgraphs?: TSubgraphs;
                 streamResumable?: boolean;
                 feedbackKeys?: string[];
             }
-        ): TypedAsyncGenerator<TStreamMode, TSubgraphs, TStateType, TUpdateType>;
+        ): TypedAsyncGenerator<TSubgraphs, TStateType, TUpdateType>;
         joinStream(
-            threadId: string | undefined | null,
+            threadId: string,
             runId: string,
             options?:
                 | {
