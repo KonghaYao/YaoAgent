@@ -69,7 +69,6 @@ const ChatInput: React.FC = () => {
     const { userInput, setUserInput, loading, sendMessage, stopGeneration, currentAgent, setCurrentAgent, client, currentChatId } = useChat();
     const { extraParams } = useExtraParams();
     const [imageUrls, setImageUrls] = useState<string[]>([]);
-
     const handleFileUploaded = (url: string) => {
         setImageUrls((prev) => [...prev, url]);
     };

@@ -68,7 +68,7 @@ export interface LangGraphClientConfig {
     timeoutMs?: number;
     defaultHeaders?: Record<string, string | null | undefined>;
     /** 自定义客户端实现，如果不提供则使用官方 Client */
-    client: ILangGraphClient;
+    client: ILangGraphClient<any, any>;
 }
 
 // 定义事件数据类型
@@ -96,6 +96,9 @@ export class LangGraphClient<TStateType = unknown, TUpdateType = TStateType> ext
     private currentAssistant: Assistant | null = null;
     private currentThread: Thread<TStateType> | null = null;
     tools: ToolManager = new ToolManager();
+    availableAssistants: Assistant[] = [];
+    graphState: any = {};
+    currentRun?: { run_id: string };
     stopController: AbortController | null = null;
     /** 用于存储 subAgent 状态数据的键 */
     subAgentsKey = "task_store";
@@ -122,7 +125,6 @@ export class LangGraphClient<TStateType = unknown, TUpdateType = TStateType> ext
     get runs() {
         return this.client.runs;
     }
-    availableAssistants: Assistant[] = [];
     private listAssistants() {
         return this.assistants.search({
             metadata: null,
@@ -272,8 +274,7 @@ export class LangGraphClient<TStateType = unknown, TUpdateType = TStateType> ext
         const tool = this.tools.getTool(lastMessage?.name!);
         return tool && tool.render && lastMessage?.type === "tool" && !lastMessage?.additional_kwargs?.done;
     }
-    graphState: any = {};
-    currentRun?: { run_id: string };
+
     /**
      * @zh 取消当前的 Run。
      * @en Cancels the current Run.

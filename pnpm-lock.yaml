@@ -277,6 +277,9 @@ importers:
 
   apps/langgraph-ui:
     dependencies:
+      '@andypf/json-viewer':
+        specifier: ^2.2.0
+        version: 2.2.0
       '@dagrejs/dagre':
         specifier: ^1.1.4
         version: 1.1.4
@@ -471,6 +474,9 @@ packages:
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
+
+  '@andypf/json-viewer@2.2.0':
+    resolution: {integrity: sha512-eqSoevfyy+q/3WDkqT/Yz0hUKxOZ0+hgJHpHH98kU5P5zmaFKvH8q5XaNLSnKc8uTA8zYIPKeiH72zxse+zvtQ==}
 
   '@antfu/install-pkg@1.1.0':
     resolution: {integrity: sha512-MGQsmw10ZyI+EJo45CdSER4zEb+p31LpDAFp2Z3gkSd1yqVZGi0Ebx++YTEMonJy4oChEMLsxZ64j8FH6sSqtQ==}
@@ -5382,6 +5388,8 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
+
+  '@andypf/json-viewer@2.2.0': {}
 
   '@antfu/install-pkg@1.1.0':
     dependencies:

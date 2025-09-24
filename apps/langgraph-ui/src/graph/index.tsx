@@ -83,7 +83,7 @@ const LayoutFlow = () => {
         }
     }, [currentNodeName]);
     return (
-        <div className="w-1/3 h-full relative overflow-hidden border-l">
+        <div className="h-full relative overflow-hidden border-l">
             <ReactFlow nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} fitView className="w-full h-full" nodeTypes={nodeTypes}>
                 <Background />
                 <Controls />

@@ -1,6 +1,6 @@
 import { createChatStore } from "@langgraph-js/sdk";
 import { ask_user_for_approve, update_plan, web_search_tool } from "../tools/index";
-import { FullTextSearchService, OpenAIVectorizer, VecDB, createMemoryTool } from "../../memory/index";
+import { FullTextSearchService, createMemoryTool } from "../../memory/index";
 import { create_artifacts } from "../tools/create_artifacts";
 
 const F =

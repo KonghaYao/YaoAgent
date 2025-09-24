@@ -66,7 +66,7 @@ export const getHistoryContent = (thread: Thread) => {
  */
 export const createChatStore = (
     initClientName: string,
-    config: LangGraphClientConfig,
+    config: Partial<LangGraphClientConfig>,
     context: {
         showHistory?: boolean;
         showGraph?: boolean;

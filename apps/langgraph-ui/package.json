@@ -18,6 +18,7 @@
     "main": "./dist/react/src/index.js",
     "type": "module",
     "dependencies": {
+        "@andypf/json-viewer": "^2.2.0",
         "@dagrejs/dagre": "^1.1.4",
         "@langgraph-js/sdk": "workspace:*",
         "@nanostores/react": "^1.0.0",

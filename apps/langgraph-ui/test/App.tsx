@@ -1,4 +1,4 @@
-import Chat from "../src/chat/Chat";
+import { Chat } from "../src/index";
 import Login from "../src/login/Login";
 import { useState } from "react";
 function App() {
