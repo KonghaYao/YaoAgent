@@ -83,7 +83,7 @@ export const defaultImportMap = {
         // plotly: "./cdn/plotly.js",
         // "plotly.js-dist-min": "./cdn/plotly.js",
         // recharts: "./cdn/recharts.js",
-        "unocss-browser": "./cdn/unocss.js",
+        "unocss-browser": baseURL + "/unocss.js",
         "lucide-react": baseURL + "/lucide.js",
     },
 };

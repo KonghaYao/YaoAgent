@@ -42,6 +42,7 @@
     },
     "devDependencies": {
         "@hatemhosny/shadcdn": "^0.0.14",
+        "@unocss/runtime": "^66.5.2",
         "chart.js": "^4.5.0",
         "framer-motion": "^12.23.19",
         "lodash-es": "^4.17.21",
