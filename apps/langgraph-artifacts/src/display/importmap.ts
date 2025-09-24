@@ -1,4 +1,5 @@
-const baseURL = "./cdn";
+/**@ts-ignore */
+const baseURL = import.meta.env.MODE === "production" ? "./cdn" : "./dist/cdn";
 const shadcnURL = baseURL + "/shadcdn.js";
 const shadcn = {
     "@/components/ui/accordion": shadcnURL,

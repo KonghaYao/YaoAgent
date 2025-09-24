@@ -10,6 +10,7 @@
     },
     "scripts": {
         "dev": "vite",
+        "build:cdn": "vite build --config vite.config.lib.ts",
         "build": "vite build && vite build --config vite.config.lib.ts",
         "prepublish": "pnpm build"
     },
