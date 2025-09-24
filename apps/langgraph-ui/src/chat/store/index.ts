@@ -1,7 +1,5 @@
 import { createChatStore } from "@langgraph-js/sdk";
-import { ask_user_for_approve, update_plan, web_search_tool } from "../tools/index";
 import { FullTextSearchService, createMemoryTool } from "../../memory/index";
-import { create_artifacts } from "../tools/create_artifacts";
 
 const F =
     localStorage.getItem("withCredentials") === "true"
@@ -54,8 +52,5 @@ export const globalChatStore = createChatStore(
     },
     {
         ...getLocalConfig(),
-        onInit(client) {
-            client.tools.bindTools([create_artifacts, web_search_tool, ask_user_for_approve, update_plan, memoryTool.manageMemory, memoryTool.searchMemory]);
-        },
     }
 );

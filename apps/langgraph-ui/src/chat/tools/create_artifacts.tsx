@@ -1,4 +1,4 @@
-import { createToolUI, ToolRenderData } from "@langgraph-js/sdk";
+import { createUITool, ToolRenderData } from "@langgraph-js/sdk";
 import { FileIcon } from "lucide-react";
 import { useState } from "react";
 import { useArtifacts } from "../../artifacts/ArtifactsContext";
@@ -15,10 +15,10 @@ interface ArtifactsResponse {
     artifactsPath?: string;
 }
 
-export const create_artifacts = createToolUI({
+export const create_artifacts = createUITool({
     name: "create_artifacts",
     description: "创建并保存代码文件到 artifacts 目录",
-    parameters: [],
+    parameters: {},
     onlyRender: true,
     render(tool: ToolRenderData<ArtifactsInput, ArtifactsResponse>) {
         const data = tool.getInputRepaired();

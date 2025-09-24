@@ -15,6 +15,8 @@ import { ArtifactViewer } from "../artifacts/ArtifactViewer";
 import "github-markdown-css/github-markdown.css";
 import { ArtifactsProvider, useArtifacts } from "../artifacts/ArtifactsContext";
 import "./index.css";
+import { show_form } from "./tools/index";
+import { create_artifacts } from "./tools/create_artifacts";
 
 const ChatMessages: React.FC = () => {
     const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse, isFELocking } = useChat();
@@ -68,9 +70,9 @@ const ChatMessages: React.FC = () => {
 const ChatInput: React.FC = () => {
     const { userInput, setUserInput, loading, sendMessage, stopGeneration, currentAgent, setCurrentAgent, client, currentChatId } = useChat();
     const { extraParams } = useExtraParams();
-    const [imageUrls, setImageUrls] = useState<string[]>([]);
+    const [imageUrls, setImageUrls] = useState<{ type: "image_url"; image_url: { url: string } }[]>([]);
     const handleFileUploaded = (url: string) => {
-        setImageUrls((prev) => [...prev, url]);
+        setImageUrls((prev) => [...prev, { type: "image_url", image_url: { url } }]);
     };
     const _setCurrentAgent = (agent: string) => {
         localStorage.setItem("agent_name", agent);
@@ -85,10 +87,7 @@ const ChatInput: React.FC = () => {
                         type: "text",
                         text: userInput,
                     },
-                    ...imageUrls.map((url) => ({
-                        type: "image_url" as const,
-                        image_url: { url },
-                    })),
+                    ...imageUrls,
                 ],
             },
         ];
@@ -157,10 +156,13 @@ const ChatInput: React.FC = () => {
 
 const Chat: React.FC = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const { showHistory, toggleHistoryVisible, showGraph, toggleGraphVisible, renderMessages } = useChat();
+    const { showHistory, toggleHistoryVisible, showGraph, toggleGraphVisible, renderMessages, setTools } = useChat();
     const { extraParams, setExtraParams } = useExtraParams();
     const { showArtifact, setShowArtifact } = useArtifacts();
 
+    useEffect(() => {
+        setTools([show_form, create_artifacts]);
+    }, []);
     return (
         <div className="langgraph-chat-container flex h-full w-full overflow-hidden">
             {showHistory && <HistoryList onClose={() => toggleHistoryVisible()} formatTime={formatTime} />}
