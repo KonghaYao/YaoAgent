@@ -8,6 +8,10 @@ import { useState } from "react";
 
 // 自定义文本输入组件
 const CustomTextWidget = (props: any) => {
+    const hasMinLength = props.options?.minLength;
+    const hasMaxLength = props.options?.maxLength;
+    const currentLength = props.value?.length || 0;
+
     return (
         <div className="mb-4">
             {props.label && (
@@ -23,8 +27,20 @@ const CustomTextWidget = (props: any) => {
                 onChange={(e) => props.onChange(e.target.value)}
                 placeholder={props.placeholder}
                 disabled={props.disabled}
+                maxLength={hasMaxLength ? props.options.maxLength : undefined}
             />
             {props.description && <p className="text-xs text-gray-500 mt-1">{props.description}</p>}
+            {(hasMinLength || hasMaxLength) && (
+                <div className="flex justify-end mt-1">
+                    <span className={`text-xs ${currentLength > (props.options?.maxLength || 0) ? "text-red-500" : "text-gray-400"}`}>
+                        {hasMinLength && hasMaxLength
+                            ? `${currentLength}/${props.options.maxLength} (最少${props.options.minLength})`
+                            : hasMaxLength
+                              ? `${currentLength}/${props.options.maxLength}`
+                              : `最少${props.options.minLength}字符`}
+                    </span>
+                </div>
+            )}
         </div>
     );
 };
@@ -61,6 +77,10 @@ const CustomPasswordWidget = (props: any) => {
 
 // 自定义文本区域组件
 const CustomTextareaWidget = (props: any) => {
+    const hasMinLength = props.options?.minLength;
+    const hasMaxLength = props.options?.maxLength;
+    const currentLength = props.value?.length || 0;
+
     return (
         <div className="mb-4">
             {props.label && (
@@ -76,8 +96,20 @@ const CustomTextareaWidget = (props: any) => {
                 placeholder={props.placeholder}
                 disabled={props.disabled}
                 rows={props.options?.rows || 4}
+                maxLength={hasMaxLength ? props.options.maxLength : undefined}
             />
             {props.description && <p className="text-xs text-gray-500 mt-1">{props.description}</p>}
+            {(hasMinLength || hasMaxLength) && (
+                <div className="flex justify-end mt-1">
+                    <span className={`text-xs ${currentLength > (props.options?.maxLength || 0) ? "text-red-500" : "text-gray-400"}`}>
+                        {hasMinLength && hasMaxLength
+                            ? `${currentLength}/${props.options.maxLength} (最少${props.options.minLength})`
+                            : hasMaxLength
+                              ? `${currentLength}/${props.options.maxLength}`
+                              : `最少${props.options.minLength}字符`}
+                    </span>
+                </div>
+            )}
         </div>
     );
 };
@@ -286,8 +318,43 @@ const CustomDateTimeWidget = (props: any) => {
     );
 };
 
+// 自定义布尔值组件
+const CustomBooleanWidget = (props: any) => {
+    return (
+        <div className="mb-4">
+            {props.label && (
+                <label className="flex items-center">
+                    <input
+                        type="checkbox"
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 mr-2"
+                        checked={props.value || false}
+                        onChange={(e) => props.onChange(e.target.checked)}
+                        disabled={props.disabled}
+                    />
+                    <span className="text-sm text-gray-700">
+                        {props.label}
+                        {props.required && <span className="text-red-500 ml-1">*</span>}
+                    </span>
+                </label>
+            )}
+            {props.description && <p className="text-xs text-gray-500 mt-1 ml-6">{props.description}</p>}
+        </div>
+    );
+};
+
 // 自定义文件上传组件
 const CustomFileWidget = (props: any) => {
+    const handleFileChange = (e: any) => {
+        const files = e.target.files;
+        if (props.multiple) {
+            // 多文件选择
+            props.onChange(files);
+        } else {
+            // 单文件选择
+            props.onChange(files?.[0] || null);
+        }
+    };
+
     return (
         <div className="mb-4">
             {props.label && (
@@ -299,7 +366,7 @@ const CustomFileWidget = (props: any) => {
             <input
                 type="file"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors file:mr-3 file:py-1 file:px-3 file:border-0 file:bg-blue-50 file:text-blue-700 file:rounded file:font-medium"
-                onChange={(e) => props.onChange(e.target.files?.[0])}
+                onChange={handleFileChange}
                 disabled={props.disabled}
                 multiple={props.multiple}
                 accept={props.accept}
@@ -348,7 +415,7 @@ const CustomObjectFieldTemplate = (props: any) => {
     return (
         <div className="mb-4">
             {props.title && <h3 className="text-sm font-medium text-gray-700 mb-2">{props.title}</h3>}
-            <div className="pl-4 border-l-2 border-gray-200 space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pl-4 border-l-2 border-gray-200">
                 {props.properties.map((prop: any) => (
                     <div key={prop.name}>{prop.content}</div>
                 ))}
@@ -402,6 +469,7 @@ export const show_form = createUITool({
             date: CustomDateWidget,
             datetime: CustomDateTimeWidget,
             file: CustomFileWidget,
+            boolean: CustomBooleanWidget,
         };
 
         const customFields = {
@@ -418,54 +486,6 @@ export const show_form = createUITool({
 
         return (
             <div className="p-4 bg-white rounded-lg border border-gray-200">
-                <style
-                    dangerouslySetInnerHTML={{
-                        __html: `
-                        .slider::-webkit-slider-thumb {
-                            appearance: none;
-                            height: 20px;
-                            width: 20px;
-                            border-radius: 50%;
-                            background: #3b82f6;
-                            cursor: pointer;
-                            border: 2px solid #ffffff;
-                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-                        }
-
-                        .slider::-moz-range-thumb {
-                            height: 20px;
-                            width: 20px;
-                            border-radius: 50%;
-                            background: #3b82f6;
-                            cursor: pointer;
-                            border: 2px solid #ffffff;
-                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-                        }
-
-                        .slider::-webkit-slider-track {
-                            height: 8px;
-                            border-radius: 4px;
-                            background: #e5e7eb;
-                        }
-
-                        .slider::-moz-range-track {
-                            height: 8px;
-                            border-radius: 4px;
-                            background: #e5e7eb;
-                        }
-
-                        .slider:disabled::-webkit-slider-thumb {
-                            background: #9ca3af;
-                            cursor: not-allowed;
-                        }
-
-                        .slider:disabled::-moz-range-thumb {
-                            background: #9ca3af;
-                            cursor: not-allowed;
-                        }
-                    `,
-                    }}
-                />
                 <div className="flex items-center gap-1.5 text-gray-700 mb-3 font-bold">
                     <FileText className="w-4 h-4 text-blue-500" />
                     <span>AI 表单</span>

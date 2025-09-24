@@ -10,7 +10,7 @@ import JsonEditorPopup from "./components/JsonEditorPopup";
 import { JsonToMessageButton } from "./components/JsonToMessage";
 import { GraphPanel } from "../graph/GraphPanel";
 import { setLocalConfig } from "./store";
-import { History, Network, LogOut, FileJson, Code } from "lucide-react";
+import { History, Network, LogOut, FileJson } from "lucide-react";
 import { ArtifactViewer } from "../artifacts/ArtifactViewer";
 import "github-markdown-css/github-markdown.css";
 import { ArtifactsProvider, useArtifacts } from "../artifacts/ArtifactsContext";
@@ -156,7 +156,7 @@ const ChatInput: React.FC = () => {
 
 const Chat: React.FC = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const { showHistory, toggleHistoryVisible, showGraph, toggleGraphVisible, renderMessages, setTools } = useChat();
+    const { showHistory, toggleHistoryVisible, showGraph, toggleGraphVisible, renderMessages, setTools, client } = useChat();
     const { extraParams, setExtraParams } = useExtraParams();
     const { showArtifact, setShowArtifact } = useArtifacts();
 
@@ -179,7 +179,7 @@ const Chat: React.FC = () => {
                         历史记录
                     </button>
                     <div className="flex-1"></div>
-                    <JsonToMessageButton />
+
                     <button
                         onClick={() => setIsPopupOpen(true)}
                         className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center gap-1.5"
@@ -195,6 +195,14 @@ const Chat: React.FC = () => {
                         }}
                     >
                         打印日志数据
+                    </button>
+                    <button
+                        className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center gap-1.5"
+                        onClick={() => {
+                            console.log(client?.graphState);
+                        }}
+                    >
+                        打印 State
                     </button>
                     <button
                         className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center gap-1.5"
