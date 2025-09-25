@@ -91,7 +91,6 @@ const ChatInput: React.FC = () => {
                 ],
             },
         ];
-
         sendMessage(content, {
             extraParams,
         });

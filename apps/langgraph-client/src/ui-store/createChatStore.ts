@@ -113,7 +113,7 @@ export const createChatStore = (
     async function initClient() {
         const newClient = new LangGraphClient({
             ...config,
-            client: config.client ?? (await createLangGraphServerClient()),
+            client: config.client ?? (await createLangGraphServerClient(config as LangGraphClientConfig)),
         });
         await newClient.initAssistant(currentAgent.get());
         currentAgent.set(newClient.getCurrentAssistant()!.graph_id);
