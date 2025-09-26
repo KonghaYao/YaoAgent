@@ -172,11 +172,17 @@ export const createChatStore = (
 
         loading.set(true);
         inChatError.set(null);
-
-        await client.get()?.sendMessage(message || userInput.get(), extraData);
-
-        userInput.set("");
-        loading.set(false);
+        try {
+            await client.get()?.sendMessage(message || userInput.get(), extraData);
+        } catch (e) {
+            const isThreadRunning = (e as Error).message.includes("422");
+            if (isThreadRunning) {
+                await client.get()?.resetStream();
+            }
+        } finally {
+            userInput.set("");
+            loading.set(false);
+        }
     };
 
     /**
