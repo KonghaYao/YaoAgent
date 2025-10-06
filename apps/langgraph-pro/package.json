@@ -40,7 +40,7 @@
         "@langchain/core": "^0.3.56",
         "@langchain/langgraph": "^0.4.0",
         "@langchain/langgraph-swarm": "^0.0.5",
-        "@langchain/openai": "^0.5.10",
+        "@langchain/openai": "^0.4.9",
         "zod": "^3.25.17"
     },
     "devDependencies": {
