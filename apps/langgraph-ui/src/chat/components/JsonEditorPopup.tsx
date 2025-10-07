@@ -125,18 +125,18 @@ const JsonEditorPopup: React.FC<JsonEditorPopupProps> = ({ isOpen, initialJson, 
     };
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 flex flex-col" style={{ height: "80vh" }}>
-                <div className="p-6 border-b border-gray-200">
-                    <h2 className="text-xl font-semibold text-gray-900">编辑 Extra Parameters</h2>
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl w-full max-w-2xl mx-4 flex flex-col overflow-hidden" style={{ height: "80vh" }}>
+                <div className="px-6 py-5 bg-white/80 backdrop-blur-sm">
+                    <h2 className="text-lg font-semibold text-gray-800">编辑 Extra Parameters</h2>
                 </div>
-                <div className="flex-grow p-6 overflow-y-auto">
-                    <div className="flex items-center border-b border-gray-200 mb-4">
+                <div className="flex-grow px-6 py-4 overflow-y-auto">
+                    <div className="flex items-center mb-4 gap-2">
                         {presets.map((preset, index) => (
                             <div
                                 key={index}
-                                className={`flex items-center px-4 py-2 border-b-2 cursor-pointer text-sm font-medium ${
-                                    activeTab === index ? "border-blue-500 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                className={`flex items-center px-4 py-2 rounded-xl cursor-pointer text-sm font-medium transition-colors ${
+                                    activeTab === index ? "bg-blue-50 text-blue-600" : "bg-gray-50 text-gray-600 hover:bg-gray-100"
                                 }`}
                                 onDoubleClick={() => {
                                     setEditingTab(index);
@@ -162,13 +162,13 @@ const JsonEditorPopup: React.FC<JsonEditorPopupProps> = ({ isOpen, initialJson, 
                                         e.stopPropagation();
                                         handleDeleteTab(index);
                                     }}
-                                    className="ml-2 text-gray-400 hover:text-gray-600 w-4 h-4 flex items-center justify-center"
+                                    className="ml-2 text-gray-400 hover:text-gray-600 w-4 h-4 flex items-center justify-center transition-colors"
                                 >
                                     &times;
                                 </button>
                             </div>
                         ))}
-                        <button onClick={handleAddTab} className="ml-2 px-3 py-1 text-sm text-gray-500 hover:text-gray-700">
+                        <button onClick={handleAddTab} className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
                             +
                         </button>
                     </div>
@@ -179,21 +179,15 @@ const JsonEditorPopup: React.FC<JsonEditorPopupProps> = ({ isOpen, initialJson, 
                             setJsonString(e.target.value);
                             setError(null); // Clear error on edit
                         }}
-                        className="w-full h-full p-3 border border-gray-300 rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full h-full px-4 py-3 bg-gray-50 rounded-xl font-mono text-sm focus:outline-none focus:bg-gray-100 transition-colors"
                     />
                     {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
                 </div>
-                <div className="flex justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50 rounded-b-lg">
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
+                <div className="flex justify-end gap-3 px-6 py-5 bg-gray-50/50">
+                    <button onClick={onClose} className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white rounded-xl hover:bg-gray-100 focus:outline-none transition-colors">
                         取消
                     </button>
-                    <button
-                        onClick={handleSave}
-                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
+                    <button onClick={handleSave} className="px-5 py-2.5 text-sm font-medium text-white bg-blue-500 rounded-xl hover:bg-blue-600 focus:outline-none transition-colors">
                         保存并使用
                     </button>
                 </div>

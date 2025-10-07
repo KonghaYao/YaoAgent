@@ -7,7 +7,7 @@ import remarkGfm from "remark-gfm";
 import { Highlight, themes } from "prism-react-renderer";
 import { MessagesBox } from "./MessageBox";
 
-const TOOL_COLORS = ["border-red-400", "border-blue-400", "border-green-500", "border-yellow-400", "border-purple-400", "border-pink-400", "border-indigo-400"];
+const TOOL_COLORS = ["bg-white", "bg-white", "bg-white", "bg-white", "bg-white", "bg-white", "bg-white"];
 
 interface MessageToolProps {
     message: ToolMessage & RenderMessage;
@@ -30,21 +30,21 @@ const getToolColorClass = (tool_name: string) => {
 const MessageTool: React.FC<MessageToolProps> = ({ message, client, getMessageContent, formatTokens, isCollapsed, onToggleCollapse }) => {
     const { getToolUIRender } = useChat();
     const render = getToolUIRender(message.name!);
-    const borderColorClass = getToolColorClass(message.name!);
+    const bgColorClass = getToolColorClass(message.name!);
     return (
         <div className="flex flex-col w-full">
             {render ? (
                 (render(message) as JSX.Element)
             ) : (
-                <div className={`flex flex-col w-full bg-white rounded-lg shadow-sm border-2 ${borderColorClass} overflow-hidden`}>
-                    <div className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-100 transition-colors" onClick={onToggleCollapse}>
-                        <div className="text-sm font-medium text-gray-700" onClick={() => console.log(message)}>
+                <div className={`flex flex-col w-full ${bgColorClass} rounded-2xl overflow-hidden`}>
+                    <div className="flex items-center justify-between px-5 py-3 cursor-pointer hover:bg-black/5 transition-colors" onClick={onToggleCollapse}>
+                        <div className="text-xs font-medium text-gray-600" onClick={() => console.log(message)}>
                             {message.node_name} | {message.name}
                         </div>
                     </div>
 
                     {!isCollapsed && (
-                        <div className="flex flex-col gap-4 p-4 border-t border-gray-100">
+                        <div className="flex flex-col gap-4 px-5 pb-4">
                             <Previewer content={message.tool_input || ""} />
                             <Previewer content={getMessageContent(message.content)} />
                             <UsageMetadata
@@ -59,7 +59,7 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, client, getMessageCo
                 </div>
             )}
             {message.sub_agent_messages && (
-                <div className="flex flex-col pl-4 py-2 border-l border-gray-300">
+                <div className="flex flex-col pl-6 py-3 ml-4 border-l-2 border-gray-200">
                     <MessagesBox renderMessages={message.sub_agent_messages} collapsedTools={[]} toggleToolCollapse={(id) => {}} client={client} />
                 </div>
             )}
@@ -86,22 +86,22 @@ const Previewer = ({ content }: { content: string }) => {
     return (
         <div className={`flex flex-col`}>
             <div className="flex gap-2 mb-2">
-                <button onClick={copyToClipboard} className="px-2 py-1 text-xs font-medium text-gray-600 bg-green-100 rounded hover:bg-green-200 transition-colors">
+                <button onClick={copyToClipboard} className="px-3 py-1 text-xs font-medium text-gray-700 bg-white/60 rounded-lg hover:bg-white transition-colors">
                     copy
                 </button>
                 {isJSON && (
-                    <button onClick={() => setJsonMode(!jsonMode)} className="px-2 py-1 text-xs font-medium text-gray-600 bg-orange-100 rounded hover:bg-orange-200 transition-colors">
+                    <button onClick={() => setJsonMode(!jsonMode)} className="px-3 py-1 text-xs font-medium text-gray-700 bg-white/60 rounded-lg hover:bg-white transition-colors">
                         json
                     </button>
                 )}
                 {isMarkdown && (
-                    <button onClick={() => setMarkdownMode(!markdownMode)} className="px-2 py-1 text-xs font-medium text-gray-600 bg-blue-100 rounded hover:bg-blue-200 transition-colors">
+                    <button onClick={() => setMarkdownMode(!markdownMode)} className="px-3 py-1 text-xs font-medium text-gray-700 bg-white/60 rounded-lg hover:bg-white transition-colors">
                         markdown
                     </button>
                 )}
             </div>
 
-            <div className="flex flex-col max-h-[300px] overflow-auto border border-gray-200 rounded p-2 w-full text-xs font-mono whitespace-pre-wrap">
+            <div className="flex flex-col max-h-[300px] overflow-auto bg-white/40 rounded-xl p-3 w-full text-xs font-mono whitespace-pre-wrap">
                 {jsonMode && isJSON ? (
                     <Highlight code={JSON.stringify(JSON.parse(content), null, 2)} language="json" theme={themes.oneLight}>
                         {({ className, style, tokens, getLineProps, getTokenProps }) => (

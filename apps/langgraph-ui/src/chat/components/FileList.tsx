@@ -45,10 +45,10 @@ const FileList: React.FC<FileListProps> = ({ onFileUploaded }) => {
     }, []);
 
     return (
-        <div className="flex gap-2 rounded-lg flex-1">
+        <div className="flex gap-2 flex-1">
             {files.length < MAX_FILES && (
                 <label
-                    className={`inline-flex items-center justify-center w-20 h-20 text-gray-500 bg-gray-100 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-200 ${files.length === 0 ? "w-8 h-8" : ""}`}
+                    className={`inline-flex items-center justify-center text-gray-400 bg-gray-50 rounded-xl cursor-pointer transition-colors hover:bg-gray-100 ${files.length === 0 ? "w-10 h-10" : "w-20 h-20"}`}
                 >
                     <svg viewBox="0 0 24 24" width={files.length === 0 ? "20" : "32"} height={files.length === 0 ? "20" : "32"} fill="currentColor">
                         <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
@@ -59,10 +59,10 @@ const FileList: React.FC<FileListProps> = ({ onFileUploaded }) => {
             )}
             <div className="flex flex-wrap gap-2">
                 {files.map((file, index) => (
-                    <div key={index} className="relative w-20 h-20 rounded-lg overflow-hidden">
-                        <img src={URL.createObjectURL(file)} alt={file.name} className="w-full h-full object-cover border border-gray-200" />
+                    <div key={index} className="relative w-20 h-20 rounded-xl overflow-hidden">
+                        <img src={URL.createObjectURL(file)} alt={file.name} className="w-full h-full object-cover" />
                         <button
-                            className="absolute top-0.5 right-0.5 w-5 h-5 bg-black/50 text-white rounded-full flex items-center justify-center text-base leading-none hover:bg-black/70 transition-colors"
+                            className="absolute top-1 right-1 w-5 h-5 bg-red-500/90 text-white rounded-full flex items-center justify-center text-sm leading-none hover:bg-red-600 transition-colors backdrop-blur-sm"
                             onClick={() => removeFile(index)}
                         >
                             ×

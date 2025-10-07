@@ -109,7 +109,7 @@ export const MessagesBox = ({
     }, [messageStates, handleCloseContextMenu]);
 
     return (
-        <div className="flex flex-col gap-4 w-full">
+        <div className="flex flex-col gap-5 w-full">
             {renderMessages.map((message, index) => {
                 const messageId = message.unique_id || `message-${index}`;
                 const messageState = messageStates.get(messageId) || {
@@ -145,14 +145,20 @@ export const MessagesBox = ({
                         {messageState.showDetail && <JSONViewer data={message} />}
                         {messageState.showContextMenu && (
                             <div
-                                className="fixed bg-white border border-gray-200 rounded shadow-lg z-50 py-1 min-w-[150px]"
+                                className="fixed bg-white/95 backdrop-blur-sm rounded-xl z-50 py-2 min-w-[150px] overflow-hidden"
                                 style={{ left: messageState.contextMenuPosition.x, top: messageState.contextMenuPosition.y }}
                                 onClick={(e) => e.stopPropagation()}
                             >
-                                <button className="w-full bg-white px-3 py-2 text-left hover:bg-gray-50 text-sm" onClick={() => handleCopyMessage(messageId, message.content)}>
+                                <button
+                                    className="w-full bg-transparent px-4 py-2.5 text-left hover:bg-gray-100/80 text-sm text-gray-700 transition-colors"
+                                    onClick={() => handleCopyMessage(messageId, message.content)}
+                                >
                                     复制消息内容
                                 </button>
-                                <button className="w-full bg-white px-3 py-2 text-left hover:bg-gray-50 text-sm" onClick={() => handleToggleDetail(messageId)}>
+                                <button
+                                    className="w-full bg-transparent px-4 py-2.5 text-left hover:bg-gray-100/80 text-sm text-gray-700 transition-colors"
+                                    onClick={() => handleToggleDetail(messageId)}
+                                >
                                     {messageState.showDetail ? "隐藏详情" : "显示详情"}
                                 </button>
                             </div>

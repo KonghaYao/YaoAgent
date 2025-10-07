@@ -48,9 +48,7 @@ const MessageHuman: React.FC<MessageHumanProps> = ({ content }) => {
 
     return (
         <div className="flex flex-row w-full justify-end">
-            <div className="flex flex-col w-fit bg-blue-500 rounded-lg text-white border border-blue-100">
-                <div className="flex flex-col p-4 ">{renderContent()}</div>
-            </div>
+            <div className="flex flex-col w-fit bg-blue-500/90 rounded-2xl text-white px-4 py-3 max-w-[80%]">{renderContent()}</div>
         </div>
     );
 };
