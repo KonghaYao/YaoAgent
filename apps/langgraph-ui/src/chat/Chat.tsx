@@ -6,6 +6,7 @@ import { ExtraParamsProvider, useExtraParams } from "./context/ExtraParamsContex
 import { UsageMetadata } from "./components/UsageMetadata";
 import { formatTime, Message } from "@langgraph-js/sdk";
 import FileList from "./components/FileList";
+import type { SupportedFileType } from "./components/FileList";
 import JsonEditorPopup from "./components/JsonEditorPopup";
 import { JsonToMessageButton } from "./components/JsonToMessage";
 import { GraphPanel } from "../graph/GraphPanel";
@@ -72,15 +73,46 @@ const ChatMessages: React.FC = () => {
 const ChatInput: React.FC = () => {
     const { userInput, setUserInput, loading, sendMessage, stopGeneration, currentAgent, setCurrentAgent, client, currentChatId } = useChat();
     const { extraParams } = useExtraParams();
-    const [imageUrls, setImageUrls] = useState<{ type: "image_url"; image_url: { url: string } }[]>([]);
-    const handleFileUploaded = (url: string) => {
-        setImageUrls((prev) => [...prev, { type: "image_url", image_url: { url } }]);
+    const [mediaUrls, setMediaUrls] = useState<Array<any>>([]);
+    const [isFileTextMode, setIsFileTextMode] = useState({
+        image: false,
+        video: false,
+        audio: false,
+        other: true,
+    });
+    const handleFileUploaded = (url: string, fileType: SupportedFileType) => {
+        // 上传时始终保存原始文件信息，在发送时根据文本模式决定格式
+        if (fileType === "image") {
+            setMediaUrls((prev) => [...prev, { type: "image_url", image_url: { url }, fileType }]);
+        } else if (fileType === "video") {
+            setMediaUrls((prev) => [...prev, { type: "video_url", video_url: { url }, fileType }]);
+        } else if (fileType === "audio") {
+            setMediaUrls((prev) => [...prev, { type: "audio_url", audio_url: { url }, fileType }]);
+        } else if (fileType === "other") {
+            setMediaUrls((prev) => [...prev, { type: "file_url", file_url: { url }, fileType }]);
+        }
     };
     const _setCurrentAgent = (agent: string) => {
         localStorage.setItem("defaultAgent", agent);
         setCurrentAgent(agent);
     };
     const sendMultiModalMessage = () => {
+        // 根据文本模式设置处理每个媒体文件
+        const processedMediaUrls = mediaUrls.map((media) => {
+            const fileType = media.fileType as SupportedFileType;
+            if (isFileTextMode[fileType]) {
+                // 文本模式：转换为 <file> 标签格式
+                const url = media.image_url?.url || media.video_url?.url || media.audio_url?.url || media.file_url?.url;
+                return {
+                    type: "text",
+                    text: `<file type="${fileType}" url="${url}"></file>`,
+                };
+            } else {
+                // 正常模式：保持原始格式
+                return media;
+            }
+        });
+
         const content: Message[] = [
             {
                 type: "human",
@@ -89,7 +121,7 @@ const ChatInput: React.FC = () => {
                         type: "text",
                         text: userInput,
                     },
-                    ...imageUrls,
+                    ...processedMediaUrls,
                 ],
             },
         ];
@@ -97,8 +129,8 @@ const ChatInput: React.FC = () => {
             extraParams,
         });
 
-        // 清空图片列表
-        setImageUrls([]);
+        // 清空媒体文件列表
+        setMediaUrls([]);
     };
 
     const handleKeyPress = (event: React.KeyboardEvent) => {
@@ -111,7 +143,36 @@ const ChatInput: React.FC = () => {
     return (
         <div className="bg-white rounded-2xl px-6 py-5  mb-4 shadow-lg shadow-gray-200">
             <div className="flex items-center justify-between mb-4">
-                <FileList onFileUploaded={handleFileUploaded} />
+                <div className="flex items-center gap-4">
+                    <FileList onFileUploaded={handleFileUploaded} />
+                    <div className="flex items-center gap-2 text-xs text-gray-600">
+                        <span>文本模式:</span>
+                        <button
+                            onClick={() => setIsFileTextMode((prev) => ({ ...prev, image: !prev.image }))}
+                            className={`px-2 py-1 rounded ${isFileTextMode.image ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
+                        >
+                            图片
+                        </button>
+                        <button
+                            onClick={() => setIsFileTextMode((prev) => ({ ...prev, video: !prev.video }))}
+                            className={`px-2 py-1 rounded ${isFileTextMode.video ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
+                        >
+                            视频
+                        </button>
+                        <button
+                            onClick={() => setIsFileTextMode((prev) => ({ ...prev, audio: !prev.audio }))}
+                            className={`px-2 py-1 rounded ${isFileTextMode.audio ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
+                        >
+                            音频
+                        </button>
+                        <button
+                            onClick={() => setIsFileTextMode((prev) => ({ ...prev, other: !prev.other }))}
+                            className={`px-2 py-1 rounded ${isFileTextMode.other ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
+                        >
+                            其他
+                        </button>
+                    </div>
+                </div>
 
                 <select
                     value={currentAgent}
@@ -148,7 +209,7 @@ const ChatInput: React.FC = () => {
                         loading ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed"
                     }`}
                     onClick={() => (loading ? stopGeneration() : sendMultiModalMessage())}
-                    disabled={!loading && !userInput.trim() && imageUrls.length === 0}
+                    disabled={!loading && !userInput.trim() && mediaUrls.length === 0}
                 >
                     {loading ? (
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -17,11 +17,11 @@ export default defineConfig(({ mode }) => {
             exclude: ["@langgraph-js/ui", "@langgraph-js/sdk"],
         },
         server: {
-            headers: {
-                "Cross-Origin-Opener-Policy": "same-origin",
-                "Cross-Origin-Embedder-Policy": "require-corp",
-                "cross-origin-resource-policy": "cross-origin",
-            },
+            // headers: {
+            //     "Cross-Origin-Opener-Policy": "same-origin",
+            //     "Cross-Origin-Embedder-Policy": "require-corp",
+            //     "cross-origin-resource-policy": "cross-origin",
+            // },
             port: 1111,
         },
     };
