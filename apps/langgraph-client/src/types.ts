@@ -52,7 +52,7 @@ export type TypedAsyncGenerator<TStateType = unknown, TUpdateType = TStateType, 
 /**
  * 兼容 LangGraph SDK 的接口定义，方便进行无侵入式的扩展
  */
-export interface ILangGraphClient<TStateType = unknown, TUpdateType = TStateType> {
+export interface ILangGraphClient<TStateType = {}, TUpdateType = TStateType> {
     assistants: {
         search(query?: { graphId?: string; metadata?: Metadata; limit?: number; offset?: number; sortBy?: AssistantSortBy; sortOrder?: SortOrder }): Promise<Assistant[]>;
         getGraph(assistantId: string, options?: { xray?: boolean | number }): Promise<AssistantGraph>;

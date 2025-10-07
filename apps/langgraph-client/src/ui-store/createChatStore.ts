@@ -167,8 +167,8 @@ export const createChatStore = (
      * @zh 发送消息。
      * @en Sends a message.
      */
-    const sendMessage = async (message?: Message[], extraData?: SendMessageOptions) => {
-        if ((!userInput.get().trim() && !message?.length) || loading.get() || !client.get()) return;
+    const sendMessage = async (message?: Message[], extraData?: SendMessageOptions, withoutCheck = false) => {
+        if ((!withoutCheck && !userInput.get().trim() && !message?.length) || loading.get() || !client.get()) return;
 
         loading.set(true);
         inChatError.set(null);
@@ -276,6 +276,18 @@ export const createChatStore = (
             toggleHistoryVisible,
             refreshHistoryList,
             addToHistory,
+            /**
+             * @zh 回滚到指定的消息。
+             * @en Reverts to the specified message.
+             */
+            async revertChatTo(messageId: string, resend = false, sendOptions?: SendMessageOptions) {
+                await client.get()?.revertChatTo(messageId);
+                if (resend) {
+                    return sendMessage([], sendOptions, true);
+                } else {
+                    updateUI(client.get()!);
+                }
+            },
             /**
              * @zh 设置用户输入内容。
              * @en Sets the user input content.

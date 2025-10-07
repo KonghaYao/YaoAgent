@@ -4,6 +4,7 @@ import MessageAI from "./MessageAI";
 import MessageTool from "./MessageTool";
 import { formatTokens, getMessageContent, LangGraphClient, RenderMessage } from "@langgraph-js/sdk";
 import { JSONViewer } from "./JSONViewer";
+import { useChat } from "../context/ChatContext";
 
 interface MessageState {
     showDetail: boolean;
@@ -22,6 +23,7 @@ export const MessagesBox = ({
     toggleToolCollapse: (id: string) => void;
     client: LangGraphClient;
 }) => {
+    const chat = useChat();
     // 使用 Map 来管理每个消息的状态
     const [messageStates, setMessageStates] = useState<Map<string, MessageState>>(new Map());
     const messageRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
@@ -160,6 +162,18 @@ export const MessagesBox = ({
                                     onClick={() => handleToggleDetail(messageId)}
                                 >
                                     {messageState.showDetail ? "隐藏详情" : "显示详情"}
+                                </button>
+                                <button
+                                    className="w-full bg-transparent px-4 py-2.5 text-left hover:bg-gray-100/80 text-sm text-gray-700 transition-colors"
+                                    onClick={() => chat.revertChatTo(messageId)}
+                                >
+                                    回滚到消息
+                                </button>
+                                <button
+                                    className="w-full bg-transparent px-4 py-2.5 text-left hover:bg-gray-100/80 text-sm text-gray-700 transition-colors"
+                                    onClick={() => chat.revertChatTo(messageId, true)}
+                                >
+                                    重发消息
                                 </button>
                             </div>
                         )}

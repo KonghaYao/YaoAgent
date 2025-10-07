@@ -4,6 +4,7 @@ import { ToolManager } from "./ToolManager.js";
 import { CallToolResult } from "./tool/createTool.js";
 import { ILangGraphClient } from "./types.js";
 import { MessageProcessor } from "./MessageProcessor.js";
+import { revertChatTo } from "./time-travel/index.js";
 
 export type RenderMessage = Message & {
     /** 对于 AIMessage 来说是节点名称，对于工具节点来说是工具名称 */
@@ -164,12 +165,15 @@ export class LangGraphClient<TStateType = unknown, TUpdateType = TStateType> ext
      */
     async createThread({
         threadId,
+        graphId,
     }: {
         threadId?: string;
+        graphId?: string;
     } = {}) {
         try {
             this.currentThread = await this.threads.create({
                 threadId,
+                graphId,
             });
             return this.currentThread;
         } catch (error) {
@@ -285,6 +289,17 @@ export class LangGraphClient<TStateType = unknown, TUpdateType = TStateType> ext
         }
     }
     /**
+     * @zh 回滚到指定的消息。但是不会触发数据的重新更新
+     * @en Reverts to the specified message.
+     */
+    async revertChatTo(messageId: string) {
+        const { state, checkpoint } = await revertChatTo(this.client as any, this.currentThread!.thread_id, messageId);
+        this.graphState = state;
+        this.messageProcessor.clearStreamingMessages();
+        this.messageProcessor.setGraphMessages(state.messages! as RenderMessage[]);
+        return state;
+    }
+    /**
      * @zh 发送消息到 LangGraph 后端。
      * @en Sends a message to the LangGraph backend.
      */
@@ -293,7 +308,7 @@ export class LangGraphClient<TStateType = unknown, TUpdateType = TStateType> ext
             throw new Error("Thread or Assistant not initialized");
         }
         if (!this.currentThread) {
-            await this.createThread();
+            await this.createThread({ graphId: this.currentAssistant!.graph_id });
             this.emit("thread", {
                 event: "thread/create",
                 data: {
