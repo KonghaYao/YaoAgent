@@ -1,24 +1,23 @@
 import React from "react";
 import { useChat } from "../context/ChatContext";
-import { getHistoryContent } from "@langgraph-js/sdk";
+import { formatTime, getHistoryContent } from "@langgraph-js/sdk";
 import { RefreshCw, X, RotateCcw, Trash2 } from "lucide-react";
 
 interface HistoryListProps {
     onClose: () => void;
-    formatTime: (date: Date) => string;
 }
 
-const HistoryList: React.FC<HistoryListProps> = ({ onClose, formatTime }) => {
+const HistoryList: React.FC<HistoryListProps> = ({ onClose }) => {
     const { historyList, currentChatId, refreshHistoryList, createNewChat, deleteHistoryChat, toHistoryChat } = useChat();
     return (
-        <section className="bg-white/70 backdrop-blur-sm h-full flex flex-col rounded-2xl shadow-md shadow-gray-100">
-            <div className="px-5 py-4 flex justify-between items-center h-16">
+        <section className="bg-white h-full flex flex-col rounded-2xl shadow-lg shadow-gray-200">
+            <div className="px-5 flex justify-between items-center py-6">
                 <div className="flex items-center gap-3">
                     <h3 className="m-0 text-base font-semibold text-gray-700">历史记录</h3>
-                    <button className="p-2 rounded-lg bg-gray-100 hover:bg-gray-300 transition-colors flex items-center justify-center group" onClick={refreshHistoryList} title="刷新列表">
-                        <RefreshCw className="w-4 h-4 text-gray-600 group-hover:rotate-180 transition-transform duration-300" />
-                    </button>
                 </div>
+                <button className="p-2 rounded-lg bg-gray-100 hover:bg-gray-300 transition-colors flex items-center justify-center group" onClick={refreshHistoryList} title="刷新列表">
+                    <RefreshCw className="w-4 h-4 text-gray-600 group-hover:rotate-180 transition-transform duration-300" />
+                </button>
                 <button className="p-2 rounded-lg bg-gray-100 hover:bg-gray-300 transition-colors flex items-center justify-center group" onClick={onClose} title="关闭">
                     <X className="w-4 h-4 text-red-500" />
                 </button>
@@ -47,7 +46,12 @@ const HistoryList: React.FC<HistoryListProps> = ({ onClose, formatTime }) => {
                                     }`}
                                     key={thread.thread_id}
                                 >
-                                    <div className="flex-1 min-w-0 mr-2">
+                                    <div
+                                        className="flex-1 min-w-0 mr-2"
+                                        onClick={() => {
+                                            toHistoryChat(thread);
+                                        }}
+                                    >
                                         <div className="text-sm text-gray-700 mb-1 truncate max-w-[180px]">{getHistoryContent(thread)}</div>
                                         <div className="flex gap-3 text-xs text-gray-400">
                                             <span className="truncate max-w-[100px]">{formatTime(new Date(thread.created_at))}</span>

@@ -10,7 +10,7 @@ import JsonEditorPopup from "./components/JsonEditorPopup";
 import { JsonToMessageButton } from "./components/JsonToMessage";
 import { GraphPanel } from "../graph/GraphPanel";
 import { setLocalConfig } from "./store";
-import { History, Network, LogOut, FileJson, Settings } from "lucide-react";
+import { History, Network, LogOut, FileJson, Settings, Send } from "lucide-react";
 import { ArtifactViewer } from "../artifacts/ArtifactViewer";
 import "github-markdown-css/github-markdown.css";
 import { ArtifactsProvider, useArtifacts } from "../artifacts/ArtifactsContext";
@@ -18,7 +18,7 @@ import "./index.css";
 import { show_form } from "./tools/index";
 import { create_artifacts } from "./tools/create_artifacts";
 import SettingPanel from "../settings/SettingPanel";
-import { Toaster } from "../sonner";
+import { toast, Toaster } from "../sonner";
 
 const ChatMessages: React.FC = () => {
     const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse, isFELocking } = useChat();
@@ -109,7 +109,7 @@ const ChatInput: React.FC = () => {
     };
 
     return (
-        <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl px-6 py-5">
+        <div className="bg-white rounded-2xl px-6 py-5  mb-4 shadow-lg shadow-gray-200">
             <div className="flex items-center justify-between mb-4">
                 <FileList onFileUploaded={handleFileUploaded} />
 
@@ -129,27 +129,39 @@ const ChatInput: React.FC = () => {
             </div>
             <div className="flex gap-3">
                 <textarea
-                    className="flex-1 px-4 py-3 text-sm bg-white/60 dark:bg-gray-800/60 rounded-xl focus:outline-none focus:bg-white/80 dark:focus:bg-gray-800/80 resize-none transition-colors placeholder:text-gray-400 dark:placeholder:text-gray-500"
-                    rows={2}
+                    className="flex-1 px-5 py-4 text-base bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-inner placeholder:text-gray-400 dark:placeholder:text-gray-500 resize-none active:outline-none focus:outline-none"
+                    rows={3}
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
                     onKeyDown={handleKeyPress}
-                    placeholder="输入消息..."
+                    placeholder="请输入消息内容…"
                     disabled={loading}
+                    style={{
+                        minHeight: "48px",
+                        maxHeight: "120px",
+                        lineHeight: "1.7",
+                        fontFamily: "inherit",
+                    }}
                 />
                 <button
-                    className={`px-6 py-3 text-sm font-medium text-white rounded-xl focus:outline-none transition-colors ${
+                    className={`px-4 py-3 text-sm font-medium text-white rounded-xl focus:outline-none transition-colors flex items-center justify-center ${
                         loading ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed"
                     }`}
                     onClick={() => (loading ? stopGeneration() : sendMultiModalMessage())}
                     disabled={!loading && !userInput.trim() && imageUrls.length === 0}
                 >
-                    {loading ? "中断" : "发送"}
+                    {loading ? (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    ) : (
+                        <Send className="w-5 h-5" />
+                    )}
                 </button>
             </div>
             <div className="flex mt-4 gap-2 justify-between items-center">
                 <UsageMetadata usage_metadata={client?.tokenCounter || {}} />
-                <span className="text-xs text-gray-400 dark:text-gray-500">会话 ID: {currentChatId}</span>
+                {!!currentChatId && <span className="text-xs text-gray-400 dark:text-gray-500">会话 ID: {currentChatId}</span>}
             </div>
         </div>
     );
@@ -166,9 +178,13 @@ const Chat: React.FC = () => {
         setTools([show_form, create_artifacts]);
     }, []);
     return (
-        <div className="langgraph-chat-container flex h-full w-full overflow-hidden ">
-            {showHistory && <HistoryList onClose={() => toggleHistoryVisible()} formatTime={formatTime} />}
-            <section className="flex-1 flex flex-col overflow-auto items-center bg-gray-100">
+        <div className="langgraph-chat-container flex h-full w-full overflow-hidden bg-gray-100">
+            {showHistory && (
+                <div className="p-4">
+                    <HistoryList onClose={() => toggleHistoryVisible()} />
+                </div>
+            )}
+            <section className="flex-1 flex flex-col overflow-auto items-center ">
                 <header className="flex items-center gap-2 px-6 py-4 bg-white/50 backdrop-blur-sm justify-end h-16 mt-4 rounded-2xl shadow-lg shadow-gray-200">
                     <button
                         className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
@@ -187,7 +203,7 @@ const Chat: React.FC = () => {
                         className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
                     >
                         <FileJson className="w-4 h-4" />
-                        编辑参数
+                        额外参数
                     </button>
                     <button
                         id="setting-button"
@@ -200,6 +216,7 @@ const Chat: React.FC = () => {
                     <button
                         className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
                         onClick={() => {
+                            toast.info("数据已打印到控制台，请 F12 查看");
                             console.log(client?.graphState);
                         }}
                     >
@@ -220,7 +237,14 @@ const Chat: React.FC = () => {
                     <ChatMessages />
                     <ChatInput />
                 </main>
-                <JsonEditorPopup isOpen={isPopupOpen} initialJson={extraParams} onClose={() => setIsPopupOpen(false)} onSave={setExtraParams} />
+                <JsonEditorPopup
+                    isOpen={isPopupOpen}
+                    initialJson={extraParams}
+                    onClose={() => setIsPopupOpen(false)}
+                    onSave={setExtraParams}
+                    title="编辑额外参数"
+                    description="额外参数用于在发送消息时附加到 LangGraph 的 State 中。"
+                />
                 <SettingPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
             </section>
             {(showGraph || showArtifact) && (

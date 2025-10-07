@@ -10,12 +10,14 @@ interface JsonEditorPopupProps {
     initialJson: object;
     onClose: () => void;
     onSave: (jsonData: object) => void;
+    title: string;
+    description: string;
 }
 
 const LOCAL_STORAGE_KEY = "json-editor-presets";
 const ACTIVE_TAB_STORAGE_KEY = "json-editor-active-tab";
 
-const JsonEditorPopup: React.FC<JsonEditorPopupProps> = ({ isOpen, initialJson, onClose, onSave }) => {
+const JsonEditorPopup: React.FC<JsonEditorPopupProps> = ({ isOpen, initialJson, onClose, onSave, title, description }) => {
     const [presets, setPresets] = useState<JsonPreset[]>([]);
     const [activeTab, setActiveTab] = useState(0);
     const [jsonString, setJsonString] = useState("");
@@ -128,9 +130,10 @@ const JsonEditorPopup: React.FC<JsonEditorPopupProps> = ({ isOpen, initialJson, 
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="bg-white rounded-2xl w-full max-w-2xl mx-4 flex flex-col overflow-hidden" style={{ height: "80vh" }}>
                 <div className="px-6 py-5 bg-white/80 backdrop-blur-sm">
-                    <h2 className="text-lg font-semibold text-gray-800">编辑 Extra Parameters</h2>
+                    <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
                 </div>
-                <div className="flex-grow px-6 py-4 overflow-y-auto">
+                <div className="px-6 py-4 text-sm text-gray-500">{description}</div>
+                <nav className="flex-grow px-6 py-4 overflow-y-auto">
                     <div className="flex items-center mb-4 gap-2">
                         {presets.map((preset, index) => (
                             <div
@@ -182,7 +185,7 @@ const JsonEditorPopup: React.FC<JsonEditorPopupProps> = ({ isOpen, initialJson, 
                         className="w-full h-full px-4 py-3 bg-gray-50 rounded-xl font-mono text-sm focus:outline-none focus:bg-gray-100 transition-colors"
                     />
                     {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
-                </div>
+                </nav>
                 <div className="flex justify-end gap-3 px-6 py-5 bg-gray-50/50">
                     <button onClick={onClose} className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white rounded-xl hover:bg-gray-100 focus:outline-none transition-colors">
                         取消
