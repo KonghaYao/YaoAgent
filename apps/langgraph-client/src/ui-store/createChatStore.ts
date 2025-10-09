@@ -178,6 +178,8 @@ export const createChatStore = (
             const isThreadRunning = (e as Error).message.includes("422");
             if (isThreadRunning) {
                 await client.get()?.resetStream();
+            } else {
+                throw e;
             }
         } finally {
             userInput.set("");

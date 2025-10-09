@@ -92,6 +92,16 @@ const ChatInput: React.FC = () => {
             setMediaUrls((prev) => [...prev, { type: "file_url", file_url: { url }, fileType }]);
         }
     };
+
+    const handleFileRemoved = (url: string, fileType: SupportedFileType) => {
+        // 删除时移除对应的媒体文件信息
+        setMediaUrls((prev) =>
+            prev.filter((media) => {
+                const mediaUrl = media.image_url?.url || media.video_url?.url || media.audio_url?.url || media.file_url?.url;
+                return mediaUrl !== url;
+            })
+        );
+    };
     const _setCurrentAgent = (agent: string) => {
         localStorage.setItem("defaultAgent", agent);
         setCurrentAgent(agent);
@@ -128,9 +138,6 @@ const ChatInput: React.FC = () => {
         sendMessage(content, {
             extraParams,
         });
-
-        // 清空媒体文件列表
-        setMediaUrls([]);
     };
 
     const handleKeyPress = (event: React.KeyboardEvent) => {
@@ -141,56 +148,44 @@ const ChatInput: React.FC = () => {
     };
 
     return (
-        <div className="bg-white rounded-2xl px-6 py-5  mb-4 shadow-lg shadow-gray-200">
+        <div className="bg-white rounded-2xl px-4 py-3  mb-4 shadow-lg shadow-gray-200">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-4">
-                    <FileList onFileUploaded={handleFileUploaded} />
-                    <div className="flex items-center gap-2 text-xs text-gray-600">
-                        <span>文本模式:</span>
-                        <button
-                            onClick={() => setIsFileTextMode((prev) => ({ ...prev, image: !prev.image }))}
-                            className={`px-2 py-1 rounded ${isFileTextMode.image ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
-                        >
-                            图片
-                        </button>
-                        <button
-                            onClick={() => setIsFileTextMode((prev) => ({ ...prev, video: !prev.video }))}
-                            className={`px-2 py-1 rounded ${isFileTextMode.video ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
-                        >
-                            视频
-                        </button>
-                        <button
-                            onClick={() => setIsFileTextMode((prev) => ({ ...prev, audio: !prev.audio }))}
-                            className={`px-2 py-1 rounded ${isFileTextMode.audio ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
-                        >
-                            音频
-                        </button>
-                        <button
-                            onClick={() => setIsFileTextMode((prev) => ({ ...prev, other: !prev.other }))}
-                            className={`px-2 py-1 rounded ${isFileTextMode.other ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
-                        >
-                            其他
-                        </button>
-                    </div>
+                    <FileList onFileUploaded={handleFileUploaded} onFileRemoved={handleFileRemoved} />
                 </div>
-
-                <select
-                    value={currentAgent}
-                    onChange={(e) => _setCurrentAgent(e.target.value)}
-                    className="px-4 py-2 text-sm bg-white/60 dark:bg-gray-800/60 rounded-xl focus:outline-none transition-colors"
-                >
-                    {client?.availableAssistants.map((i) => {
-                        return (
-                            <option value={i.graph_id} key={i.graph_id}>
-                                {i.name}
-                            </option>
-                        );
-                    })}
-                </select>
             </div>
+            {mediaUrls.length > 0 && (
+                <div className="flex items-center gap-2 text-xs text-gray-600 mb-3" title="文本传输将会把多模态文件转为 XML + URL 的格式传递给大模型">
+                    <span>启动文本传输:</span>
+                    <button
+                        onClick={() => setIsFileTextMode((prev) => ({ ...prev, image: !prev.image }))}
+                        className={`px-2 py-1 rounded ${isFileTextMode.image ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
+                    >
+                        图片
+                    </button>
+                    <button
+                        onClick={() => setIsFileTextMode((prev) => ({ ...prev, video: !prev.video }))}
+                        className={`px-2 py-1 rounded ${isFileTextMode.video ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
+                    >
+                        视频
+                    </button>
+                    <button
+                        onClick={() => setIsFileTextMode((prev) => ({ ...prev, audio: !prev.audio }))}
+                        className={`px-2 py-1 rounded ${isFileTextMode.audio ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
+                    >
+                        音频
+                    </button>
+                    <button
+                        onClick={() => setIsFileTextMode((prev) => ({ ...prev, other: !prev.other }))}
+                        className={`px-2 py-1 rounded ${isFileTextMode.other ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
+                    >
+                        其他
+                    </button>
+                </div>
+            )}
             <div className="flex gap-3">
                 <textarea
-                    className="flex-1 px-5 py-4 text-base bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-inner placeholder:text-gray-400 dark:placeholder:text-gray-500 resize-none active:outline-none focus:outline-none"
+                    className="flex-1 px-5 py-4 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl placeholder:text-gray-400 dark:placeholder:text-gray-500 resize-none active:outline-none focus:outline-none"
                     rows={3}
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
@@ -198,9 +193,8 @@ const ChatInput: React.FC = () => {
                     placeholder="请输入消息内容…"
                     disabled={loading}
                     style={{
-                        minHeight: "48px",
-                        maxHeight: "120px",
-                        lineHeight: "1.7",
+                        minHeight: "3rem",
+                        maxHeight: "6rem",
                         fontFamily: "inherit",
                     }}
                 />
@@ -222,7 +216,22 @@ const ChatInput: React.FC = () => {
             </div>
             <div className="flex mt-4 gap-2 justify-between items-center">
                 <UsageMetadata usage_metadata={client?.tokenCounter || {}} />
-                {!!currentChatId && <span className="text-xs text-gray-400 dark:text-gray-500">会话 ID: {currentChatId}</span>}
+                <div className="flex items-center gap-2">
+                    {!!currentChatId && <span className="text-xs text-gray-400 dark:text-gray-500">会话 ID: {currentChatId}</span>}
+                    <select
+                        value={currentAgent}
+                        onChange={(e) => _setCurrentAgent(e.target.value)}
+                        className="px-4 py-2 text-sm bg-white/60 dark:bg-gray-800/60 rounded-xl focus:outline-none transition-colors"
+                    >
+                        {client?.availableAssistants.map((i) => {
+                            return (
+                                <option value={i.graph_id} key={i.graph_id}>
+                                    {i.name}
+                                </option>
+                            );
+                        })}
+                    </select>
+                </div>
             </div>
         </div>
     );

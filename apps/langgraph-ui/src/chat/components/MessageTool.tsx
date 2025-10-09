@@ -37,7 +37,7 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, client, getMessageCo
                 (render(message) as JSX.Element)
             ) : (
                 <div className={`flex flex-col w-full ${bgColorClass} rounded-2xl overflow-hidden`}>
-                    <div className="flex items-center justify-between px-5 py-3 cursor-pointer hover:bg-black/5 transition-colors" onClick={onToggleCollapse}>
+                    <div className="flex items-center justify-between px-5 py-3 cursor-pointer hover:bg-gray-100 transition-colors" onClick={onToggleCollapse}>
                         <div className="text-xs font-medium text-gray-600" onClick={() => console.log(message)}>
                             {message.node_name} | {message.name}
                         </div>
@@ -86,22 +86,28 @@ const Previewer = ({ content }: { content: string }) => {
     return (
         <div className={`flex flex-col`}>
             <div className="flex gap-2 mb-2">
-                <button onClick={copyToClipboard} className="px-3 py-1 text-xs font-medium text-gray-700 bg-white/60 rounded-lg hover:bg-white transition-colors">
+                <button onClick={copyToClipboard} className="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
                     copy
                 </button>
                 {isJSON && (
-                    <button onClick={() => setJsonMode(!jsonMode)} className="px-3 py-1 text-xs font-medium text-gray-700 bg-white/60 rounded-lg hover:bg-white transition-colors">
+                    <button
+                        onClick={() => setJsonMode(!jsonMode)}
+                        className="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
                         json
                     </button>
                 )}
                 {isMarkdown && (
-                    <button onClick={() => setMarkdownMode(!markdownMode)} className="px-3 py-1 text-xs font-medium text-gray-700 bg-white/60 rounded-lg hover:bg-white transition-colors">
+                    <button
+                        onClick={() => setMarkdownMode(!markdownMode)}
+                        className="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
                         markdown
                     </button>
                 )}
             </div>
 
-            <div className="flex flex-col max-h-[300px] overflow-auto bg-white/40 rounded-xl p-3 w-full text-xs font-mono whitespace-pre-wrap">
+            <div className="flex flex-col max-h-[300px] overflow-auto bg-white border border-gray-200 rounded-xl p-3 w-full text-xs font-mono whitespace-pre-wrap">
                 {jsonMode && isJSON ? (
                     <Highlight code={JSON.stringify(JSON.parse(content), null, 2)} language="json" theme={themes.oneLight}>
                         {({ className, style, tokens, getLineProps, getTokenProps }) => (

@@ -1,4 +1,3 @@
-import { RemoveMessage } from "@langchain/core/messages";
 import { Client, Message } from "@langchain/langgraph-sdk";
 
 export async function revertChatTo(client: Client<{ messages: Message[] }, { messages: Message[] }, unknown>, threadId: string, messageId: string) {
