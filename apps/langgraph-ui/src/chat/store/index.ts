@@ -39,13 +39,13 @@ const db = new FullTextSearchService({
 db.initialize();
 console.log(db);
 export const memoryTool = createMemoryTool(db);
-const defaultHeaders = JSON.parse(localStorage.getItem("code") || "{}");
+const defaultHeaders = JSON.parse(localStorage.getItem("code") || "[]");
 
 export const globalChatStore = createChatStore(
     localStorage.getItem("defaultAgent") || "",
     {
         apiUrl: localStorage.getItem("apiUrl") || "http://localhost:8123",
-        defaultHeaders,
+        defaultHeaders: Object.fromEntries(defaultHeaders.map((i: { key: string; value: string }) => [i.key, i.value])),
         callerOptions: {
             // 携带 cookie 的写法
             fetch: F,
