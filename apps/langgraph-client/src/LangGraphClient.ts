@@ -302,7 +302,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
             throw new Error("Thread or Assistant not initialized");
         }
         if (!this.currentThread) {
-            await this.createThread({ graphId: this.currentAssistant!.graph_id!, threadId: this.currentThread!.thread_id! });
+            await this.createThread({ graphId: this.currentAssistant!.graph_id! });
             this.emit("thread", {
                 event: "thread/create",
                 data: {

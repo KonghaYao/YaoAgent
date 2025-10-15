@@ -1,4 +1,4 @@
-import { createElement, createContext, useContext, useMemo, ReactNode, useEffect } from "react";
+import { createElement, createContext, useContext, useMemo, ReactNode, useEffect, useRef } from "react";
 
 import { createChatStore, UnionStore, useUnionStore } from "../ui-store/index.js";
 import { useStore } from "@nanostores/react";
@@ -28,12 +28,21 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     children,
     defaultAgent = "",
     apiUrl = "http://localhost:8123",
-    defaultHeaders = {},
+    defaultHeaders,
     withCredentials = false,
     showHistory = false,
     showGraph = false,
     onInitError,
 }) => {
+    // 使用 useMemo 稳定 defaultHeaders 的引用
+    const stableHeaders = useMemo(() => defaultHeaders || {}, [defaultHeaders]);
+
+    // 使用 useRef 保存 onInitError 的最新引用
+    const onInitErrorRef = useRef(onInitError);
+    useEffect(() => {
+        onInitErrorRef.current = onInitError;
+    }, [onInitError]);
+
     const store = useMemo(() => {
         const F = withCredentials
             ? (url: string, options: RequestInit) => {
@@ -46,7 +55,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
             defaultAgent,
             {
                 apiUrl,
-                defaultHeaders,
+                defaultHeaders: stableHeaders,
                 callerOptions: {
                     fetch: F,
                     maxRetries: 1,
@@ -57,11 +66,19 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
                 showGraph,
             }
         );
-    }, [defaultAgent, apiUrl, defaultHeaders, withCredentials, showHistory, showGraph]);
+    }, [defaultAgent, apiUrl, stableHeaders, withCredentials, showHistory, showGraph]);
 
     const unionStore = useUnionStore(store, useStore);
 
+    // 使用 ref 标记是否已初始化
+    const initializedRef = useRef(false);
+
     useEffect(() => {
+        if (initializedRef.current) {
+            return;
+        }
+        initializedRef.current = true;
+
         unionStore
             .initClient()
             .then((res) => {
@@ -71,11 +88,11 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
             })
             .catch((err) => {
                 console.error(err);
-                if (onInitError) {
-                    onInitError(err, unionStore.currentAgent);
+                if (onInitErrorRef.current) {
+                    onInitErrorRef.current(err, unionStore.currentAgent);
                 }
             });
-    }, [unionStore, onInitError]);
+    }, [unionStore]);
 
     return createElement(ChatContext.Provider, { value: unionStore }, children);
 };
