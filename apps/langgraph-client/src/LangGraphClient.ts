@@ -2,7 +2,7 @@ import type { Thread, Message, Assistant, HumanMessage, AIMessage, ToolMessage, 
 import { EventEmitter } from "eventemitter3";
 import { ToolManager } from "./ToolManager.js";
 import { CallToolResult } from "./tool/createTool.js";
-import { ILangGraphClient } from "./types.js";
+import { type ILangGraphClient } from "@langgraph-js/pure-graph/dist/types.js";
 import { MessageProcessor } from "./MessageProcessor.js";
 import { revertChatTo } from "./time-travel/index.js";
 
@@ -69,7 +69,7 @@ export interface LangGraphClientConfig {
     timeoutMs?: number;
     defaultHeaders?: Record<string, string | null | undefined>;
     /** 自定义客户端实现，如果不提供则使用官方 Client */
-    client: ILangGraphClient<any, any>;
+    client: ILangGraphClient<any>;
 }
 
 // 定义事件数据类型
@@ -92,8 +92,8 @@ export interface LangGraphEvents {
  * @zh LangGraphClient 类是与 LangGraph 后端交互的主要客户端。
  * @en The LangGraphClient class is the main client for interacting with the LangGraph backend.
  */
-export class LangGraphClient<TStateType = unknown, TUpdateType = TStateType> extends EventEmitter<LangGraphEvents> {
-    private client: ILangGraphClient<TStateType, TUpdateType>;
+export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGraphEvents> {
+    private client: ILangGraphClient<TStateType>;
     private currentAssistant: Assistant | null = null;
     private currentThread: Thread<TStateType> | null = null;
     tools: ToolManager = new ToolManager();
@@ -123,7 +123,7 @@ export class LangGraphClient<TStateType = unknown, TUpdateType = TStateType> ext
     }
 
     /** 代理 runs 属性到内部 client */
-    get runs() {
+    get runs(): ILangGraphClient["runs"] {
         return this.client.runs;
     }
     private listAssistants() {
@@ -163,13 +163,7 @@ export class LangGraphClient<TStateType = unknown, TUpdateType = TStateType> ext
      * @zh 创建一个新的 Thread。
      * @en Creates a new Thread.
      */
-    async createThread({
-        threadId,
-        graphId,
-    }: {
-        threadId?: string;
-        graphId?: string;
-    } = {}) {
+    async createThread({ threadId, graphId }: { threadId?: string; graphId?: string } = {}) {
         try {
             this.currentThread = await this.threads.create({
                 threadId,
@@ -308,7 +302,7 @@ export class LangGraphClient<TStateType = unknown, TUpdateType = TStateType> ext
             throw new Error("Thread or Assistant not initialized");
         }
         if (!this.currentThread) {
-            await this.createThread({ graphId: this.currentAssistant!.graph_id });
+            await this.createThread({ graphId: this.currentAssistant!.graph_id!, threadId: this.currentThread!.thread_id! });
             this.emit("thread", {
                 event: "thread/create",
                 data: {
