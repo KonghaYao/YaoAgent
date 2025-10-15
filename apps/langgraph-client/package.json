@@ -1,12 +1,26 @@
 {
     "name": "@langgraph-js/sdk",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "description": "The UI SDK for LangGraph - seamlessly integrate your AI agents with frontend interfaces",
     "main": "dist/index.js",
     "type": "module",
     "publishConfig": {
         "registry": "https://registry.npmjs.org/",
         "access": "public"
+    },
+    "exports": {
+        "./react": {
+            "import": "./dist/react/index.js",
+            "types": "./dist/react/index.d.ts"
+        },
+        "./vue": {
+            "import": "./dist/vue/index.js",
+            "types": "./dist/vue/index.d.ts"
+        },
+        ".": {
+            "import": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        }
     },
     "scripts": {
         "build": "tsc",
@@ -20,7 +34,8 @@
         "ai",
         "agents",
         "langchain",
-        "react"
+        "react",
+        "vue"
     ],
     "author": "LangGraph Team",
     "license": "Apache-2.0",
@@ -34,12 +49,36 @@
         "url": "https://github.com/KonghaYao/YaoAgent/issues"
     },
     "dependencies": {
-        "@langchain/langgraph-sdk": "^0.0.77",
+        "@langchain/langgraph-sdk": "^0.1.10",
         "eventemitter3": "^5.0.1",
         "jsonrepair": "^3.12.0",
         "nanostores": "^1.0.1",
         "ts-debounce": "^4.0.0",
         "zod": "^3.25.17",
         "zod-to-json-schema": "^3.24.5"
+    },
+    "peerDependencies": {
+        "@nanostores/react": "^1.0.0",
+        "@nanostores/vue": "^1.0.0",
+        "react": "^19||^18",
+        "vue": "^3.0.0"
+    },
+    "peerDependenciesMeta": {
+        "@nanostores/react": {
+            "optional": true
+        },
+        "@nanostores/vue": {
+            "optional": true
+        },
+        "react": {
+            "optional": true
+        },
+        "vue": {
+            "optional": true
+        }
+    },
+    "devDependencies": {
+        "@types/react": "^19.1.6",
+        "vue": "^3.5.14"
     }
 }

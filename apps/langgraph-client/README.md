@@ -97,40 +97,10 @@ First, install the nanostores React integration:
 pnpm i @nanostores/react
 ```
 
-Then create a context provider for your chat:
+Then use the ChatProvider in your components:
 
 ```tsx
-import React, { createContext, useContext, useEffect } from "react";
-import { globalChatStore } from "../store"; // Import your store
-import { UnionStore, useUnionStore } from "@langgraph-js/sdk";
-import { useStore } from "@nanostores/react";
-
-type ChatContextType = UnionStore<typeof globalChatStore>;
-
-const ChatContext = createContext<ChatContextType | undefined>(undefined);
-
-export const useChat = () => {
-    const context = useContext(ChatContext);
-    if (!context) {
-        throw new Error("useChat must be used within a ChatProvider");
-    }
-    return context;
-};
-
-export const ChatProvider = ({ children }) => {
-    // Use store to ensure React gets reactive state updates
-    const store = useUnionStore(globalChatStore, useStore);
-    
-    useEffect(() => {
-        // Initialize client
-        store.initClient().then(() => {
-            // Initialize conversation history
-            store.refreshHistoryList();
-        });
-    }, [store.currentAgent]);
-
-    return <ChatContext.Provider value={store}>{children}</ChatContext.Provider>;
-};
+import { ChatProvider, useChat } from "@langgraph-js/sdk/react";
 ```
 
 Use it in your components:
@@ -138,8 +108,19 @@ Use it in your components:
 ```tsx
 export const MyChat = () => {
     return (
-        <ChatProvider>
-            <ChatComp></ChatComp>
+        <ChatProvider
+            defaultAgent="agent"
+            apiUrl="http://localhost:8123"
+            defaultHeaders={{}}
+            withCredentials={false}
+            showHistory={true}
+            showGraph={false}
+            onInitError={(error, currentAgent) => {
+                console.error(`Failed to initialize ${currentAgent}:`, error);
+                // Handle initialization error
+            }}
+        >
+            <ChatComp />
         </ChatProvider>
     );
 };
@@ -148,6 +129,84 @@ function ChatComp() {
     const chat = useChat();
     // Use chat store methods and state here
 }
+```
+
+### Vue Integration
+
+First, install the nanostores Vue integration:
+
+```bash
+pnpm i @nanostores/vue
+```
+
+Then use the ChatProvider in your components:
+
+```typescript
+import { ChatProvider, useChat, useChatProvider } from "@langgraph-js/sdk/vue";
+```
+
+#### Option 1: Using ChatProvider Component
+
+Use it in your components:
+
+```vue
+<template>
+    <ChatProvider
+        :default-agent="'agent'"
+        :api-url="'http://localhost:8123'"
+        :default-headers="{}"
+        :with-credentials="false"
+        :show-history="true"
+        :show-graph="false"
+        :on-init-error="
+            (error, currentAgent) => {
+                console.error(`Failed to initialize ${currentAgent}:`, error);
+                // Handle initialization error
+            }
+        "
+    >
+        <ChatComp />
+    </ChatProvider>
+</template>
+
+<script setup lang="ts">
+import { ChatProvider } from "@langgraph-js/sdk/vue";
+
+function ChatComp() {
+    const chat = useChat();
+    // Use chat store methods and state here
+}
+</script>
+```
+
+#### Option 2: Using useChatProvider Hook Directly
+
+For more flexibility, you can use the hook directly in your setup:
+
+```vue
+<script setup lang="ts">
+import { useChatProvider } from "@langgraph-js/sdk/vue";
+
+const props = {
+    defaultAgent: "agent",
+    apiUrl: "http://localhost:8123",
+    defaultHeaders: {},
+    withCredentials: false,
+    showHistory: true,
+    showGraph: false,
+    onInitError: (error: any, currentAgent: string) => {
+        console.error(`Failed to initialize ${currentAgent}:`, error);
+        // Handle initialization error
+    },
+};
+
+const { unionStore } = useChatProvider(props);
+// Use unionStore methods and state here
+</script>
+
+<template>
+    <ChatComp />
+</template>
 ```
 
 ## Documentation

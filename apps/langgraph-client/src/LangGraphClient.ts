@@ -356,7 +356,7 @@ export class LangGraphClient<TStateType = unknown, TUpdateType = TStateType> ext
             streamRecord.push(chunk);
             if (chunk.event === "metadata") {
                 this.currentRun = chunk.data;
-            } else if (chunk.event === "error") {
+            } else if (chunk.event === "error" || chunk.event === "Error" || chunk.event === "__stream_error__") {
                 this.emit("error", chunk);
             } else if (chunk.event === "messages/partial") {
                 for (const message of chunk.data) {
