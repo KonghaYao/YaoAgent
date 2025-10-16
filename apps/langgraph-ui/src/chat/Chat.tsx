@@ -1,17 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MessagesBox } from "./components/MessageBox";
 import HistoryList from "./components/HistoryList";
-import { ChatProvider, useChat } from "./context/ChatContext";
+import { ChatProvider, useChat } from "@langgraph-js/sdk/react";
 import { ExtraParamsProvider, useExtraParams } from "./context/ExtraParamsContext";
 import { UsageMetadata } from "./components/UsageMetadata";
-import { formatTime, Message } from "@langgraph-js/sdk";
+import { Message } from "@langgraph-js/sdk";
 import FileList from "./components/FileList";
 import type { SupportedFileType } from "./components/FileList";
 import JsonEditorPopup from "./components/JsonEditorPopup";
-import { JsonToMessageButton } from "./components/JsonToMessage";
 import { GraphPanel } from "../graph/GraphPanel";
 import { setLocalConfig } from "./store";
-import { History, Network, LogOut, FileJson, Settings, Send } from "lucide-react";
+import { History, Network, FileJson, Settings, Send } from "lucide-react";
 import { ArtifactViewer } from "../artifacts/ArtifactViewer";
 import "github-markdown-css/github-markdown.css";
 import { ArtifactsProvider, useArtifacts } from "../artifacts/ArtifactsContext";
@@ -328,8 +327,74 @@ const Chat: React.FC = () => {
 };
 
 const ChatWrapper: React.FC = () => {
+    // 从 localStorage 读取配置数据
+    const getLocalStorageData = () => {
+        try {
+            const storedHeaders = localStorage.getItem("code");
+            const storedWithCredentials = localStorage.getItem("withCredentials");
+            const storedApiUrl = localStorage.getItem("apiUrl");
+            const storedDefaultAgent = localStorage.getItem("defaultAgent");
+            const storedShowHistory = localStorage.getItem("showHistory");
+            const storedShowGraph = localStorage.getItem("showGraph");
+
+            // 处理请求头
+            let defaultHeaders: Record<string, string> = {};
+            if (storedHeaders) {
+                const parsedHeaders = JSON.parse(storedHeaders);
+                if (Array.isArray(parsedHeaders)) {
+                    defaultHeaders = Object.fromEntries(parsedHeaders.map((item: { key: string; value: string }) => [item.key, item.value]));
+                } else if (typeof parsedHeaders === "object") {
+                    defaultHeaders = parsedHeaders;
+                }
+            }
+
+            return {
+                defaultAgent: storedDefaultAgent || "",
+                apiUrl: storedApiUrl || "http://localhost:8123",
+                defaultHeaders,
+                withCredentials: storedWithCredentials === "true",
+                showHistory: storedShowHistory === "true",
+                showGraph: storedShowGraph === "true",
+            };
+        } catch (error) {
+            console.error("Error reading config from localStorage:", error);
+            return {
+                defaultAgent: "",
+                apiUrl: "http://localhost:8123",
+                defaultHeaders: {},
+                withCredentials: false,
+                showHistory: false,
+                showGraph: false,
+            };
+        }
+    };
+
+    const config = getLocalStorageData();
+
     return (
-        <ChatProvider>
+        <ChatProvider
+            defaultAgent={config.defaultAgent}
+            apiUrl={config.apiUrl}
+            defaultHeaders={config.defaultHeaders}
+            withCredentials={config.withCredentials}
+            showHistory={config.showHistory}
+            showGraph={config.showGraph}
+            onInitError={(err, currentAgent) => {
+                // 默认错误处理
+                toast.error("请检查服务器配置: ", "初始化客户端失败，" + currentAgent + "\n" + err, {
+                    duration: 10000,
+                    action: {
+                        label: "去设置",
+                        onClick: () => {
+                            document.getElementById("setting-button")?.click();
+                            setTimeout(() => {
+                                document.getElementById("server-login-button")?.click();
+                            }, 300);
+                        },
+                    },
+                });
+            }}
+        >
             <ExtraParamsProvider>
                 <ArtifactsProvider>
                     <Chat />

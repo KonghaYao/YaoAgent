@@ -4,7 +4,7 @@ import MessageAI from "./MessageAI";
 import MessageTool from "./MessageTool";
 import { formatTokens, getMessageContent, LangGraphClient, RenderMessage } from "@langgraph-js/sdk";
 import { JSONViewer } from "./JSONViewer";
-import { useChat } from "../context/ChatContext";
+import { useChat } from "@langgraph-js/sdk/react";
 
 interface MessageState {
     showDetail: boolean;

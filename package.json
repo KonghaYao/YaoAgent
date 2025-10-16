@@ -3,16 +3,14 @@
     "author": "Your Name",
     "private": true,
     "scripts": {
-        "preinstall": "node patch_deps.mjs",
         "dev": "turbo dev --filter=agents",
         "build": "turbo build",
         "turbo:command": "turbo",
         "format": "turbo format",
         "lint": "turbo lint",
         "lint:fix": "turbo lint:fix",
-        "docs:dev": "vitepress dev docs",
-        "docs:build": "vitepress build docs",
-        "docs:preview": "vitepress preview docs"
+        "docs:dev": "xyd",
+        "docs:build": "npx xyd-js build"
     },
     "devDependencies": {
         "@tsconfig/recommended": "^1.0.8",
@@ -22,15 +20,7 @@
         "tsx": "^4.19.3",
         "turbo": "latest",
         "typescript": "^5.8.3",
-        "vitepress": "^1.6.3",
         "vitest": "^3.0.0"
     },
-    "resolutions": {
-        "@langchain/core": "^0.3.42"
-    },
-    "packageManager": "pnpm@10.11.0",
-    "dependencies": {
-        "@langchain/core": "^0.3.49",
-        "vite": "^6.3.5"
-    }
+    "packageManager": "pnpm@10.11.0"
 }

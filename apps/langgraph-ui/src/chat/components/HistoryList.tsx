@@ -1,5 +1,5 @@
 import React from "react";
-import { useChat } from "../context/ChatContext";
+import { useChat } from "@langgraph-js/sdk/react";
 import { formatTime, getHistoryContent } from "@langgraph-js/sdk";
 import { RefreshCw, X, RotateCcw, Trash2 } from "lucide-react";
 

@@ -1,7 +1,7 @@
 import React, { JSX, useState } from "react";
 import { LangGraphClient, RenderMessage, ToolMessage } from "@langgraph-js/sdk";
 import { UsageMetadata } from "./UsageMetadata";
-import { useChat } from "../context/ChatContext";
+import { useChat } from "@langgraph-js/sdk/react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Highlight, themes } from "prism-react-renderer";

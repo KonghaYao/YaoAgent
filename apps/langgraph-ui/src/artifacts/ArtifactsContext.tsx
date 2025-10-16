@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
-import { useChat } from "../chat/context/ChatContext";
+import { useChat } from "@langgraph-js/sdk/react";
 import { Message } from "@langgraph-js/sdk";
 
 interface Artifact {

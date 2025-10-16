@@ -1,9 +1,13 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from "react";
-type ChatContextType = UnionStore<typeof globalChatStore>;
+import React, { createContext, useContext, useMemo, ReactNode, useEffect } from "react";
+import { createChatStore } from "@langgraph-js/sdk";
+import { UnionStore, useUnionStore } from "@langgraph-js/sdk";
+import { useStore } from "@nanostores/react";
+
+type ChatContextType = UnionStore<ReturnType<typeof createChatStore>>;
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
-export const useChat = () => {
+export const useChat = (): ChatContextType => {
     const context = useContext(ChatContext);
     if (!context) {
         throw new Error("useChat must be used within a ChatProvider");
@@ -13,42 +17,67 @@ export const useChat = () => {
 
 interface ChatProviderProps {
     children: ReactNode;
+    defaultAgent?: string;
+    apiUrl?: string;
+    defaultHeaders?: Record<string, string>;
+    withCredentials?: boolean;
+    showHistory?: boolean;
+    showGraph?: boolean;
+    onInitError?: (error: any, currentAgent: string) => void;
 }
-import { globalChatStore } from "../store";
-import { UnionStore, useUnionStore } from "@langgraph-js/sdk";
-import { useStore } from "@nanostores/react";
-import { toast } from "../../sonner/toast";
-export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
-    const store = useUnionStore(globalChatStore, useStore);
+
+export const ChatProvider: React.FC<ChatProviderProps> = ({
+    children,
+    defaultAgent = "",
+    apiUrl = "http://localhost:8123",
+    defaultHeaders = {},
+    withCredentials = false,
+    showHistory = false,
+    showGraph = false,
+    onInitError,
+}) => {
+    const store = useMemo(() => {
+        const F = withCredentials
+            ? (url: string, options: RequestInit) => {
+                  options.credentials = "include";
+                  return fetch(url, options);
+              }
+            : fetch;
+
+        return createChatStore(
+            defaultAgent,
+            {
+                apiUrl,
+                defaultHeaders,
+                callerOptions: {
+                    fetch: F,
+                    maxRetries: 1,
+                },
+            },
+            {
+                showHistory,
+                showGraph,
+            }
+        );
+    }, [defaultAgent, apiUrl, defaultHeaders, withCredentials, showHistory, showGraph]);
+
+    const unionStore = useUnionStore(store, useStore);
+
     useEffect(() => {
-        store
+        unionStore
             .initClient()
             .then((res) => {
-                if (store.showHistory) {
-                    store.refreshHistoryList();
+                if (unionStore.showHistory) {
+                    unionStore.refreshHistoryList();
                 }
-                // console.log(res);
-                toast.success("Hello, LangGraph!");
             })
             .catch((err) => {
                 console.error(err);
-                toast.error("请检查服务器配置: ", "初始化客户端失败，" + store.currentAgent + "\n" + err, {
-                    duration: 10000,
-                    action: {
-                        label: "去设置",
-                        onClick: () => {
-                            document.getElementById("setting-button")?.click();
-                            setTimeout(() => {
-                                document.getElementById("server-login-button")?.click();
-                            }, 300);
-                        },
-                    },
-                });
-                // const agentName = prompt("Failed to initialize chat client: " + store.currentAgent + "\n请输入 agent 名称");
-                // localStorage.setItem("agent_name", agentName!);
-                // location.reload();
+                if (onInitError) {
+                    onInitError(err, unionStore.currentAgent);
+                }
             });
-    }, []);
+    }, [unionStore, onInitError]);
 
-    return <ChatContext.Provider value={store}>{children}</ChatContext.Provider>;
+    return <ChatContext.Provider value={unionStore}>{children}</ChatContext.Provider>;
 };
