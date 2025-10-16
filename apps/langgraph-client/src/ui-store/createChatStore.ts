@@ -271,6 +271,9 @@ export const createChatStore = (
             isFELocking() {
                 return client.get()?.isFELocking(renderMessages.get());
             },
+            getClient() {
+                return client.get();
+            },
             initClient,
             sendMessage,
             stopGeneration,

@@ -1,4 +1,4 @@
-import { defineComponent, inject, provide, onMounted, h, type InjectionKey, type PropType, Ref } from "vue";
+import { defineComponent, inject, provide, onMounted, defineExpose, type InjectionKey, type PropType, Ref } from "vue";
 import { createChatStore } from "../ui-store/index.js";
 import { useStore } from "@nanostores/vue";
 import { PreinitializedWritableAtom, StoreValue } from "nanostores";
