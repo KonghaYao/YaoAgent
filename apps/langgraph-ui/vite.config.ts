@@ -1,16 +1,16 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import basicSsl from "@vitejs/plugin-basic-ssl";
-import path from "node:path";
-import UnoCSS from "unocss/vite";
+import tailwindcss from "@tailwindcss/vite";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
     const isHttps = mode === "https";
     return {
-        plugins: [UnoCSS(), react(), isHttps ? basicSsl() : undefined],
+        plugins: [react(), tailwindcss(), isHttps ? basicSsl() : undefined],
         resolve: {
             alias: {
                 "@langgraph-js/sdk": new URL("../langgraph-client/src", import.meta.url).pathname,
+                "@/": new URL("./src/", import.meta.url).pathname,
             },
         },
         optimizeDeps: {

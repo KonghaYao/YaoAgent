@@ -2,10 +2,9 @@ import React, { JSX, useState } from "react";
 import { LangGraphClient, RenderMessage, ToolMessage } from "@langgraph-js/sdk";
 import { UsageMetadata } from "./UsageMetadata";
 import { useChat } from "@langgraph-js/sdk/react";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { Highlight, themes } from "prism-react-renderer";
 import { MessagesBox } from "./MessageBox";
+import { Response } from "@/components/ai-elements/response";
+import { CodeBlock } from "../../components/ai-elements/code-block";
 
 const TOOL_COLORS = ["bg-white", "bg-white", "bg-white", "bg-white", "bg-white", "bg-white", "bg-white"];
 
@@ -109,22 +108,10 @@ const Previewer = ({ content }: { content: string }) => {
 
             <div className="flex flex-col max-h-[300px] overflow-auto bg-white border border-gray-200 rounded-xl p-3 w-full text-xs font-mono whitespace-pre-wrap">
                 {jsonMode && isJSON ? (
-                    <Highlight code={JSON.stringify(JSON.parse(content), null, 2)} language="json" theme={themes.oneLight}>
-                        {({ className, style, tokens, getLineProps, getTokenProps }) => (
-                            <pre style={style}>
-                                {tokens.map((line, i) => (
-                                    <div key={i} {...getLineProps({ line })}>
-                                        {line.map((token, key) => (
-                                            <span key={key} {...getTokenProps({ token })} />
-                                        ))}
-                                    </div>
-                                ))}
-                            </pre>
-                        )}
-                    </Highlight>
+                    <CodeBlock code={JSON.stringify(JSON.parse(content), null, 2)} language="json"></CodeBlock>
                 ) : markdownMode && isMarkdown ? (
                     <div className="markdown-body">
-                        <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
+                        <Response>{content}</Response>
                     </div>
                 ) : (
                     <pre className="whitespace-pre-wrap">{content}</pre>

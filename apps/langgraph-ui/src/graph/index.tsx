@@ -1,7 +1,7 @@
 import { ReactFlow, Background, Controls, Node, Edge, ReactFlowProvider, useNodesState, useEdgesState, useReactFlow, Panel } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback, useEffect } from "react";
-import { useChat } from "../chat/context/ChatContext";
+import { useChat } from "@langgraph-js/sdk/react";
 import Dagre from "@dagrejs/dagre";
 import { flattenGraph } from "./flattenGraph";
 import { AssistantGraph } from "@langgraph-js/sdk";

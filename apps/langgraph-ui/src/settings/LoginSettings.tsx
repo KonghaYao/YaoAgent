@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, ChangeEvent } from "react";
-import { toast } from "../sonner";
+import { toast } from "sonner";
 
 interface HeaderConfig {
     key: string;

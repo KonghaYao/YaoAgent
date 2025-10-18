@@ -3,8 +3,8 @@ import MessageHuman from "./MessageHuman";
 import MessageAI from "./MessageAI";
 import MessageTool from "./MessageTool";
 import { formatTokens, getMessageContent, LangGraphClient, RenderMessage } from "@langgraph-js/sdk";
-import { JSONViewer } from "./JSONViewer";
 import { useChat } from "@langgraph-js/sdk/react";
+import { CodeBlock } from "@/components/ai-elements/code-block";
 
 interface MessageState {
     showDetail: boolean;
@@ -144,7 +144,7 @@ export const MessagesBox = ({
                         ) : (
                             <MessageAI message={message} />
                         )}
-                        {messageState.showDetail && <JSONViewer data={message} />}
+                        {messageState.showDetail && <CodeBlock code={JSON.stringify(message, null, 2)} language="json" />}
                         {messageState.showContextMenu && (
                             <div
                                 className="fixed bg-white/95 backdrop-blur-sm rounded-xl z-50 py-2 min-w-[150px] overflow-hidden"

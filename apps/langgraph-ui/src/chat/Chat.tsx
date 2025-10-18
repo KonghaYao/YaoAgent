@@ -18,8 +18,8 @@ import "./index.css";
 import { show_form } from "./tools/index";
 import { create_artifacts } from "./tools/create_artifacts";
 import SettingPanel from "../settings/SettingPanel";
-import { toast, Toaster } from "../sonner";
-
+import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 const ChatMessages: React.FC = () => {
     const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse, isFELocking } = useChat();
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -381,7 +381,7 @@ const ChatWrapper: React.FC = () => {
             showGraph={config.showGraph}
             onInitError={(err, currentAgent) => {
                 // 默认错误处理
-                toast.error("请检查服务器配置: ", "初始化客户端失败，" + currentAgent + "\n" + err, {
+                toast.error("请检查服务器配置: " + currentAgent + "\n" + err, {
                     duration: 10000,
                     action: {
                         label: "去设置",
