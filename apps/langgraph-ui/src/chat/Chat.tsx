@@ -13,7 +13,7 @@ import { setLocalConfig } from "./store";
 import { History, Network, FileJson, Settings, Send } from "lucide-react";
 import { ArtifactViewer } from "../artifacts/ArtifactViewer";
 import "github-markdown-css/github-markdown.css";
-import { ArtifactsProvider, useArtifacts } from "../artifacts/ArtifactsContext";
+
 import "./index.css";
 import { show_form } from "./tools/index";
 import { create_artifacts } from "./tools/create_artifacts";
@@ -241,7 +241,7 @@ const Chat: React.FC = () => {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const { showHistory, toggleHistoryVisible, showGraph, toggleGraphVisible, renderMessages, setTools, client } = useChat();
     const { extraParams, setExtraParams } = useExtraParams();
-    const { showArtifact, setShowArtifact } = useArtifacts();
+    const { showArtifact, setShowArtifact } = useChat();
 
     useEffect(() => {
         setTools([show_form, create_artifacts]);
@@ -396,10 +396,8 @@ const ChatWrapper: React.FC = () => {
             }}
         >
             <ExtraParamsProvider>
-                <ArtifactsProvider>
-                    <Chat />
-                    <Toaster />
-                </ArtifactsProvider>
+                <Chat />
+                <Toaster />
             </ExtraParamsProvider>
         </ChatProvider>
     );

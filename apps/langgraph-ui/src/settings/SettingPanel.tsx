@@ -45,7 +45,7 @@ const SettingPanel: React.FC<SettingPanelProps> = ({ isOpen, onClose, tabs: exte
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl h-[80vh] flex flex-col relative overflow-hidden ring-1 ring-gray-900/5 dark:ring-white/10">
                 {/* 关闭按钮 */}
                 <button
