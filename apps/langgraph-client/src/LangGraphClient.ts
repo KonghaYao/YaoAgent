@@ -188,6 +188,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
     async listThreads() {
         return this.threads.search({
             sortOrder: "desc",
+            sortBy: "updated_at",
         });
     }
     async deleteThread(threadId: string) {

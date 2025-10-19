@@ -1,10 +1,11 @@
-import { atom, computed } from "nanostores";
+import { atom } from "nanostores";
 import { LangGraphClient, LangGraphClientConfig, RenderMessage, SendMessageOptions } from "../LangGraphClient.js";
-import { AssistantGraph, Client, Message, Thread } from "@langchain/langgraph-sdk";
+import { AssistantGraph, Message, Thread } from "@langchain/langgraph-sdk";
 import { debounce } from "ts-debounce";
 import { ToolRenderData } from "../tool/ToolUI.js";
 import { UnionTool } from "../tool/createTool.js";
 import { createLangGraphServerClient } from "../client/LanggraphServer.js";
+import { useArtifacts } from "../artifacts/index.js";
 
 /**
  * @zh 格式化日期对象为时间字符串。
@@ -245,6 +246,7 @@ export const createChatStore = (
         return tool ? (message: RenderMessage) => tool(new ToolRenderData(message, client.get()!)) : null;
     };
 
+    const artifactHook = useArtifacts(renderMessages, client);
     return {
         data: {
             client,
@@ -261,6 +263,7 @@ export const createChatStore = (
             graphVisualize,
             currentNodeName,
             tools,
+            ...artifactHook.data,
         },
         mutations: {
             refreshTools,
@@ -354,6 +357,7 @@ export const createChatStore = (
                 await refreshHistoryList();
             },
             getToolUIRender,
+            ...artifactHook.mutation,
         },
     };
 };
