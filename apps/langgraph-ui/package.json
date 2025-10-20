@@ -1,6 +1,6 @@
 {
     "name": "@langgraph-js/ui",
-    "version": "3.1.0",
+    "version": "3.1.2",
     "description": "",
     "scripts": {
         "dev": "vite",
@@ -18,6 +18,9 @@
     "main": "./dist/react/src/index.js",
     "type": "module",
     "dependencies": {
+        "@tailwindcss/vite": "^4.1.14",
+        "@vitejs/plugin-basic-ssl": "^2.1.0",
+        "@vitejs/plugin-react": "^5.0.4",
         "ai-artifacts": "^1.1.0",
         "next-themes": "^0.4.6",
         "sonner": "^2.0.7",
@@ -32,12 +35,9 @@
         "@rjsf/core": "^5.24.13",
         "@rjsf/utils": "^5.24.13",
         "@rjsf/validator-ajv8": "^5.24.13",
-        "@tailwindcss/vite": "^4.1.14",
         "@types/react": "^19.0.10",
         "@types/react-dom": "^19.0.4",
         "@types/react-syntax-highlighter": "^15.5.13",
-        "@vitejs/plugin-basic-ssl": "^2.1.0",
-        "@vitejs/plugin-react": "^5.0.4",
         "@xyflow/react": "^12.6.4",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",

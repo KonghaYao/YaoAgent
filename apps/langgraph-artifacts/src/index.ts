@@ -10,6 +10,12 @@ export class Entrypoint {
     }
 }
 import { expose, windowEndpoint } from "comlink";
+import VConsole from "vconsole";
+
+if (self.frameElement?.hasAttribute("show-console")) {
+    // 注册 console.log
+    new VConsole();
+}
 
 // 暴露给父页面的对象
 const iframeApi = {

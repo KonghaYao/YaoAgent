@@ -6,7 +6,7 @@
         <title>Document</title>
     </head>
     <body>
-        <iframe src="./index.html" style="width: 100%; height: 90vh" border="0" id="iframe"></iframe>
+        <iframe src="./index.html" show-console style="width: 100%; height: 90vh" border="0" id="iframe"></iframe>
     </body>
     <script type="module">
         import { getIframeAPI } from "./src/parent.js";
@@ -16,7 +16,11 @@
         // 从 hash 中获取路径，默认为 /test/motion.jsx
         const path = location.hash ? location.hash.slice(1) : "/test/motion.jsx";
         const code = await fetch(path).then((res) => res.text());
-        const data = await iframeApi.run(code, path.replace(/^\//, ""), "application/javascript");
-        console.log("done", data);
+        try {
+            const data = await iframeApi.run(code, path.replace(/^\//, ""), "application/javascript");
+            console.log("done", data);
+        } catch (e) {
+            console.log(e);
+        }
     </script>
 </html>
