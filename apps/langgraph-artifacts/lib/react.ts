@@ -40,4 +40,5 @@ export {
 import ReactDom from "react-dom";
 export { jsx, jsxs, createElement } from "react/jsx-runtime";
 import React from "react";
+globalThis.React = React;
 export default Object.assign(React, ReactDom);

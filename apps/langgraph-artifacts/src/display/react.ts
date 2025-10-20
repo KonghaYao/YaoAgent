@@ -23,10 +23,21 @@ if(App) {
         const imports = analyzeImports(code);
         const importMap = {
             imports: {
-                ...Object.fromEntries(imports.map((i) => [i, "https://esm.sh/" + i])),
+                ...Object.fromEntries(
+                    imports.map((i) => {
+                        if (i.startsWith("@/components/ui/")) {
+                            return [i, this.importMap.imports["@/components/ui"]];
+                        }
+                        if (i.startsWith("@/components/ai-elements/")) {
+                            return [i, this.importMap.imports["@/components/ai-elements"]];
+                        }
+                        return [i, "https://esm.sh/" + i];
+                    })
+                ),
                 ...this.importMap.imports,
             },
         };
+        console.log(importMap);
         this.injectImportMap(importMap);
         const { code: compiledCode, errors } = this.transformCode(code);
         if (!compiledCode) {
