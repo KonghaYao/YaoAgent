@@ -17,6 +17,13 @@ export default defineConfig(({ mode }) => {
             exclude: ["@langgraph-js/ui", "@langgraph-js/sdk"],
         },
         server: {
+            proxy: {
+                "/api/langgraph": {
+                    target: "http://localhost:8123",
+                    changeOrigin: true,
+                    rewrite: (path) => path.replace(/^\/api\/langgraph/, ""),
+                },
+            },
             // headers: {
             //     "Cross-Origin-Opener-Policy": "same-origin",
             //     "Cross-Origin-Embedder-Policy": "require-corp",
