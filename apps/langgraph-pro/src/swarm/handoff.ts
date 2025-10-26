@@ -2,13 +2,7 @@ import { z } from "zod";
 import { ToolMessage } from "@langchain/core/messages";
 import { DynamicTool, StructuredToolInterface, tool } from "@langchain/core/tools";
 import { RunnableToolLike } from "@langchain/core/runnables";
-import {
-    AnnotationRoot,
-    MessagesAnnotation,
-    Command,
-    CompiledStateGraph,
-    getCurrentTaskInput,
-} from "@langchain/langgraph";
+import { AnnotationRoot, MessagesAnnotation, Command, CompiledStateGraph, getCurrentTaskInput } from "@langchain/langgraph";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
 
 const WHITESPACE_RE = /\s+/g;
@@ -91,13 +85,7 @@ const createHandoffTool = ({ agentName, description, updateState }: CreateHandof
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getHandoffDestinations = <AnnotationRootT extends AnnotationRoot<any>>(
-    agent: CompiledStateGraph<
-        AnnotationRootT["State"],
-        AnnotationRootT["Update"],
-        string,
-        AnnotationRootT["spec"],
-        AnnotationRootT["spec"]
-    >,
+    agent: CompiledStateGraph<AnnotationRootT["State"], AnnotationRootT["Update"], string, AnnotationRootT["spec"], AnnotationRootT["spec"]>,
     toolNodeName: string = "tools"
 ): string[] => {
     /**
@@ -118,10 +106,7 @@ const getHandoffDestinations = <AnnotationRootT extends AnnotationRoot<any>>(
 
     const { tools } = toolNode as ToolNode;
     return tools
-        .filter(
-            (tool): tool is DynamicTool =>
-                isDynamicTool(tool) && tool.metadata !== undefined && METADATA_KEY_HANDOFF_DESTINATION in tool.metadata
-        )
+        .filter((tool): tool is DynamicTool => isDynamicTool(tool) && tool.metadata !== undefined && METADATA_KEY_HANDOFF_DESTINATION in tool.metadata)
         .map((tool) => tool.metadata![METADATA_KEY_HANDOFF_DESTINATION] as string);
 };
 

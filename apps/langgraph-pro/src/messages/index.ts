@@ -1,4 +1,4 @@
-import { BaseMessage, HumanMessage, isHumanMessage, MessageContentText } from "@langchain/core/messages";
+import { BaseMessage, HumanMessage } from "@langchain/core/messages";
 /**
  * 获取消息的文本内容, 会对多个文本消息进行合并处理
  * @example
@@ -6,14 +6,10 @@ import { BaseMessage, HumanMessage, isHumanMessage, MessageContentText } from "@
  * console.log(text);
  */
 export const getTextMessageContent = (message: BaseMessage): string => {
-    if (typeof message.content === "string") {
-        return message.content;
-    } else {
-        return message.content
-            .filter((i) => i.type === "text")
-            .map((i) => (i as MessageContentText).text)
-            .join("\n");
-    }
+    return message.contentBlocks
+        .filter((i) => i.type === "text")
+        .map((i) => i.text)
+        .join("\n");
 };
 
 /**
@@ -27,7 +23,7 @@ export function getLastHumanMessage(messages: BaseMessage[]): HumanMessage | und
     for (let i = messages.length - 1; i >= 0; i--) {
         const message = messages[i];
         // 检查消息是否是 HumanMessage 的实例
-        if (isHumanMessage(message)) {
+        if (HumanMessage.isInstance(message)) {
             return message;
         }
     }

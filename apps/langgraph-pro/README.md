@@ -5,34 +5,41 @@
 
 This is an extension library for LangGraph that provides additional convenient features and tools, helping developers build complex AI workflows more easily. It's particularly suitable for building multi-agent collaboration, deep research, task planning, and other complex scenarios.
 
+> LangGraph 1.0 Support!
+
 ## Getting Started
 
 ### 1. State Management
 
 ```typescript
-import { createState, createDefaultAnnotation } from "@langgraph-js/pro";
+import { AgentState } from "@langgraph-js/pro";
+import { z } from "zod";
+// 创建自定义状态
+const PlannerState = AgentState.merge(
+    z.object({
+        current_plan: z.any().nullable(),
+        title: z.string(),
+    })
+);
 
-// Create custom state
-const PlannerState = createState().build({
-    current_plan: createDefaultAnnotation<Plan | null>(() => null),
-    title: createDefaultAnnotation<string>(() => ""),
-});
-
-// Extend existing state
-const ExportState = createState(PlannerState).build({
-    description: createDefaultAnnotation<string>(() => ""),
-});
+// 扩展已有状态
+const ExportState = PlannerState.merge(
+    z.object({
+        description: z.string(),
+    })
+);
 ```
 
 ### 2. Swarm Agent
 
 ```typescript
+import { createAgent } from "langchain";
 import { createSwarm, createHandoffTool } from "@langgraph-js/pro";
 
 // Create coordinator agent
-const coordinator_agent = createReactAgent({
+const coordinator_agent = createAgent({
     name: "coordinator",
-    llm,
+    model,
     tools: [
         createHandoffTool({
             agentName: "planner",
@@ -41,7 +48,7 @@ const coordinator_agent = createReactAgent({
             updateState: keepAllStateInHandOff,
         }),
     ],
-    prompt: "",
+    systemPrompt: "",
 });
 
 // Create swarm collaboration
