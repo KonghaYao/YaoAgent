@@ -5,5 +5,9 @@ packages:
 onlyBuiltDependencies:
   - '@rolldown/browser'
   - '@tailwindcss/oxide'
+  - better-sqlite3
+  - core-js
+  - cpu-features
   - esbuild
   - protobufjs
+  - ssh2

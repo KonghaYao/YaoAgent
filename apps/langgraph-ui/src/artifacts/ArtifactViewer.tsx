@@ -1,13 +1,13 @@
 "use client";
 import { useEffect } from "react";
-import { setArtifactStore, artifactStore } from "ai-artifacts";
+import { setArtifactStore, artifactStore, ArtifactType } from "ai-artifacts";
 import { useChat } from "@langgraph-js/sdk/react";
 
 export const ArtifactViewer: React.FC = () => {
     const { artifacts, currentArtifactId } = useChat();
     useEffect(() => {
         setArtifactStore({
-            artifacts: { default: artifacts },
+            artifacts: { default: artifacts as ArtifactType[] },
         });
     }, [artifacts]);
     return <ai-artifacts store-id="default" group-id={currentArtifactId?.[0] || ""} version-id={currentArtifactId?.[1] || ""}></ai-artifacts>;

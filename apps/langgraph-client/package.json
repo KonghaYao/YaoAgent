@@ -1,6 +1,6 @@
 {
     "name": "@langgraph-js/sdk",
-    "version": "3.1.0",
+    "version": "3.2.0",
     "description": "The UI SDK for LangGraph - seamlessly integrate your AI agents with frontend interfaces",
     "main": "dist/index.js",
     "type": "module",
@@ -49,8 +49,7 @@
         "url": "https://github.com/KonghaYao/YaoAgent/issues"
     },
     "dependencies": {
-        "@langchain/langgraph-sdk": "^0.1.10",
-        "@langgraph-js/pure-graph": "^1.5.2",
+        "@langchain/langgraph-sdk": "^1.0.0",
         "eventemitter3": "^5.0.1",
         "jsonrepair": "^3.12.0",
         "nanostores": "^1.0.1",
@@ -79,6 +78,7 @@
         }
     },
     "devDependencies": {
+        "@langgraph-js/pure-graph": "^2.0.0",
         "@types/react": "^19.1.6",
         "vue": "^3.5.14"
     }
