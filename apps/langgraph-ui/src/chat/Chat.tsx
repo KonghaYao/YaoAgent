@@ -219,7 +219,7 @@ const Chat: React.FC = () => {
     const { showHistory, toggleHistoryVisible, showGraph, toggleGraphVisible, renderMessages, setTools, client } = useChat();
     const { extraParams, setExtraParams } = useExtraParams();
     const { showArtifact, setShowArtifact } = useChat();
-    const { openMonitorWithChat, openMonitor: openModal } = useMonitor();
+    const { openMonitor } = useMonitor();
     useEffect(() => {
         setTools([show_form, create_artifacts]);
     }, []);
@@ -231,9 +231,9 @@ const Chat: React.FC = () => {
                 </div>
             )}
             <section className="flex-1 flex flex-col overflow-auto items-center ">
-                <header className="flex items-center gap-2 px-6 py-4 bg-white/50 backdrop-blur-sm justify-end h-16 mt-4 rounded-2xl shadow-lg shadow-gray-200">
+                <header className="flex items-center gap-2 px-3 py-2 justify-end h-16 mt-4  max-w-6xl w-full">
                     <button
-                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 cursor-pointer rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
                         onClick={() => {
                             toggleHistoryVisible();
                             setLocalConfig({ showHistory: !showHistory });
@@ -246,7 +246,7 @@ const Chat: React.FC = () => {
 
                     <button
                         onClick={() => setIsPopupOpen(true)}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 cursor-pointer rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
                     >
                         <FileJson className="w-4 h-4" />
                         额外参数
@@ -254,13 +254,13 @@ const Chat: React.FC = () => {
                     <button
                         id="setting-button"
                         onClick={() => setIsSettingsOpen(true)}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 cursor-pointer rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
                     >
                         <Settings className="w-4 h-4" />
                         设置
                     </button>
                     <button
-                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 cursor-pointer rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
                         onClick={() => {
                             toast.info("数据已打印到控制台，请 F12 查看");
                             console.log(client?.graphState);
@@ -269,7 +269,7 @@ const Chat: React.FC = () => {
                         打印 State
                     </button>
                     <button
-                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 cursor-pointer rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
                         onClick={() => {
                             toggleGraphVisible();
                             setLocalConfig({ showGraph: !showGraph });
@@ -279,9 +279,9 @@ const Chat: React.FC = () => {
                         节点图
                     </button>
                     <button
-                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 cursor-pointer rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
                         onClick={() => {
-                            openModal("/api/open-smith/ui/index.html");
+                            openMonitor("/api/open-smith/ui/index.html");
                         }}
                     >
                         <Network className="w-4 h-4" />

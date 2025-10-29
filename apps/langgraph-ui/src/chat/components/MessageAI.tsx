@@ -10,7 +10,7 @@ interface MessageAIProps {
 
 const MessageAI: React.FC<MessageAIProps> = ({ message }) => {
     return (
-        <div className="flex flex-col w-[80%] bg-white rounded-2xl px-5 py-4">
+        <div className="flex flex-col w-[80%] bg-white rounded-2xl px-5 py-4 border border-gray-200">
             <div className="text-xs font-medium text-gray-500 mb-3">{message.name}</div>
             <div className="markdown-body max-w-none">
                 <Response>{getMessageContent(message.content)}</Response>
