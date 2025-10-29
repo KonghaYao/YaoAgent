@@ -1,85 +1,41 @@
-import React, { useState, useCallback } from "react";
-import { TmpFilesClient } from "../FileUpload";
-import { File, UploadCloudIcon } from "lucide-react";
+import React from "react";
+import { useFileList } from "./FileListContext";
 
 export type SupportedFileType = "image" | "video" | "audio" | "other";
 
-const getFileType = (file: File): SupportedFileType => {
-    if (file.type.startsWith("image/")) return "image";
-    if (file.type === "video/mp4") return "video";
-    if (file.type.startsWith("audio/")) return "audio";
-    return "other";
-};
-
-interface UploadedFile {
-    file: File;
-    url: string;
-    type: SupportedFileType;
-}
-
-interface FileListProps {
-    onFileUploaded: (url: string, type: SupportedFileType) => void;
-    onFileRemoved: (url: string, type: SupportedFileType) => void;
-}
-
-const FileList: React.FC<FileListProps> = ({ onFileUploaded, onFileRemoved }) => {
-    const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
-    const client = new TmpFilesClient();
-    const MAX_FILES = 3;
-
-    const handleFileChange = useCallback(
-        async (event: React.ChangeEvent<HTMLInputElement>) => {
-            const selectedFiles = Array.from(event.target.files || []);
-            const mediaFiles = selectedFiles;
-
-            // 检查是否超过最大数量限制
-            if (uploadedFiles.length + mediaFiles.length > MAX_FILES) {
-                alert(`最多只能上传${MAX_FILES}个文件`);
-                event.target.value = "";
-                return;
-            }
-
-            for (const file of mediaFiles) {
-                try {
-                    const result = await client.upload(file);
-                    if (result.data?.url) {
-                        const fileType = getFileType(file);
-                        if (fileType) {
-                            const uploadedFile = { file, url: result.data.url, type: fileType };
-                            setUploadedFiles((prev) => [...prev, uploadedFile]);
-                            onFileUploaded(result.data.url, fileType);
-                        }
-                    }
-                } catch (error) {
-                    console.error("Upload failed:", error);
-                }
-            }
-
-            event.target.value = "";
-        },
-        [onFileUploaded, uploadedFiles.length]
-    );
-
-    const removeFile = useCallback(
-        (index: number) => {
-            const fileToRemove = uploadedFiles[index];
-            if (fileToRemove) {
-                setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
-                onFileRemoved(fileToRemove.url, fileToRemove.type);
-            }
-        },
-        [uploadedFiles, onFileRemoved]
-    );
+const FileList: React.FC = () => {
+    const { uploadedFiles, removeFile, mediaUrls, setIsFileTextMode, isFileTextMode } = useFileList();
 
     return (
-        <div className="flex gap-2 flex-1">
-            {uploadedFiles.length < MAX_FILES && (
-                <label
-                    className={`inline-flex items-center justify-center text-gray-700 bg-white border border-gray-200 rounded-xl cursor-pointer transition-colors hover:bg-gray-100 hover:border-gray-300 ${uploadedFiles.length === 0 ? "w-10 h-10" : "w-20 h-20"}`}
-                >
-                    <UploadCloudIcon size={uploadedFiles.length === 0 ? 20 : 32} />
-                    <input type="file" accept="*" multiple onChange={handleFileChange} className="hidden" />
-                </label>
+        <div>
+            {mediaUrls.length > 0 && (
+                <div className="flex items-center gap-2 text-xs text-gray-600 mb-3" title="文本传输将会把多模态文件转为 XML + URL 的格式传递给大模型">
+                    <span>启动文本传输:</span>
+                    <button
+                        onClick={() => setIsFileTextMode((prev) => ({ ...prev, image: !prev.image }))}
+                        className={`px-2 py-1 rounded ${isFileTextMode.image ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
+                    >
+                        图片
+                    </button>
+                    <button
+                        onClick={() => setIsFileTextMode((prev) => ({ ...prev, video: !prev.video }))}
+                        className={`px-2 py-1 rounded ${isFileTextMode.video ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
+                    >
+                        视频
+                    </button>
+                    <button
+                        onClick={() => setIsFileTextMode((prev) => ({ ...prev, audio: !prev.audio }))}
+                        className={`px-2 py-1 rounded ${isFileTextMode.audio ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
+                    >
+                        音频
+                    </button>
+                    <button
+                        onClick={() => setIsFileTextMode((prev) => ({ ...prev, other: !prev.other }))}
+                        className={`px-2 py-1 rounded ${isFileTextMode.other ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
+                    >
+                        其他
+                    </button>
+                </div>
             )}
             <div className="flex flex-wrap gap-2">
                 {uploadedFiles.map((uploadedFile, index) => {
@@ -113,7 +69,7 @@ const FileList: React.FC<FileListProps> = ({ onFileUploaded, onFileRemoved }) =>
                         </div>
                     );
                 })}
-            </div>
+            </div>{" "}
         </div>
     );
 };

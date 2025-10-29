@@ -6,11 +6,12 @@ import { ExtraParamsProvider, useExtraParams } from "./context/ExtraParamsContex
 import { UsageMetadata } from "./components/UsageMetadata";
 import { Message } from "@langgraph-js/sdk";
 import FileList from "./components/FileList";
+import { FileListProvider, useFileList } from "./components/FileListContext";
 import type { SupportedFileType } from "./components/FileList";
 import JsonEditorPopup from "./components/JsonEditorPopup";
 import { GraphPanel } from "../graph/GraphPanel";
 import { setLocalConfig } from "./store";
-import { History, Network, FileJson, Settings, Send } from "lucide-react";
+import { History, Network, FileJson, Settings, Send, UploadCloudIcon } from "lucide-react";
 import { ArtifactViewer } from "../artifacts/ArtifactViewer";
 import "github-markdown-css/github-markdown.css";
 
@@ -22,6 +23,7 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 
 import { MonitorProvider, Monitor, useMonitor } from "../monitor";
+import UploadButton from "./components/UploadButton";
 
 const ChatMessages: React.FC = () => {
     const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse, isFELocking } = useChat();
@@ -58,7 +60,19 @@ const ChatMessages: React.FC = () => {
 
     return (
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 bg-gray-100" ref={MessageContainer}>
-            <MessagesBox renderMessages={renderMessages} collapsedTools={collapsedTools} toggleToolCollapse={toggleToolCollapse} client={client!} />
+            {renderMessages.length === 0 && !loading ? (
+                <div className="flex items-center justify-center h-full">
+                    <div className="text-center">
+                        <div className="flex items-center justify-center">
+                            <div className="text-6xl mb-4 w-24 h-24 border border-green-300 rounded-full p-4 bg-green-100">🦜</div>
+                        </div>
+                        <h1 className="text-4xl font-bold text-gray-700 mb-2">LangGraph Console</h1>
+                        <div className="text-lg text-gray-500">AI 助手控制台</div>
+                    </div>
+                </div>
+            ) : (
+                <MessagesBox renderMessages={renderMessages} collapsedTools={collapsedTools} toggleToolCollapse={toggleToolCollapse} client={client!} />
+            )}
             {/* {isFELocking() && <div className="flex items-center justify-center py-4 text-gray-500">请你继续操作</div>} */}
             {loading && !isFELocking() && (
                 <div className="flex items-center justify-center py-6 text-gray-500">
@@ -73,38 +87,10 @@ const ChatMessages: React.FC = () => {
 };
 
 const ChatInput: React.FC = () => {
-    const { userInput, setUserInput, loading, sendMessage, stopGeneration, currentAgent, setCurrentAgent, client, currentChatId } = useChat();
+    const { userInput, renderMessages, setUserInput, loading, sendMessage, stopGeneration, currentAgent, setCurrentAgent, client, currentChatId } = useChat();
     const { extraParams } = useExtraParams();
     const { openMonitorWithChat } = useMonitor();
-    const [mediaUrls, setMediaUrls] = useState<Array<any>>([]);
-    const [isFileTextMode, setIsFileTextMode] = useState({
-        image: false,
-        video: false,
-        audio: false,
-        other: true,
-    });
-    const handleFileUploaded = (url: string, fileType: SupportedFileType) => {
-        // 上传时始终保存原始文件信息，在发送时根据文本模式决定格式
-        if (fileType === "image") {
-            setMediaUrls((prev) => [...prev, { type: "image_url", image_url: { url }, fileType }]);
-        } else if (fileType === "video") {
-            setMediaUrls((prev) => [...prev, { type: "video_url", video_url: { url }, fileType }]);
-        } else if (fileType === "audio") {
-            setMediaUrls((prev) => [...prev, { type: "audio_url", audio_url: { url }, fileType }]);
-        } else if (fileType === "other") {
-            setMediaUrls((prev) => [...prev, { type: "file_url", file_url: { url }, fileType }]);
-        }
-    };
-
-    const handleFileRemoved = (url: string, fileType: SupportedFileType) => {
-        // 删除时移除对应的媒体文件信息
-        setMediaUrls((prev) =>
-            prev.filter((media) => {
-                const mediaUrl = media.image_url?.url || media.video_url?.url || media.audio_url?.url || media.file_url?.url;
-                return mediaUrl !== url;
-            })
-        );
-    };
+    const { mediaUrls, isFileTextMode, setIsFileTextMode } = useFileList();
     const _setCurrentAgent = (agent: string) => {
         localStorage.setItem("defaultAgent", agent);
         setCurrentAgent(agent);
@@ -134,7 +120,7 @@ const ChatInput: React.FC = () => {
                         type: "text",
                         text: userInput,
                     },
-                    ...processedMediaUrls,
+                    ...(processedMediaUrls as any),
                 ],
             },
         ];
@@ -150,81 +136,38 @@ const ChatInput: React.FC = () => {
         }
     };
 
+    const [usingSingleMode, setUsingSingleMode] = useState(true);
+    useEffect(() => {
+        if (mediaUrls.length > 0) {
+            setUsingSingleMode(false);
+        } else {
+            setUsingSingleMode(true);
+        }
+    }, [renderMessages.length, mediaUrls.length]);
     return (
-        <div className="bg-white rounded-2xl px-4 py-3  mb-4 shadow-lg shadow-gray-200">
-            <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-4">
-                    <FileList onFileUploaded={handleFileUploaded} onFileRemoved={handleFileRemoved} />
-                </div>
-            </div>
-            {mediaUrls.length > 0 && (
-                <div className="flex items-center gap-2 text-xs text-gray-600 mb-3" title="文本传输将会把多模态文件转为 XML + URL 的格式传递给大模型">
-                    <span>启动文本传输:</span>
-                    <button
-                        onClick={() => setIsFileTextMode((prev) => ({ ...prev, image: !prev.image }))}
-                        className={`px-2 py-1 rounded ${isFileTextMode.image ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
-                    >
-                        图片
-                    </button>
-                    <button
-                        onClick={() => setIsFileTextMode((prev) => ({ ...prev, video: !prev.video }))}
-                        className={`px-2 py-1 rounded ${isFileTextMode.video ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
-                    >
-                        视频
-                    </button>
-                    <button
-                        onClick={() => setIsFileTextMode((prev) => ({ ...prev, audio: !prev.audio }))}
-                        className={`px-2 py-1 rounded ${isFileTextMode.audio ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
-                    >
-                        音频
-                    </button>
-                    <button
-                        onClick={() => setIsFileTextMode((prev) => ({ ...prev, other: !prev.other }))}
-                        className={`px-2 py-1 rounded ${isFileTextMode.other ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}
-                    >
-                        其他
-                    </button>
-                </div>
-            )}
-            <div className="flex gap-3">
-                <textarea
-                    className="flex-1 px-5 py-4 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl placeholder:text-gray-400 dark:placeholder:text-gray-500 resize-none active:outline-none focus:outline-none"
-                    rows={3}
-                    value={userInput}
-                    onChange={(e) => setUserInput(e.target.value)}
-                    onKeyDown={handleKeyPress}
-                    placeholder="请输入消息内容…"
-                    disabled={loading}
-                    style={{
-                        minHeight: "3rem",
-                        maxHeight: "6rem",
-                        fontFamily: "inherit",
-                    }}
-                />
-                <button
-                    className={`px-4 py-3 text-sm font-medium text-white rounded-xl focus:outline-none transition-colors flex items-center justify-center ${
-                        loading ? "bg-red-500 hover:bg-red-600" : "bg-blue-500 hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed"
-                    }`}
-                    onClick={() => (loading ? stopGeneration() : sendMultiModalMessage())}
-                    disabled={!loading && !userInput.trim() && mediaUrls.length === 0}
-                >
-                    {loading ? (
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    ) : (
-                        <Send className="w-5 h-5" />
-                    )}
-                </button>
-            </div>
-            <div className="flex mt-4 gap-2 justify-between items-center">
-                <UsageMetadata usage_metadata={client?.tokenCounter || {}} />
-                <div className="flex items-center gap-2">
-                    {!!currentChatId && (
-                        <span className="text-xs text-gray-400 dark:text-gray-500" onClick={() => openMonitorWithChat(currentChatId)}>
-                            会话 ID: {currentChatId}
-                        </span>
-                    )}
+        <div className=" pb-8 ">
+            <div className={"bg-white border border-gray-200 shadow-lg shadow-gray-200 " + (usingSingleMode ? "rounded-full px-3 py-3" : "rounded-4xl px-4 py-3")}>
+                {!usingSingleMode && mediaUrls.length > 0 && (
+                    <div className="flex items-center justify-between mb-2 border-b border-gray-200 pb-2">
+                        <FileList />
+                    </div>
+                )}
+                <div className={`flex gap-3 ${usingSingleMode ? "items-center" : ""}`}>
+                    <UploadButton />
+                    <textarea
+                        className="flex-1 text-sm resize-none active:outline-none focus:outline-none"
+                        rows={1}
+                        value={userInput}
+                        onChange={(e) => setUserInput(e.target.value)}
+                        onKeyDown={handleKeyPress}
+                        placeholder={usingSingleMode ? "请输入消息内容…" : "请输入消息内容…"}
+                        disabled={loading}
+                        style={{
+                            maxHeight: usingSingleMode ? "2rem" : "6rem",
+                            fontFamily: "inherit",
+                            lineHeight: usingSingleMode ? "2rem" : "inherit",
+                        }}
+                    />
                     <select
                         value={currentAgent}
                         onChange={(e) => _setCurrentAgent(e.target.value)}
@@ -238,6 +181,32 @@ const ChatInput: React.FC = () => {
                             );
                         })}
                     </select>
+                    <button
+                        className={`w-8 h-8 flex items-center justify-center rounded-full focus:outline-none transition-colors ${
+                            loading ? "bg-red-500 hover:bg-red-600 text-white" : "bg-blue-500 hover:bg-blue-600 text-white disabled:opacity-40 disabled:cursor-not-allowed"
+                        }`}
+                        onClick={() => (loading ? stopGeneration() : sendMultiModalMessage())}
+                        disabled={!loading && !userInput.trim() && mediaUrls.length === 0}
+                    >
+                        {loading ? (
+                            <svg className={"w-4 h-4"} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        ) : (
+                            <Send className={"w-4 h-4"} />
+                        )}
+                    </button>
+                </div>
+            </div>
+
+            <div className={"flex gap-2 px-8 pt-4 justify-between items-center " + (renderMessages.length ? "opacity-100" : "opacity-0")}>
+                <UsageMetadata usage_metadata={client?.tokenCounter || {}} />
+                <div className="flex items-center gap-2">
+                    {!!currentChatId && (
+                        <span className="cursor-pointer text-xs text-gray-300 dark:text-gray-500" onClick={() => openMonitorWithChat(currentChatId)}>
+                            会话 ID: {currentChatId}
+                        </span>
+                    )}
                 </div>
             </div>
         </div>
@@ -321,7 +290,9 @@ const Chat: React.FC = () => {
                 </header>
                 <main className="flex-1 overflow-y-auto overflow-x-hidden max-w-6xl w-full h-full  flex flex-col">
                     <ChatMessages />
-                    <ChatInput />
+                    <FileListProvider>
+                        <ChatInput />
+                    </FileListProvider>
                 </main>
                 <JsonEditorPopup
                     isOpen={isPopupOpen}
