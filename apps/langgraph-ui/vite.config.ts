@@ -2,13 +2,13 @@ import react from "@vitejs/plugin-react";
 import { defineConfig, Plugin } from "vite";
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import tailwindcss from "@tailwindcss/vite";
-import { app } from "@langgraph-js/open-smith/dist/app.js";
 import { Readable } from "stream";
 const OpenSmithPlugin = () =>
     ({
         name: "open-smith",
         configureServer(server) {
             server.middlewares.use("/api/open-smith", async (req, res, next) => {
+                const { app } = await import("@langgraph-js/open-smith/dist/app.js");
                 try {
                     const body = Readable.toWeb(req);
                     // Build a compatible Request for Fetch API
@@ -44,7 +44,7 @@ const OpenSmithPlugin = () =>
 export default defineConfig(({ mode }) => {
     const isHttps = mode === "https";
     return {
-        plugins: [react(), tailwindcss(), isHttps ? basicSsl() : undefined, OpenSmithPlugin()],
+        plugins: [react(), tailwindcss(), isHttps ? basicSsl() : undefined, process.env.NODE_ENV === "development" && OpenSmithPlugin()],
         resolve: {
             alias: {
                 "@langgraph-js/sdk": new URL("../langgraph-client/src", import.meta.url).pathname,
