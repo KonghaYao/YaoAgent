@@ -71,6 +71,7 @@ export const createChatStore = (
     context: {
         showHistory?: boolean;
         showGraph?: boolean;
+        fallbackToAvailableAssistants?: boolean;
         onInit?: (client: LangGraphClient) => void;
     } = {}
 ) => {
@@ -116,7 +117,7 @@ export const createChatStore = (
             ...config,
             client: config.client ?? (await createLangGraphServerClient(config as LangGraphClientConfig)),
         });
-        await newClient.initAssistant(currentAgent.get());
+        await newClient.initAssistant(currentAgent.get(), { fallbackToAvailableAssistants: context.fallbackToAvailableAssistants ?? false });
         currentAgent.set(newClient.getCurrentAssistant()!.graph_id);
         // 不再需要创建，sendMessage 会自动创建
         // await newClient.createThread();

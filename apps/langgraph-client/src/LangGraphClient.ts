@@ -137,7 +137,12 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
      * @zh 初始化 Assistant。
      * @en Initializes the Assistant.
      */
-    async initAssistant(agentName?: string) {
+    async initAssistant(
+        agentName?: string,
+        config: {
+            fallbackToAvailableAssistants?: boolean;
+        } = {}
+    ) {
         try {
             const assistants = await this.listAssistants();
             this.availableAssistants = assistants;
@@ -145,10 +150,15 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
                 if (agentName) {
                     this.currentAssistant = assistants.find((assistant: any) => assistant.graph_id === agentName) || null;
                     if (!this.currentAssistant) {
+                        if (config.fallbackToAvailableAssistants) {
+                            this.currentAssistant = this.availableAssistants[0];
+                            return this.currentAssistant;
+                        }
                         throw new Error("Agent not found: " + agentName);
                     }
                 } else {
                     this.currentAssistant = assistants[0];
+                    return this.currentAssistant;
                 }
             } else {
                 throw new Error("No assistants found");

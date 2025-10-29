@@ -21,6 +21,7 @@ interface ChatProviderProps {
     withCredentials?: boolean;
     showHistory?: boolean;
     showGraph?: boolean;
+    fallbackToAvailableAssistants?: boolean;
     onInitError?: (error: any, currentAgent: string) => void;
 }
 
@@ -32,6 +33,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     withCredentials = false,
     showHistory = false,
     showGraph = false,
+    fallbackToAvailableAssistants = false,
     onInitError,
 }) => {
     // 使用 useMemo 稳定 defaultHeaders 的引用
@@ -64,9 +66,10 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
             {
                 showHistory,
                 showGraph,
+                fallbackToAvailableAssistants,
             }
         );
-    }, [defaultAgent, apiUrl, stableHeaders, withCredentials, showHistory, showGraph]);
+    }, [defaultAgent, apiUrl, stableHeaders, withCredentials, showHistory, showGraph, fallbackToAvailableAssistants]);
 
     const unionStore = useUnionStore(store, useStore);
 

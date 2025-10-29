@@ -53,6 +53,7 @@ export interface ChatProviderProps {
     withCredentials?: boolean;
     showHistory?: boolean;
     showGraph?: boolean;
+    fallbackToAvailableAssistants?: boolean;
     onInitError?: (error: any, currentAgent: string) => void;
 }
 
@@ -81,6 +82,7 @@ export const useChatProvider = (props: ChatProviderProps) => {
         {
             showHistory: props.showHistory,
             showGraph: props.showGraph,
+            fallbackToAvailableAssistants: props.fallbackToAvailableAssistants,
         }
     );
 
