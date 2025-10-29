@@ -1,5 +1,6 @@
 import React, { useState, useEffect, ReactNode } from "react";
 import LoginSettings from "./LoginSettings"; // 导入新的 LoginSettings 组件
+import ConsoleSettings from "./ConsoleSettings"; // 导入控制台设置组件
 
 interface SettingPanelProps {
     isOpen: boolean;
@@ -17,14 +18,14 @@ const SettingPanel: React.FC<SettingPanelProps> = ({ isOpen, onClose, tabs: exte
     // 内部默认的 tabs
     const defaultTabs: SettingTab[] = [
         {
-            id: "general",
-            title: "通用",
-            component: <div className="text-gray-500 dark:text-gray-400">通用设置内容将在此显示</div>,
-        },
-        {
             id: "server-login",
             title: "服务器",
             component: <LoginSettings />,
+        },
+        {
+            id: "console",
+            title: "控制台",
+            component: <ConsoleSettings />,
         },
         // 更多设置页面将在这里添加
     ];

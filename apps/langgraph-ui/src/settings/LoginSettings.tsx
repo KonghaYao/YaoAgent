@@ -16,11 +16,14 @@ interface LoginSettingsData {
 const initialLoginSettings: LoginSettingsData = {
     headers: [{ key: "authorization", value: "" }],
     withCredentials: false,
-    apiUrl: "",
-    defaultAgent: "assistant",
+    apiUrl: "/api-langgraph",
+    defaultAgent: "agent",
 };
 
+const apiUrlShortcuts = ["/api/langgraph", "http://localhost:8123", "http://localhost:3000", "http://localhost:8000", "http://localhost:5000"];
+
 const LoginSettings: React.FC = () => {
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [formData, setFormData] = useState<LoginSettingsData>(() => {
         try {
             const storedHeaders = localStorage.getItem("code");
@@ -62,6 +65,21 @@ const LoginSettings: React.FC = () => {
         }
     }, [formData]);
 
+    // 点击外部关闭下拉菜单
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as Element;
+            if (isDropdownOpen && !target.closest(".api-url-dropdown")) {
+                setIsDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isDropdownOpen]);
+
     const addHeader = useCallback(() => {
         setFormData((prevData) => ({
             ...prevData,
@@ -100,6 +118,14 @@ const LoginSettings: React.FC = () => {
         }));
     }, []);
 
+    const handleApiUrlShortcutSelect = useCallback((url: string) => {
+        setFormData((prevData) => ({
+            ...prevData,
+            apiUrl: url,
+        }));
+        setIsDropdownOpen(false);
+    }, []);
+
     const handleSave = () => {
         // 保存逻辑已经通过 useEffect 处理了，这里可以添加其他保存后的操作，例如提示用户保存成功
         toast.success("配置已保存！重启程序");
@@ -129,15 +155,42 @@ const LoginSettings: React.FC = () => {
                 <label htmlFor="api-url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     API URL
                 </label>
-                <input
-                    type="text"
-                    id="apiUrl"
-                    name="apiUrl"
-                    value={formData.apiUrl}
-                    onChange={handleInputChange}
-                    placeholder="例如: http://localhost:8123"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
+                <div className="relative api-url-dropdown">
+                    <div className="flex">
+                        <input
+                            type="text"
+                            id="apiUrl"
+                            name="apiUrl"
+                            value={formData.apiUrl}
+                            onChange={handleInputChange}
+                            placeholder="例如: http://localhost:8123"
+                            className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            className="px-3 py-3 border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-lg bg-gray-50 dark:bg-gray-600 hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                            <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                    </div>
+                    {isDropdownOpen && (
+                        <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
+                            {apiUrlShortcuts.map((url, index) => (
+                                <button
+                                    key={index}
+                                    type="button"
+                                    onClick={() => handleApiUrlShortcutSelect(url)}
+                                    className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors first:rounded-t-lg last:rounded-b-lg text-gray-900 dark:text-white"
+                                >
+                                    {url}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div>

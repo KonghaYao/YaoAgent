@@ -20,6 +20,9 @@ import { create_artifacts } from "./tools/create_artifacts";
 import SettingPanel from "../settings/SettingPanel";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+
+import { MonitorProvider, Monitor, useMonitor } from "../monitor";
+
 const ChatMessages: React.FC = () => {
     const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse, isFELocking } = useChat();
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -72,6 +75,7 @@ const ChatMessages: React.FC = () => {
 const ChatInput: React.FC = () => {
     const { userInput, setUserInput, loading, sendMessage, stopGeneration, currentAgent, setCurrentAgent, client, currentChatId } = useChat();
     const { extraParams } = useExtraParams();
+    const { openMonitorWithChat } = useMonitor();
     const [mediaUrls, setMediaUrls] = useState<Array<any>>([]);
     const [isFileTextMode, setIsFileTextMode] = useState({
         image: false,
@@ -216,7 +220,11 @@ const ChatInput: React.FC = () => {
             <div className="flex mt-4 gap-2 justify-between items-center">
                 <UsageMetadata usage_metadata={client?.tokenCounter || {}} />
                 <div className="flex items-center gap-2">
-                    {!!currentChatId && <span className="text-xs text-gray-400 dark:text-gray-500">会话 ID: {currentChatId}</span>}
+                    {!!currentChatId && (
+                        <span className="text-xs text-gray-400 dark:text-gray-500" onClick={() => openMonitorWithChat(currentChatId)}>
+                            会话 ID: {currentChatId}
+                        </span>
+                    )}
                     <select
                         value={currentAgent}
                         onChange={(e) => _setCurrentAgent(e.target.value)}
@@ -242,14 +250,14 @@ const Chat: React.FC = () => {
     const { showHistory, toggleHistoryVisible, showGraph, toggleGraphVisible, renderMessages, setTools, client } = useChat();
     const { extraParams, setExtraParams } = useExtraParams();
     const { showArtifact, setShowArtifact } = useChat();
-
+    const { openMonitorWithChat, openMonitor: openModal } = useMonitor();
     useEffect(() => {
         setTools([show_form, create_artifacts]);
     }, []);
     return (
         <div className="langgraph-chat-container flex h-full w-full overflow-hidden bg-gray-100">
             {showHistory && (
-                <div className="p-4">
+                <div className="border-r border-gray-200 min-w-64">
                     <HistoryList onClose={() => toggleHistoryVisible()} />
                 </div>
             )}
@@ -301,6 +309,15 @@ const Chat: React.FC = () => {
                         <Network className="w-4 h-4" />
                         节点图
                     </button>
+                    <button
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
+                        onClick={() => {
+                            openModal("/api/open-smith/ui/index.html");
+                        }}
+                    >
+                        <Network className="w-4 h-4" />
+                        控制台
+                    </button>
                 </header>
                 <main className="flex-1 overflow-y-auto overflow-x-hidden max-w-6xl w-full h-full  flex flex-col">
                     <ChatMessages />
@@ -347,10 +364,10 @@ const ChatWrapper: React.FC = () => {
                     defaultHeaders = parsedHeaders;
                 }
             }
-
+            const apiUrl = storedApiUrl?.startsWith("/") ? new URL(storedApiUrl, window.location.origin).toString() : storedApiUrl;
             return {
                 defaultAgent: storedDefaultAgent || "",
-                apiUrl: storedApiUrl || "http://localhost:8123",
+                apiUrl: apiUrl || "http://localhost:8123",
                 defaultHeaders,
                 withCredentials: storedWithCredentials === "true",
                 showHistory: storedShowHistory === "true",
@@ -372,34 +389,38 @@ const ChatWrapper: React.FC = () => {
     const config = getLocalStorageData();
 
     return (
-        <ChatProvider
-            defaultAgent={config.defaultAgent}
-            apiUrl={config.apiUrl}
-            defaultHeaders={config.defaultHeaders}
-            withCredentials={config.withCredentials}
-            showHistory={config.showHistory}
-            showGraph={config.showGraph}
-            onInitError={(err, currentAgent) => {
-                // 默认错误处理
-                toast.error("请检查服务器配置: " + currentAgent + "\n" + err, {
-                    duration: 10000,
-                    action: {
-                        label: "去设置",
-                        onClick: () => {
-                            document.getElementById("setting-button")?.click();
-                            setTimeout(() => {
-                                document.getElementById("server-login-button")?.click();
-                            }, 300);
+        <MonitorProvider>
+            <ChatProvider
+                defaultAgent={config.defaultAgent}
+                apiUrl={config.apiUrl}
+                defaultHeaders={config.defaultHeaders}
+                withCredentials={config.withCredentials}
+                showHistory={config.showHistory}
+                showGraph={config.showGraph}
+                fallbackToAvailableAssistants={true}
+                onInitError={(err, currentAgent) => {
+                    // 默认错误处理
+                    toast.error("请检查服务器配置: " + currentAgent + "\n" + err, {
+                        duration: 10000,
+                        action: {
+                            label: "去设置",
+                            onClick: () => {
+                                document.getElementById("setting-button")?.click();
+                                setTimeout(() => {
+                                    document.getElementById("server-login-button")?.click();
+                                }, 300);
+                            },
                         },
-                    },
-                });
-            }}
-        >
-            <ExtraParamsProvider>
-                <Chat />
-                <Toaster />
-            </ExtraParamsProvider>
-        </ChatProvider>
+                    });
+                }}
+            >
+                <ExtraParamsProvider>
+                    <Chat />
+                    <Toaster />
+                    <Monitor />
+                </ExtraParamsProvider>
+            </ChatProvider>
+        </MonitorProvider>
     );
 };
 
