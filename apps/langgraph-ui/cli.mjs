@@ -18,9 +18,11 @@ console.log("启动 LangGraph UI...");
 console.log(`命令: vite preview ${args.join(" ")}`);
 
 // 使用 spawn 而不是 exec，以便更好地处理输入/输出流和参数
-const childProcess = spawn("npx", ["vite", "preview", "--config", "vite.config.preview.ts", ...args], {
+const childProcess = spawn("npx", ["vite", "dev", "--config", "../vite.config.preview.ts", ...args], {
     stdio: "inherit", // 继承父进程的 stdio，使输出直接显示在控制台
     shell: true,
+    // cwd 是 ./dist
+    cwd: "./dist",
 });
 
 // 处理子进程退出

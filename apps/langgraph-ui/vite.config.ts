@@ -8,7 +8,7 @@ import { OpenSmithPlugin } from "./src/OpenSmithPlugin";
 export default defineConfig(({ mode }) => {
     const isHttps = mode === "https";
     return {
-        plugins: [react(), tailwindcss(), isHttps ? basicSsl() : undefined],
+        plugins: [react(), tailwindcss(), isHttps ? basicSsl() : undefined, OpenSmithPlugin()],
         resolve: {
             alias: {
                 "@langgraph-js/sdk": new URL("../langgraph-client/src", import.meta.url).pathname,

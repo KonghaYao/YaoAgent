@@ -5,6 +5,7 @@ export const OpenSmithPlugin = () =>
     ({
         name: "open-smith",
         configureServer(server) {
+            console.log("open-smith is open on http://localhost:4173/api/open-smith/ui/index.html");
             server.middlewares.use("/api/open-smith", async (req, res, next) => {
                 try {
                     const body = Readable.toWeb(req);
