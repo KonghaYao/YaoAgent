@@ -29,7 +29,7 @@ export default defineConfig(({ mode }) => {
             //     "Cross-Origin-Embedder-Policy": "require-corp",
             //     "cross-origin-resource-policy": "cross-origin",
             // },
-            port: 1111,
+            port: 4173,
         },
     };
 });

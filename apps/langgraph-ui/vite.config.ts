@@ -2,13 +2,12 @@ import react from "@vitejs/plugin-react";
 import { defineConfig, Plugin } from "vite";
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import tailwindcss from "@tailwindcss/vite";
-import { OpenSmithPlugin } from "./src/OpenSmithPlugin";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
     const isHttps = mode === "https";
     return {
-        plugins: [react(), tailwindcss(), isHttps ? basicSsl() : undefined, OpenSmithPlugin()],
+        plugins: [react(), tailwindcss(), isHttps ? basicSsl() : undefined],
         resolve: {
             alias: {
                 "@langgraph-js/sdk": new URL("../langgraph-client/src", import.meta.url).pathname,
