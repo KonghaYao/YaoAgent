@@ -216,7 +216,16 @@ export class MessageProcessor {
      * @zh 转换 subAgent 消息为工具的子消息
      * @en Convert subAgent messages to tool sub-messages
      */
-    convertSubAgentMessages(messages: RenderMessage[], graphState: any): RenderMessage[] {
+    convertSubAgentMessages(
+        messages: RenderMessage[],
+        graphState: any,
+        messagesMetadata: Record<
+            string,
+            {
+                subagent_id?: string;
+            }
+        >
+    ): RenderMessage[] {
         const origin_task_store = graphState[this.subAgentsKey];
         if (!origin_task_store) return messages;
 
@@ -225,10 +234,10 @@ export class MessageProcessor {
         /** 获取 subAgent 消息的 id，用于流式过程中对数据进行标记 */
         messages
             .filter((i) => {
-                return i.node_name?.startsWith("subagent_");
+                return messagesMetadata[i.id!]?.subagent_id || i.node_name?.startsWith("subagent_");
             })
             .forEach((i) => {
-                const tool_call_id = i.node_name!.replace("subagent_", "");
+                const tool_call_id = messagesMetadata[i.id!]?.subagent_id || i.node_name!.replace("subagent_", "");
                 const store = task_store[tool_call_id];
                 if (store) {
                     // 根据 id 进行去重
@@ -256,7 +265,7 @@ export class MessageProcessor {
                 const task = task_store[message.tool_call_id];
                 if (task) {
                     // 递归处理子消息，但避免重复处理
-                    message.sub_agent_messages = this.processMessages(task.messages);
+                    message.sub_agent_messages = this.processMessages(task.messages, task, messagesMetadata);
                 }
             }
             if (message.id && ignoreIds.has(message.id)) continue;
@@ -269,7 +278,16 @@ export class MessageProcessor {
      * @zh 生成用于 UI 中的流式渲染的消息
      * @en Generate messages used for streaming rendering in the UI
      */
-    renderMessages(graphState: any, getGraphNodeNow: () => { name: string }): RenderMessage[] {
+    renderMessages(
+        graphState: any,
+        getGraphNodeNow: () => { name: string },
+        messagesMetadata: Record<
+            string,
+            {
+                subagent_id?: string;
+            }
+        >
+    ): RenderMessage[] {
         const previousMessage = new Map<string, Message>();
         const closedToolCallIds = new Set<string>();
         const result: Message[] = [];
@@ -328,14 +346,23 @@ export class MessageProcessor {
             }
         }
 
-        return this.processMessages(result as RenderMessage[], graphState);
+        return this.processMessages(result as RenderMessage[], graphState, messagesMetadata);
     }
 
     /**
      * @zh 统一的消息处理入口，按顺序执行所有处理步骤
      * @en Unified message processing entry point, executing all processing steps in order
      */
-    processMessages(messages: RenderMessage[], graphState?: any): RenderMessage[] {
+    processMessages(
+        messages: RenderMessage[],
+        graphState: any,
+        messagesMetadata: Record<
+            string,
+            {
+                subagent_id?: string;
+            }
+        >
+    ): RenderMessage[] {
         // 1. 组合工具消息
         const composedMessages = this.composeToolMessages(messages);
 
@@ -344,7 +371,7 @@ export class MessageProcessor {
 
         // 3. 转换子代理消息（如果提供了 graphState）
         if (graphState) {
-            return this.convertSubAgentMessages(messagesWithInfo, graphState);
+            return this.convertSubAgentMessages(messagesWithInfo, graphState, messagesMetadata);
         }
 
         return messagesWithInfo;

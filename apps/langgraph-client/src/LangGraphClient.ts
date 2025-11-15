@@ -240,7 +240,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
      * @en Messages used for streaming rendering in the UI.
      */
     get renderMessage() {
-        return this.messageProcessor.renderMessages(this.graphState, () => this.getGraphNodeNow());
+        return this.messageProcessor.renderMessages(this.graphState, () => this.getGraphNodeNow(), this.messagesMetadata);
     }
     /**
      * @zh 获取 Token 计数器信息。
@@ -304,6 +304,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
         this.messageProcessor.setGraphMessages(state.messages! as RenderMessage[]);
         return state;
     }
+    public messagesMetadata = {};
     /**
      * @zh 发送消息到 LangGraph 后端。
      * @en Sends a message to the LangGraph backend.
@@ -363,6 +364,9 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
                 this.currentRun = chunk.data;
             } else if (chunk.event === "error" || chunk.event === "Error" || chunk.event === "__stream_error__") {
                 this.emit("error", chunk);
+            } else if (chunk.event === "messages/metadata") {
+                Object.assign(this.messagesMetadata, chunk.data);
+                continue;
             } else if (chunk.event === "messages/partial") {
                 for (const message of chunk.data) {
                     this.messageProcessor.updateStreamingMessage(message);
