@@ -349,6 +349,24 @@ The crawler provides seamless integration with AI agents through the Model Conte
 - **Agent-Friendly**: Designed for integration with LLM frameworks and AI assistants
 - **Extensible Architecture**: Easy to add new MCP tools and capabilities
 
+#### Free Public MCP SSE Endpoint
+
+For quick testing and integration, a free public MCP SSE endpoint is available:
+
+```bash
+https://website-to-md.deno.dev/mcp
+```
+
+```json
+{
+    "mcpServers": {
+        "web-search": {
+            "url": "https://website-to-md.deno.dev/mcp"
+        }
+    }
+}
+```
+
 ### Performance Considerations
 
 - Implements caching mechanisms to prevent redundant requests
