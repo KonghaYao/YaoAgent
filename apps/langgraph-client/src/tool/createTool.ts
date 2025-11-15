@@ -1,5 +1,5 @@
 import { actionParametersToJsonSchema, convertJsonSchemaToZodRawShape } from "./utils.js";
-import { z, ZodRawShape, ZodTypeAny } from "zod";
+import { z, ZodRawShape } from "zod";
 import { Action, Parameter } from "./copilotkit-actions.js";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { Message } from "@langchain/langgraph-sdk";
@@ -14,8 +14,8 @@ export interface UnionTool<Args extends ZodRawShape, Child extends Object = Obje
     execute?: ToolCallback<Args>;
     /** 工具执行成功后触发的附加消息 */
     callbackMessage?: (result: CallToolResult) => Message[];
-    handler?: (args: z.objectOutputType<Args, ZodTypeAny>, context?: any) => ResponseType | Promise<ResponseType>;
-    render?: (tool: ToolRenderData<z.objectOutputType<Args, ZodTypeAny>, ResponseType>) => Child;
+    handler?: (args: z.infer<z.ZodObject<Args>>, context?: any) => ResponseType | Promise<ResponseType>;
+    render?: (tool: ToolRenderData<z.infer<z.ZodObject<Args>>, ResponseType>) => Child;
     onlyRender?: boolean;
     /** 只允许指定的 agent 使用该工具，如果未指定，则所有 agent 都可以使用 */
     allowAgent?: string[];
@@ -24,7 +24,7 @@ export interface UnionTool<Args extends ZodRawShape, Child extends Object = Obje
     /** 是否是纯净的 json schema 参数，而不是 zod 参数 */
     isPureParams?: boolean;
 }
-export type ToolCallback<Args extends ZodRawShape> = (args: z.objectOutputType<Args, ZodTypeAny>, context?: any) => CallToolResult | Promise<CallToolResult>;
+export type ToolCallback<Args extends ZodRawShape> = (args: z.infer<z.ZodObject<Args>>, context?: any) => CallToolResult | Promise<CallToolResult>;
 
 export type CallToolResult = string | { type: "text"; text: string }[];
 
@@ -80,7 +80,7 @@ export const createFETool = <const T extends Parameter[], Args extends ZodRawSha
         allowGraph: tool.allowGraph,
         async execute(args, context) {
             try {
-                const result = await tool.handler?.(args, context);
+                const result = await tool.handler?.(args as any, context);
                 if (typeof result === "string") {
                     return [{ type: "text", text: result }];
                 }
@@ -106,7 +106,7 @@ export const createMCPTool = <Args extends ZodRawShape>(tool: UnionTool<Args>) =
         tool.name,
         tool.description,
         tool.parameters,
-        async (args: z.objectOutputType<Args, ZodTypeAny>) => {
+        async (args: z.infer<z.ZodObject<Args>>) => {
             try {
                 const result = await tool.execute?.(args);
                 if (typeof result === "string") {
