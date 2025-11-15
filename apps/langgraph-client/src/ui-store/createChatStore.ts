@@ -12,7 +12,7 @@ import { useArtifacts } from "../artifacts/index.js";
  * @en Formats a Date object into a time string.
  */
 export const formatTime = (date: Date) => {
-    return date.toLocaleTimeString("en-US");
+    return date.toLocaleTimeString();
 };
 
 /**
@@ -47,7 +47,8 @@ export const getMessageContent = (content: any) => {
  * @en Gets the text representation of Thread content in history.
  */
 export const getHistoryContent = (thread: Thread) => {
-    const content = (thread?.values as any)?.messages?.[0]?.content;
+    /** @ts-ignore */
+    const content: string | any[] = thread.title || thread.name || (thread?.values as any)?.messages?.[0]?.content;
     if (content && Array.isArray(content)) {
         return content.map((item: any) => {
             if (item.type === "text") {

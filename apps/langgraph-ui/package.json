@@ -1,6 +1,6 @@
 {
     "name": "@langgraph-js/ui",
-    "version": "4.0.4",
+    "version": "4.1.0",
     "description": "",
     "scripts": {
         "dev": "vite",
@@ -25,6 +25,9 @@
         "ai-artifacts": "^1.2.2",
         "next-themes": "^0.4.6",
         "sonner": "^2.0.7",
+        "@langchain/core": "^1.0.2",
+        "@langchain/openai": "^1.0.0",
+        "hono": "^4.10.4",
         "vite": "^7"
     },
     "devDependencies": {

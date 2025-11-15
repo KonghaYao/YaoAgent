@@ -1,6 +1,7 @@
 # langgraoh-ui
 
 ```sh
-npm i -g @langgraph-js/ui
-langgraph-ui
+npx @langgraph-js/ui
+npx @langgraph-js/ui --mode https
+npx @langgraph-js/ui --mode https --host localhost.any.com
 ```

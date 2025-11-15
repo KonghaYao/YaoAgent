@@ -483,7 +483,6 @@ export const show_form = createUITool({
                 SubmitButton: CustomSubmitButton,
             },
         };
-
         return (
             <div className="p-4 bg-white rounded-lg border border-gray-200">
                 <div className="flex items-center gap-1.5 text-gray-700 mb-3 font-bold">
@@ -493,7 +492,7 @@ export const show_form = createUITool({
                 <ErrorBoundary>
                     <Form
                         readonly={tool.state === "done"}
-                        schema={formSchema}
+                        schema={formSchema || {}}
                         formData={output}
                         onSubmit={(data: IChangeEvent<any>) => handleSubmit(data.formData)}
                         validator={validator}

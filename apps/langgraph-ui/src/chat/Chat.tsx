@@ -11,7 +11,7 @@ import type { SupportedFileType } from "./components/FileList";
 import JsonEditorPopup from "./components/JsonEditorPopup";
 import { GraphPanel } from "../graph/GraphPanel";
 import { setLocalConfig } from "./store";
-import { History, Network, FileJson, Settings, Send, UploadCloudIcon } from "lucide-react";
+import { History, Network, FileJson, Settings, Send, UploadCloudIcon, GitBranch, TestTube, Terminal, Printer, BotIcon } from "lucide-react";
 import { ArtifactViewer } from "../artifacts/ArtifactViewer";
 import "github-markdown-css/github-markdown.css";
 
@@ -19,6 +19,7 @@ import "./index.css";
 import { show_form } from "./tools/index";
 import { create_artifacts } from "./tools/create_artifacts";
 import SettingPanel from "../settings/SettingPanel";
+import ModelTesterPopup from "./components/ModelTesterPopup";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -152,7 +153,7 @@ const ChatInput: React.FC = () => {
                         <FileList />
                     </div>
                 )}
-                <div className={`flex gap-3 ${usingSingleMode ? "items-center" : ""}`}>
+                <div className={`flex gap-3 items-center`}>
                     <UploadButton />
                     <textarea
                         className="flex-1 text-sm resize-none active:outline-none focus:outline-none"
@@ -216,6 +217,7 @@ const ChatInput: React.FC = () => {
 const Chat: React.FC = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isModelTesterOpen, setIsModelTesterOpen] = useState(false);
     const { showHistory, toggleHistoryVisible, showGraph, toggleGraphVisible, renderMessages, setTools, client } = useChat();
     const { extraParams, setExtraParams } = useExtraParams();
     const { showArtifact, setShowArtifact } = useChat();
@@ -252,6 +254,13 @@ const Chat: React.FC = () => {
                         额外参数
                     </button>
                     <button
+                        onClick={() => setIsModelTesterOpen(true)}
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 cursor-pointer rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
+                    >
+                        <BotIcon className="w-4 h-4" />
+                        模型测试器
+                    </button>
+                    <button
                         id="setting-button"
                         onClick={() => setIsSettingsOpen(true)}
                         className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 cursor-pointer rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
@@ -266,25 +275,26 @@ const Chat: React.FC = () => {
                             console.log(client?.graphState);
                         }}
                     >
+                        <Printer className="w-4 h-4" />
                         打印 State
                     </button>
-                    <button
+                    {/* <button
                         className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 cursor-pointer rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
                         onClick={() => {
                             toggleGraphVisible();
                             setLocalConfig({ showGraph: !showGraph });
                         }}
                     >
-                        <Network className="w-4 h-4" />
+                        <GitBranch className="w-4 h-4" />
                         节点图
-                    </button>
+                    </button> */}
                     <button
                         className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 cursor-pointer rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
                         onClick={() => {
                             openMonitor("/api/open-smith/ui/index.html");
                         }}
                     >
-                        <Network className="w-4 h-4" />
+                        <Terminal className="w-4 h-4" />
                         控制台
                     </button>
                 </header>
@@ -302,6 +312,7 @@ const Chat: React.FC = () => {
                     title="编辑额外参数"
                     description="额外参数用于在发送消息时附加到 LangGraph 的 State 中。"
                 />
+                <ModelTesterPopup isOpen={isModelTesterOpen} onClose={() => setIsModelTesterOpen(false)} />
                 <SettingPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
             </section>
             {(showGraph || showArtifact) && (

@@ -1,6 +1,7 @@
 import { Plugin } from "vite";
 import { Readable } from "stream";
 import { app } from "@langgraph-js/open-smith/dist/app.js";
+import appendLLMRouter from "../server/index";
 export const OpenSmithPlugin = () =>
     ({
         name: "open-smith",
@@ -19,7 +20,7 @@ export const OpenSmithPlugin = () =>
                     });
 
                     // Proxy the request to app.basePath handler
-                    const response = await app.basePath("/api/open-smith").fetch(fetchRequest);
+                    const response = await appendLLMRouter(app).basePath("/api/open-smith").fetch(fetchRequest);
 
                     // Set status and headers
                     res.statusCode = response.status;
@@ -28,9 +29,25 @@ export const OpenSmithPlugin = () =>
                         res.setHeader(key, value);
                     }
 
-                    // Send the response body
-                    const arrayBuffer = await response.arrayBuffer();
-                    res.end(Buffer.from(arrayBuffer));
+                    // 使用 Web Stream API 流式转发响应
+                    if (response.body) {
+                        const reader = response.body.getReader();
+
+                        try {
+                            while (true) {
+                                const { done, value } = await reader.read();
+                                if (done) break;
+
+                                // 将 Uint8Array 直接写入响应流
+                                res.write(Buffer.from(value));
+                            }
+                            res.end();
+                        } finally {
+                            reader.releaseLock();
+                        }
+                    } else {
+                        res.end();
+                    }
                 } catch (error) {
                     console.log(error);
                 }

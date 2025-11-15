@@ -17,7 +17,7 @@ interface MessageToolProps {
     onToggleCollapse: () => void;
 }
 
-const getToolColorClass = (tool_name: string) => {
+const getToolColorClass = (tool_name: string = "") => {
     let hash = 0;
     for (let i = 0; i < tool_name.length; i++) {
         hash = tool_name.charCodeAt(i) + ((hash << 5) - hash);
@@ -28,8 +28,8 @@ const getToolColorClass = (tool_name: string) => {
 
 const MessageTool: React.FC<MessageToolProps> = ({ message, client, getMessageContent, formatTokens, isCollapsed, onToggleCollapse }) => {
     const { getToolUIRender } = useChat();
-    const render = getToolUIRender(message.name!);
-    const bgColorClass = getToolColorClass(message.name!);
+    const render = getToolUIRender(message.name || "");
+    const bgColorClass = getToolColorClass(message.name || "");
     return (
         <div className="flex flex-col w-full">
             {render ? (
