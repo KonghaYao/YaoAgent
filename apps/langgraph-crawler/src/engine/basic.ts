@@ -1,4 +1,4 @@
-import { SearchEngine, SearchResult } from "../search.js";
+import { SearchEngine, SearchEngineResult } from "../search.js";
 import { getDocument } from "../utils/DOMParser.js";
 import { createCommonHeaders } from "../utils/createCommonHeaders.js";
 
@@ -18,7 +18,7 @@ export const BasicEngine: SearchEngine = {
         );
         const doc = await getDocument(html, "https://searx.bndkt.io/search?q=${encodeURIComponent(query)}&safesearch=0&category_general=1&pageno=1&theme=simple&language=all");
 
-        const results: SearchResult[] = [];
+        const results: SearchEngineResult[] = [];
         const articles = doc.querySelectorAll("#urls article.result");
 
         articles.forEach((article) => {

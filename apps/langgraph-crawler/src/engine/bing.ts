@@ -1,4 +1,4 @@
-import { SearchEngine, SearchResult } from "../search.js";
+import { SearchEngine, SearchEngineResult, SearchResult } from "../search.js";
 import { getDocument } from "../utils/DOMParser.js";
 import { createCommonHeaders } from "../utils/createCommonHeaders.js";
 
@@ -16,7 +16,7 @@ export const BingEngine: SearchEngine = {
         const html = await getHTMLContent(`https://www.bing.com/search?q=${encodeURIComponent(query)}`);
         const doc = await getDocument(html, "https://www.bing.com/search?q=${encodeURIComponent(query)}");
 
-        const results: SearchResult[] = [];
+        const results: SearchEngineResult[] = [];
         const searchResults = doc.querySelectorAll("#b_results .b_algo");
 
         searchResults.forEach((result) => {

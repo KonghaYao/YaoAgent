@@ -11,24 +11,32 @@ async function handleExtractRequest(req: Request): Promise<Response> {
         try {
             json = await req.json();
         } catch (_) {
-            return new Response(JSON.stringify({ error: "Invalid JSON" }), {
+            return new Response(JSON.stringify({ detail: { error: "Invalid JSON" } }), {
                 status: 400,
+                headers: { "Content-Type": "application/json" }
             });
         }
 
-        if (!ExtractSchema.safeParse(json).success) {
-            return new Response(JSON.stringify({ error: "Invalid URL" }), {
+        json;
+        const validation = ExtractSchema.safeParse(json);
+        if (!validation.success) {
+            return new Response(JSON.stringify({ detail: { error: validation.error.message } }), {
                 status: 400,
+                headers: { "Content-Type": "application/json" }
             });
         }
 
         try {
-            const content = await extract(json);
-            return new Response(content, { status: 200 });
+            const response = await extract(json);
+            return new Response(JSON.stringify(response), {
+                status: 200,
+                headers: { "Content-Type": "application/json" }
+            });
         } catch (error) {
             console.error(error);
-            return new Response(JSON.stringify({ error: (error as Error).message }), {
+            return new Response(JSON.stringify({ detail: { error: (error as Error).message } }), {
                 status: 500,
+                headers: { "Content-Type": "application/json" }
             });
         }
     } else {
@@ -41,28 +49,30 @@ async function handleSearchRequest(req: Request): Promise<Response> {
         try {
             json = await req.json();
         } catch (_) {
-            return new Response(JSON.stringify({ error: "Invalid JSON" }), {
+            return new Response(JSON.stringify({ detail: { error: "Invalid JSON" } }), {
                 status: 400,
+                headers: { "Content-Type": "application/json" }
             });
         }
         const { success, data, error } = SearchSchema.safeParse(json);
         if (!success) {
-            return new Response(JSON.stringify({ error: error.message }), {
+            return new Response(JSON.stringify({ detail: { error: error.message } }), {
                 status: 400,
+                headers: { "Content-Type": "application/json" }
             });
         }
 
         try {
-            const content = await search(data);
-            if (typeof content === "string") {
-                return new Response(content, { status: 200, headers: { "Content-Type": "text/markdown" } });
-            } else {
-                return new Response(JSON.stringify(content), { status: 200, headers: { "Content-Type": "application/json" } });
-            }
+            const response = await search(data);
+            return new Response(JSON.stringify(response), {
+                status: 200,
+                headers: { "Content-Type": "application/json" }
+            });
         } catch (error) {
             console.error(error);
-            return new Response(JSON.stringify({ error: (error as Error).message }), {
+            return new Response(JSON.stringify({ detail: { error: (error as Error).message } }), {
                 status: 500,
+                headers: { "Content-Type": "application/json" }
             });
         }
     } else {

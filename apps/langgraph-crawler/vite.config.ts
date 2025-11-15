@@ -9,9 +9,7 @@ export default defineConfig({
         },
     },
     plugins: [
-        nodeExternals({
-            exclude: ["happy-dom"],
-        }),
+        nodeExternals(),
         {
             name: "turndown",
             enforce: "pre",
@@ -27,9 +25,12 @@ export default defineConfig({
     build: {
         target: "esnext",
         lib: {
-            entry: "src/index.ts",
+            entry: {
+                index: "src/index.ts",
+                hono: "src/endpoint/hono.ts",
+                mcp: "src/endpoint/mcp.ts",
+            },
             formats: ["es"],
-            fileName: "index",
         },
         assetsInlineLimit: 0,
         minify: false,

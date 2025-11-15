@@ -32,7 +32,7 @@ export const AnthropicEngine: SearchEngine = {
         // console.log(data);
         // 转换搜索结果
         if (data?.data?.search?.searchHits && Array.isArray(data.data.search.searchHits)) {
-            return data.data.search.searchHits.map((hit: any): SearchResult => {
+            return data.data.search.searchHits.map((hit: any) => {
                 const description = hit.preview || (hit.content?.content ? hit.content.content.substring(0, 200) + "..." : "");
 
                 // 获取更新时间，如果没有则使用当前日期

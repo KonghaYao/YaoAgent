@@ -1,5 +1,5 @@
 import { getHTMLContent } from "../extract.js";
-import { SearchEngine, SearchResult } from "../search.js";
+import { SearchEngine, SearchEngineResult } from "../search.js";
 import { getDocument } from "../utils/DOMParser.js";
 export const GithubEngine: SearchEngine = {
     name: "github",
@@ -10,7 +10,7 @@ export const GithubEngine: SearchEngine = {
         // 使用DOMParser解析HTML
         const doc = await getDocument(html, "https://github.com/search?q=${encodeURIComponent(query)}&type=repositories");
 
-        const results: SearchResult[] = [];
+        const results: SearchEngineResult[] = [];
 
         // 备用方案：使用DOM解析
         const repoItems = doc.querySelector("[data-testid='results-list']")?.children;
