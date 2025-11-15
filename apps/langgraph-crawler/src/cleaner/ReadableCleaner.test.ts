@@ -1,6 +1,6 @@
 import { describe, expect, test, vi, beforeEach } from "vitest";
 import { Readability } from "@mozilla/readability";
-import { DOMParser } from "../utils/DOMParser.js";
+import { getDocument } from "../utils/DOMParser.js";
 describe("handleRequest", () => {
     beforeEach(() => {
         vi.resetAllMocks();
@@ -18,7 +18,7 @@ describe("handleRequest", () => {
     </pre>
 </div>
         `;
-        const doc = new DOMParser().parseFromString(html, "text/html");
+        const doc = getDocument(html);
         const parser = new Readability(doc as unknown as Document, {
             keepClasses: true,
         });

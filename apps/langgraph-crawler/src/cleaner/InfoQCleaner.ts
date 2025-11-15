@@ -1,7 +1,7 @@
 import { HTMLCleaner } from "./HTMLCleaner.js";
 import { getMetaData } from "../getMetaData.js";
 import { tiptapJSONToHTML } from "../utils/tiptapJSONToHTML.js";
-import { DOMParser } from "../utils/DOMParser.js";
+
 export type Root = {
     type: string;
     content: Array<{
@@ -116,8 +116,8 @@ export class InfoQCleaner extends HTMLCleaner {
             content = `<html><body>${await contentResponse.text()}</body></html>`;
         }
 
-        const doc = new DOMParser().parseFromString(this.html, "text/html");
-        const metaData = getMetaData(doc as unknown as Document);
+        const doc = await this.getDocument();
+        const metaData = getMetaData(doc);
 
         return {
             content: content,

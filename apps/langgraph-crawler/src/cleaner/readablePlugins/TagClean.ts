@@ -11,3 +11,12 @@ export const aTagCleanPlugin: ReadableCleanerPlugin = {
         });
     },
 };
+/** 删除 style 标签 */
+export const DeleteStyleCleanPlugin: ReadableCleanerPlugin = {
+    name: "deleteStyleTag",
+    beforeClean: (doc, cleaner) => {
+        doc.querySelectorAll("style").forEach((styleTag) => {
+            styleTag.parentNode?.removeChild(styleTag);
+        });
+    },
+};

@@ -1,6 +1,6 @@
 import { getHTMLContent } from "../extract.js";
 import { SearchEngine, SearchResult } from "../search.js";
-import { DOMParser } from "../utils/DOMParser.js";
+import { getDocument } from "../utils/DOMParser.js";
 export const GithubEngine: SearchEngine = {
     name: "github",
     topic: "code",
@@ -8,8 +8,7 @@ export const GithubEngine: SearchEngine = {
         const html = await getHTMLContent(`https://github.com/search?q=${encodeURIComponent(query)}&type=repositories`);
 
         // 使用DOMParser解析HTML
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
+        const doc = await getDocument(html, "https://github.com/search?q=${encodeURIComponent(query)}&type=repositories");
 
         const results: SearchResult[] = [];
 

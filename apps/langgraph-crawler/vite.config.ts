@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-
+import { nodeExternals } from "rollup-plugin-node-externals";
 // nodejs 环境，不要 browser 环境
 export default defineConfig({
     resolve: {
@@ -9,6 +9,9 @@ export default defineConfig({
         },
     },
     plugins: [
+        nodeExternals({
+            exclude: ["happy-dom"],
+        }),
         {
             name: "turndown",
             enforce: "pre",
@@ -28,6 +31,7 @@ export default defineConfig({
             formats: ["es"],
             fileName: "index",
         },
+        assetsInlineLimit: 0,
         minify: false,
     },
 });

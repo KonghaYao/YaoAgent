@@ -1,6 +1,6 @@
 {
     "name": "@langgraph-js/crawler",
-    "version": "1.7.0",
+    "version": "1.9.0",
     "description": "A powerful web crawler designed specifically for LLM applications, capable of extracting clean, readable content from various web pages and converting it to Markdown format.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -42,10 +42,12 @@
         "url": "https://github.com/KonghaYao/YaoAgent/issues"
     },
     "dependencies": {
-        "@modelcontextprotocol/sdk": "^1.12.1"
+        "@modelcontextprotocol/sdk": "^1.12.1",
+        "@xmldom/xmldom": "^0.8.11",
+        "happy-dom": "^20.0.10"
     },
     "devDependencies": {
-        "@b-fuze/deno-dom": "jsr:^0.1.49",
+        "@b-fuze/deno-dom": "jsr:^0.1.56",
         "@mixmark-io/domino": "^2.2.0",
         "@mozilla/readability": "^0.6.0",
         "@tiptap/core": "^2.12.0",
@@ -66,10 +68,12 @@
         "@tiptap/extension-text-style": "^2.12.0",
         "@tiptap/html": "^2.12.0",
         "@types/turndown": "^5.0.5",
-        "defuddle": "^0.6.4",
+        "defuddle": "^0.6.6",
+        "hono": "^4.10.6",
         "iconv-lite": "^0.6.3",
         "playwright": "^1.53.0",
         "prettier": "^3.2.5",
+        "rollup-plugin-node-externals": "^8.1.2",
         "turndown": "^7.2.0",
         "typescript": "^5.3.3",
         "vitest": "^3.2.4",

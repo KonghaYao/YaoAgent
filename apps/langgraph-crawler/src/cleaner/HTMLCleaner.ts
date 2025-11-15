@@ -1,4 +1,5 @@
 import { MetaData } from "../getMetaData.js";
+import { getDocument } from "../utils/DOMParser.js";
 
 export abstract class HTMLCleaner {
     readonly html: string;
@@ -9,6 +10,9 @@ export abstract class HTMLCleaner {
     }
     abstract getCleanContent(): Promise<{ content: string; metaData: MetaData; isPureMarkdown?: boolean }>;
     abstract isMatch(url: string): boolean;
+    getDocument() {
+        return getDocument(this.html, this.originUrl);
+    }
 }
 
 export class NoCleaner extends HTMLCleaner {

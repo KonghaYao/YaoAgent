@@ -4,7 +4,7 @@ import { getMetaData, metaDataToYaml } from "./getMetaData.js";
 import { ReadableCleaner } from "./cleaner/ReadableCleaner.js";
 import { InfoQCleaner } from "./cleaner/InfoQCleaner.js";
 import { HTMLCleaner, NoCleaner } from "./cleaner/HTMLCleaner.js";
-import { npmPlugin, aTagCleanPlugin, wechatArticleCleanPlugin } from "./cleaner/readablePlugins/index.js";
+import { npmPlugin, aTagCleanPlugin, wechatArticleCleanPlugin, DeleteStyleCleanPlugin } from "./cleaner/readablePlugins/index.js";
 import { decodeCharset } from "./utils/decodeCharset.js";
 import { createCommonHeaders } from "./utils/createCommonHeaders.js";
 import { DockerHubCleaner } from "./cleaner/DockerHubCleaner.js";
@@ -19,7 +19,7 @@ export async function extractReadableContent(html: string, originUrl: string) {
         new NoCleaner(html, originUrl, [/\/\/tophub\.today\/c\/news/]),
         new DockerHubCleaner(html, originUrl),
         new InfoQCleaner(html, originUrl),
-        new ReadableCleaner(html, originUrl).addPlugin(wechatArticleCleanPlugin).addPlugin(npmPlugin).addPlugin(aTagCleanPlugin),
+        new ReadableCleaner(html, originUrl).addPlugins([wechatArticleCleanPlugin, npmPlugin, aTagCleanPlugin, DeleteStyleCleanPlugin]),
     ];
     const cleaner = cleaners.find((cleaner) => cleaner.isMatch(originUrl))!;
     return await cleaner.getCleanContent();
@@ -48,8 +48,15 @@ export const getHTMLContent = async (url: string): Promise<string> => {
     return htmlText as string;
 };
 
+const urlTransformer = (url: string) => {
+    if (url.includes("npmjs.com/package")) {
+        return url.replace("npmjs.com/package", "npm.io/package").replace("www.", "");
+    }
+    return url;
+};
+
 export async function extract({ url, raw }: z.infer<typeof ExtractSchema>): Promise<string> {
-    const htmlText = await getHTMLContent(url);
+    const htmlText = await getHTMLContent(urlTransformer(url));
     const { content = htmlText, metaData, isPureMarkdown } = await extractReadableContent(htmlText as string, url);
 
     if (raw) {

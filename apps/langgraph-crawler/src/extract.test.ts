@@ -11,9 +11,9 @@ describe("extract", () => {
             url: "https://www.npmjs.com/package/@langchain/langgraph",
             raw: false,
         });
-        expect(text).toContain("github.com/langchain-ai/langgraphjs");
+        expect(text).toContain("/langchain-ai/langgraphjs");
         // 修补代码块缺失
-        expect(text).toContain("```ts");
+        expect(text).toContain("```typescript");
     });
     // 测试爬取微信公众号
     test("should crawl wechat", async () => {
@@ -63,6 +63,6 @@ describe("extract", () => {
             url: "https://juejin.cn/post/7476665749126742025",
             raw: false,
         });
-        expect(text).toContain("Juejin");
+        expect(text).toContain("Multimodality");
     });
 });

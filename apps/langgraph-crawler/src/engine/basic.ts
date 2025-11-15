@@ -1,5 +1,5 @@
 import { SearchEngine, SearchResult } from "../search.js";
-import { DOMParser } from "../utils/DOMParser.js";
+import { getDocument } from "../utils/DOMParser.js";
 import { createCommonHeaders } from "../utils/createCommonHeaders.js";
 
 async function getHTMLContent(url: string): Promise<string> {
@@ -16,7 +16,7 @@ export const BasicEngine: SearchEngine = {
         const html = await getHTMLContent(
             `${process.env.SEARCH_ENGINE_URL || "https://searx.bndkt.io"}/search?q=${encodeURIComponent(query)}&safesearch=0&category_general=1&pageno=1&theme=simple&language=all`
         );
-        const doc = new DOMParser().parseFromString(html, "text/html");
+        const doc = await getDocument(html, "https://searx.bndkt.io/search?q=${encodeURIComponent(query)}&safesearch=0&category_general=1&pageno=1&theme=simple&language=all");
 
         const results: SearchResult[] = [];
         const articles = doc.querySelectorAll("#urls article.result");

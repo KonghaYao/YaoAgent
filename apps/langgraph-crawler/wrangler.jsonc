@@ -3,13 +3,13 @@
  * https://developers.cloudflare.com/workers/wrangler/configuration/
  */
 {
-    "$schema": "node_modules/wrangler/config-schema.json",
     "name": "langgraph-crawler",
-    "main": "src/index.ts",
+    "main": "demo/cloudflare.js",
     "compatibility_date": "2025-06-01",
     "observability": {
         "enabled": true,
     },
+    "compatibility_flags": ["nodejs_compat"],
 
     /**
      * Smart Placement

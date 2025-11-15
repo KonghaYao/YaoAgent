@@ -1,5 +1,5 @@
 import { SearchEngine, SearchResult } from "../search.js";
-import { DOMParser } from "../utils/DOMParser.js";
+import { getDocument } from "../utils/DOMParser.js";
 import { createCommonHeaders } from "../utils/createCommonHeaders.js";
 
 async function getHTMLContent(url: string): Promise<string> {
@@ -14,7 +14,7 @@ export const BingEngine: SearchEngine = {
     topic: "general",
     search: async (query) => {
         const html = await getHTMLContent(`https://www.bing.com/search?q=${encodeURIComponent(query)}`);
-        const doc = new DOMParser().parseFromString(html, "text/html");
+        const doc = await getDocument(html, "https://www.bing.com/search?q=${encodeURIComponent(query)}");
 
         const results: SearchResult[] = [];
         const searchResults = doc.querySelectorAll("#b_results .b_algo");
