@@ -89,9 +89,9 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, getMessageContent, f
                     )}
                 </div>
             )}
-            {message.sub_agent_messages && (
+            {message.sub_messages && (
                 <div className="flex flex-col pl-6 py-3 ml-4 border-l-2 border-gray-200">
-                    <MessagesBox renderMessages={message.sub_agent_messages} collapsedTools={[]} toggleToolCollapse={(id) => {}} client={client} />
+                    <MessagesBox renderMessages={message.sub_messages} collapsedTools={[]} toggleToolCollapse={(id) => {}} client={client!} />
                 </div>
             )}
         </div>

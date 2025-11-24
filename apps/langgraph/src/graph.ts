@@ -1,11 +1,12 @@
-import { entrypoint, MessagesZodMeta, getConfig, interrupt, MemorySaver } from "@langchain/langgraph";
+import { entrypoint, MessagesZodMeta, getConfig, interrupt, MemorySaver, Command } from "@langchain/langgraph";
 import { z } from "zod/v3";
 import { createEntrypointGraph } from "@langgraph-js/pure-graph";
 import { ChatOpenAI } from "@langchain/openai";
-import { BaseMessage, createAgent, humanInTheLoopMiddleware, tool } from "langchain";
+import { BaseMessage, createAgent, humanInTheLoopMiddleware, HumanMessage, tool, ToolMessage } from "langchain";
 import { withLangGraph } from "@langchain/langgraph/zod";
 
 const State = z.object({
+    task_store: z.record(z.string(), z.any()).default({}),
     messages: withLangGraph(z.custom<BaseMessage[]>(), MessagesZodMeta),
 });
 const show_form = tool(
@@ -35,6 +36,46 @@ const interrupt_test = tool(
     }
 );
 
+const sub_agent_tool = tool(
+    async (props, config) => {
+        const toolId = config?.toolCall?.id;
+        const agent = createAgent({
+            model: new ChatOpenAI({
+                model: "gpt-4o-mini",
+                useResponsesApi: false,
+                tags: ["test"],
+                metadata: {
+                    parent_id: toolId,
+                },
+            }),
+            systemPrompt: "你是一个智能助手",
+        });
+
+        const data = await agent.invoke({
+            messages: [new HumanMessage(props.message)],
+        });
+        return new Command({
+            update: {
+                task_store: {
+                    [toolId]: data,
+                },
+                messages: [
+                    new ToolMessage({
+                        content: "done",
+                        tool_call_id: toolId,
+                    }),
+                ],
+            },
+        });
+    },
+    {
+        name: "sub_agent_tool",
+        schema: z.object({
+            message: z.string().describe("子 agent 工具的输入"),
+        }),
+    }
+);
+
 const workflow = entrypoint("test-entrypoint", async (state: z.infer<typeof State>) => {
     // Access context data
     // const config = getConfig();
@@ -49,7 +90,7 @@ const workflow = entrypoint("test-entrypoint", async (state: z.infer<typeof Stat
             },
         }),
         systemPrompt: "你是一个智能助手",
-        tools: [show_form, interrupt_test],
+        tools: [show_form, interrupt_test, sub_agent_tool],
         middleware: [
             humanInTheLoopMiddleware({
                 interruptOn: {
@@ -57,6 +98,7 @@ const workflow = entrypoint("test-entrypoint", async (state: z.infer<typeof Stat
                 },
             }),
         ],
+        stateSchema: State,
     });
     return agent.invoke(state);
 });
@@ -64,5 +106,4 @@ const workflow = entrypoint("test-entrypoint", async (state: z.infer<typeof Stat
 export const graph = createEntrypointGraph({
     stateSchema: State,
     graph: workflow,
-    checkpointer: new MemorySaver(),
 });

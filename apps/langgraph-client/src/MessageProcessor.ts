@@ -21,15 +21,12 @@ export class StreamingMessageType {
  * @en The MessageProcessor class is used to uniformly handle Message-related logic and avoid duplicate processing.
  */
 export class MessageProcessor {
-    private subAgentsKey: string;
     /** 流式消息缓存 */
     private streamingMessage: RenderMessage[] = [];
     /** 图发过来的更新信息 */
     private graphMessages: RenderMessage[] = [];
 
-    constructor(subAgentsKey: string = "task_store") {
-        this.subAgentsKey = subAgentsKey;
-    }
+    constructor() {}
 
     /**
      * @zh 获取流式消息
@@ -101,27 +98,6 @@ export class MessageProcessor {
             }),
             ...idMap.values(),
         ];
-    }
-
-    /**
-     * @zh 子图的数据需要通过 merge 的方式重新进行合并更新
-     * @en Subgraph data needs to be merged and updated through merge method
-     */
-    mergeSubGraphMessagesToStreamingMessages(messages: Message[]): void {
-        const map = new Map(messages.filter((i) => i.id).map((i) => [i.id!, i]));
-        this.streamingMessage.forEach((i) => {
-            if (map.has(i.id!)) {
-                const newValue = map.get(i.id!)!;
-                Object.assign(i, newValue);
-                map.delete(i.id!);
-            }
-        });
-        // 剩余的 message 一定不在 streamMessage 中
-        map.forEach((i) => {
-            if (i.type === "tool" && i.tool_call_id) {
-                this.streamingMessage.push(i as RenderMessage);
-            }
-        });
     }
 
     /**
@@ -213,81 +189,10 @@ export class MessageProcessor {
     }
 
     /**
-     * @zh 转换 subAgent 消息为工具的子消息
-     * @en Convert subAgent messages to tool sub-messages
-     */
-    convertSubAgentMessages(
-        messages: RenderMessage[],
-        graphState: any,
-        messagesMetadata: Record<
-            string,
-            {
-                subagent_id?: string;
-            }
-        >
-    ): RenderMessage[] {
-        const origin_task_store = graphState[this.subAgentsKey];
-        if (!origin_task_store) return messages;
-
-        const task_store = JSON.parse(JSON.stringify(origin_task_store));
-
-        /** 获取 subAgent 消息的 id，用于流式过程中对数据进行标记 */
-        messages
-            .filter((i) => {
-                return messagesMetadata[i.id!]?.subagent_id || i.node_name?.startsWith("subagent_");
-            })
-            .forEach((i) => {
-                const tool_call_id = messagesMetadata[i.id!]?.subagent_id || i.node_name!.replace("subagent_", "");
-                const store = task_store[tool_call_id];
-                if (store) {
-                    // 根据 id 进行去重
-                    const exists = (store.messages as RenderMessage[]).some((msg) => msg.id === i.id);
-                    if (!exists) {
-                        (store.messages as RenderMessage[]).push(i);
-                    }
-                } else {
-                    task_store[tool_call_id] = {
-                        messages: [i],
-                    };
-                }
-            });
-
-        const ignoreIds = new Set<string>();
-        Object.values(task_store).forEach((task: any) => {
-            task.messages.forEach((message: RenderMessage) => {
-                ignoreIds.add(message.id!);
-            });
-        });
-
-        const result: RenderMessage[] = [];
-        for (const message of messages) {
-            if (message.type === "tool" && message.tool_call_id) {
-                const task = task_store[message.tool_call_id];
-                if (task) {
-                    // 递归处理子消息，但避免重复处理
-                    message.sub_agent_messages = this.processMessages(task.messages, task, messagesMetadata);
-                }
-            }
-            if (message.id && ignoreIds.has(message.id)) continue;
-            result.push(message);
-        }
-        return result;
-    }
-
-    /**
      * @zh 生成用于 UI 中的流式渲染的消息
      * @en Generate messages used for streaming rendering in the UI
      */
-    renderMessages(
-        graphState: any,
-        getGraphNodeNow: () => { name: string },
-        messagesMetadata: Record<
-            string,
-            {
-                subagent_id?: string;
-            }
-        >
-    ): RenderMessage[] {
+    renderMessages(graphState: any, getGraphNodeNow: () => { name: string }, messagesMetadata: Record<string, any>): RenderMessage[] {
         const previousMessage = new Map<string, Message>();
         const closedToolCallIds = new Set<string>();
         const result: Message[] = [];
@@ -349,31 +254,78 @@ export class MessageProcessor {
         return this.processMessages(result as RenderMessage[], graphState, messagesMetadata);
     }
 
+    foldTreeMessages(
+        messages: RenderMessage[],
+        graphState?: {
+            task_store?: Record<
+                string,
+                {
+                    messages: RenderMessage[];
+                }
+            >;
+        },
+        messagesMetadata?: Record<string, any>
+    ): RenderMessage[] {
+        const state_sub_messages = Object.entries(graphState?.task_store || {}).map(([key, value]) => [key, value.messages] as [string, RenderMessage[]]);
+        const state_sub_messages_map = new Map<string, RenderMessage[]>(state_sub_messages);
+
+        const nonRootMessageId = new Set<string>();
+        const parentPointer = new Map(
+            Object.entries(messagesMetadata || {})
+                .map(([childId, metadata]) => {
+                    if (metadata?.parent_id) {
+                        nonRootMessageId.add(childId);
+                        return [childId, metadata?.parent_id];
+                    }
+                    return;
+                })
+                .filter((i): i is [string, string] => i !== undefined)
+        );
+
+        // 第一遍遍历：构建 childrenMap，将子消息归类到父消息下
+        const childrenMap = state_sub_messages_map;
+        const rootMessages: RenderMessage[] = [];
+
+        for (const message of messages) {
+            const isRoot = !nonRootMessageId.has(message.id!);
+            if (!isRoot) {
+                // 处理子消息
+                const parentId = parentPointer.get(message.id!)!;
+                const children = childrenMap.get(parentId);
+                if (children) {
+                    children.push(message);
+                } else {
+                    childrenMap.set(parentId, [message]);
+                }
+            } else {
+                // 收集根消息
+                rootMessages.push(message);
+            }
+        }
+
+        // 第二遍遍历：为所有根消息赋值 sub_messages
+        for (const rootMessage of rootMessages) {
+            rootMessage.sub_messages = childrenMap.get(rootMessage.id!) || [];
+            if (rootMessage.type === "tool" && childrenMap.has(rootMessage.tool_call_id)) {
+                rootMessage.sub_messages.unshift(...childrenMap.get(rootMessage.tool_call_id)!);
+                // 根据 id 去重
+                rootMessage.sub_messages = rootMessage.sub_messages.filter((i, index, self) => self.findIndex((t) => t.id === i.id) === index);
+            }
+        }
+        return rootMessages;
+    }
     /**
      * @zh 统一的消息处理入口，按顺序执行所有处理步骤
      * @en Unified message processing entry point, executing all processing steps in order
      */
-    processMessages(
-        messages: RenderMessage[],
-        graphState: any,
-        messagesMetadata: Record<
-            string,
-            {
-                subagent_id?: string;
-            }
-        >
-    ): RenderMessage[] {
+    processMessages(messages: RenderMessage[], graphState?: any, messagesMetadata?: Record<string, any>): RenderMessage[] {
         // 1. 组合工具消息
         const composedMessages = this.composeToolMessages(messages);
 
         // 2. 附加信息
         const messagesWithInfo = this.attachInfoForMessage(composedMessages);
 
-        // 3. 转换子代理消息（如果提供了 graphState）
-        if (graphState) {
-            return this.convertSubAgentMessages(messagesWithInfo, graphState, messagesMetadata);
-        }
-
-        return messagesWithInfo;
+        // 3. 折叠树状消息（如果提供了 messagesMetadata）
+        return this.foldTreeMessages(messagesWithInfo, graphState, messagesMetadata);
     }
 }

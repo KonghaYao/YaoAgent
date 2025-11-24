@@ -21,7 +21,6 @@ export type RenderMessage = Message & {
             };
         }[];
     };
-    sub_agent_messages?: RenderMessage[];
     usage_metadata?: {
         total_tokens: number;
         input_tokens: number;
@@ -31,6 +30,8 @@ export type RenderMessage = Message & {
     response_metadata?: {
         create_time: string;
     };
+    // 子消息
+    sub_messages?: RenderMessage[];
     /** 耗时 */
     spend_time?: number;
     /** 渲染时的唯一 id，聚合而来*/
@@ -115,15 +116,13 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
     graphState: any = {};
     currentRun?: { run_id: string };
     stopController: AbortController | null = null;
-    /** 用于存储 subAgent 状态数据的键 */
-    subAgentsKey = "task_store";
     /** Message 处理器 */
     private messageProcessor: MessageProcessor;
 
     constructor(config: LangGraphClientConfig) {
         super();
         this.client = config.client;
-        this.messageProcessor = new MessageProcessor(this.subAgentsKey);
+        this.messageProcessor = new MessageProcessor();
     }
 
     /** 代理 assistants 属性到内部 client */
@@ -409,10 +408,6 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
                 }
                 continue;
             } else if (chunk.event.startsWith("values|")) {
-                // 这个 values 必然是子 values
-                if (chunk.data?.messages) {
-                    this.messageProcessor.mergeSubGraphMessagesToStreamingMessages(chunk.data.messages);
-                }
                 this.graphPosition = chunk.event.split("|")[1];
             }
         }
@@ -444,8 +439,6 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
         const data = this.messageProcessor.getStreamingMessages(); // 需要保证不被清理
         const lastMessage = data[data.length - 1];
         if (!lastMessage) return;
-        debugger;
-
         // 如果最后一条消息是前端工具消息，则调用工具
         if (lastMessage.type === "ai" && lastMessage.tool_calls?.length) {
             const result = lastMessage.tool_calls.map((tool) => {
