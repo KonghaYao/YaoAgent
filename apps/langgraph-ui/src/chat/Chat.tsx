@@ -25,6 +25,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 import { MonitorProvider, Monitor, useMonitor } from "../monitor";
 import UploadButton from "./components/UploadButton";
+import { __default_tool__ } from "./tools/human-in-the-loop";
 
 const ChatMessages: React.FC = () => {
     const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse, isFELocking } = useChat();
@@ -223,7 +224,7 @@ const Chat: React.FC = () => {
     const { showArtifact, setShowArtifact } = useChat();
     const { openMonitor } = useMonitor();
     useEffect(() => {
-        setTools([show_form, create_artifacts]);
+        setTools([show_form, create_artifacts, __default_tool__]);
     }, []);
     return (
         <div className="langgraph-chat-container flex h-full w-full overflow-hidden bg-gray-100">

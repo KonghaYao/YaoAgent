@@ -1,5 +1,5 @@
-import React, { JSX, useState } from "react";
-import { LangGraphClient, RenderMessage, ToolMessage } from "@langgraph-js/sdk";
+import React, { JSX, memo, useState } from "react";
+import { LangGraphClient, RenderMessage, ToolMessage, ToolRenderData } from "@langgraph-js/sdk";
 import { UsageMetadata } from "./UsageMetadata";
 import { useChat } from "@langgraph-js/sdk/react";
 import { MessagesBox } from "./MessageBox";
@@ -26,10 +26,41 @@ const getToolColorClass = (tool_name: string = "") => {
     return TOOL_COLORS[index];
 };
 
-const MessageTool: React.FC<MessageToolProps> = ({ message, client, getMessageContent, formatTokens, isCollapsed, onToggleCollapse }) => {
-    const { getToolUIRender } = useChat();
+const MessageTool: React.FC<MessageToolProps> = ({ message, getMessageContent, formatTokens, isCollapsed, onToggleCollapse }) => {
+    const { getToolUIRender, client } = useChat();
     const render = getToolUIRender(message.name || "");
     const bgColorClass = getToolColorClass(message.name || "");
+    const onHumanClick = (type: string) => {
+        return client?.doneFEToolWaiting(message.id as string, {
+            decisions: [
+                {
+                    type: type,
+                },
+            ],
+        });
+    };
+    const humanInTheLoopButton = () => {
+        const tool = new ToolRenderData(message, client!);
+        if (!tool.client.humanInTheLoop) return null;
+        for (let i of tool.client.humanInTheLoop) {
+            for (let j of i.value.reviewConfigs) {
+                if (j.actionName === message.name) {
+                    return j.allowedDecisions.map((k) => {
+                        return (
+                            <button
+                                key={k}
+                                className="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                                onClick={() => onHumanClick(k)}
+                            >
+                                {k}
+                            </button>
+                        );
+                    });
+                }
+            }
+        }
+        return null;
+    };
     return (
         <div className="flex flex-col w-full">
             {render ? (
@@ -40,6 +71,7 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, client, getMessageCo
                         <div className="text-xs font-medium text-gray-600" onClick={() => console.log(message)}>
                             {message.node_name} | {message.name}
                         </div>
+                        <div>{humanInTheLoopButton()}</div>
                     </div>
 
                     {!isCollapsed && (

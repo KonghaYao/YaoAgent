@@ -44,6 +44,8 @@ export const createUITool = <Args extends ZodRawShape, Child extends Object = {}
                 const result = await tool.handler?.(args, context);
                 if (typeof result === "string") {
                     return [{ type: "text", text: result }];
+                } else if (result.decisions) {
+                    return result;
                 }
                 return [{ type: "text", text: JSON.stringify(result) }];
             } catch (error) {

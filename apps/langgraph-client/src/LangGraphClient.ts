@@ -44,6 +44,20 @@ export type SendMessageOptions = {
     command?: Command;
     joinRunId?: string;
 };
+export type InterruptData = {
+    id: string;
+    value: {
+        actionRequests: {
+            name: string;
+            description: string;
+            args: any;
+        }[];
+        reviewConfigs: {
+            actionName: string;
+            allowedDecisions: ("approve" | "edit" | "reject")[];
+        }[];
+    };
+}[];
 export interface LangGraphClientConfig {
     apiUrl?: string;
     apiKey?: string;
@@ -305,6 +319,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
         return state;
     }
     public messagesMetadata = {};
+    public humanInTheLoop: InterruptData | null = null;
     /**
      * @zh 发送消息到 LangGraph 后端。
      * @en Sends a message to the LangGraph backend.
@@ -358,6 +373,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
         this.emit("start", {
             event: "start",
         });
+
         for await (const chunk of streamResponse) {
             streamRecord.push(chunk);
             if (chunk.event === "metadata") {
@@ -374,9 +390,14 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
                 this.emit("message", chunk);
                 continue;
             } else if (chunk.event === "values") {
-                const data = chunk.data as { messages: Message[] };
+                const data = chunk.data as {
+                    __interrupt__?: InterruptData;
+                    messages: Message[];
+                };
 
-                if (data.messages) {
+                if (data.__interrupt__) {
+                    this.humanInTheLoop = data.__interrupt__;
+                } else if (data.messages) {
                     const isResume = !!command?.resume;
                     const isLongerThanLocal = data.messages.length >= this.messageProcessor.getGraphMessages().length;
                     // resume 情况下，长度低于前端 message 的统统不接受
@@ -423,20 +444,20 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
         const data = this.messageProcessor.getStreamingMessages(); // 需要保证不被清理
         const lastMessage = data[data.length - 1];
         if (!lastMessage) return;
+        debugger;
+
         // 如果最后一条消息是前端工具消息，则调用工具
         if (lastMessage.type === "ai" && lastMessage.tool_calls?.length) {
             const result = lastMessage.tool_calls.map((tool) => {
-                if (this.tools.getTool(tool.name!)) {
-                    const toolMessage: ToolMessage = {
-                        ...tool,
-                        tool_call_id: tool.id!,
-                        /** @ts-ignore */
-                        tool_input: JSON.stringify(tool.args),
-                        additional_kwargs: {},
-                    };
-                    // json 校验
-                    return this.callFETool(toolMessage, tool.args);
-                }
+                const toolMessage: ToolMessage = {
+                    ...tool,
+                    tool_call_id: tool.id!,
+                    /** @ts-ignore */
+                    tool_input: JSON.stringify(tool.args),
+                    additional_kwargs: {},
+                };
+                // json 校验
+                return this.callFETool(toolMessage, tool.args);
             });
             this.currentThread!.status = "interrupted"; // 修复某些机制下，状态不为 interrupted 与后端有差异
             return Promise.all(result);

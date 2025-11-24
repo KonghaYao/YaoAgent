@@ -15,8 +15,8 @@ export class ToolManager {
      * @en Registers a tool.
      */
     bindTool(tool: UnionTool<any>) {
-        if (this.tools.has(tool.name)) {
-            throw new Error(`Tool with name ${tool.name} already exists`);
+        if (this.tools.has(tool.name) && tool.name !== "__default__") {
+            console.warn(`Tool with name ${tool.name} already exists`);
         }
         this.tools.set(tool.name, tool);
     }
@@ -73,10 +73,7 @@ export class ToolManager {
      * @en Calls the tool with the specified name.
      */
     async callTool(name: string, args: any, context: { client: LangGraphClient; message: ToolMessage }) {
-        const tool = this.getTool(name);
-        if (!tool) {
-            throw new Error(`Tool with name ${name} not found`);
-        }
+        const tool = this.getTool(name) || this.getTool("__default__")!;
         return await tool.execute?.(args, context);
     }
 

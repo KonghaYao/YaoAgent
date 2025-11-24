@@ -1,6 +1,6 @@
 {
     "name": "@langgraph-js/ui",
-    "version": "4.2.0",
+    "version": "4.4.0",
     "description": "",
     "scripts": {
         "dev": "vite",
@@ -18,7 +18,7 @@
     "main": "./dist/react/src/index.js",
     "type": "module",
     "dependencies": {
-        "@langgraph-js/open-smith": "^1.4.0",
+        "@langgraph-js/open-smith": "^2.0.0",
         "@tailwindcss/vite": "^4.1.14",
         "@vitejs/plugin-basic-ssl": "^2.1.0",
         "@vitejs/plugin-react": "^5.0.4",
