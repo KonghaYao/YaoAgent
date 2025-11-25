@@ -1,6 +1,10 @@
+import { RenderMessage } from "@langgraph-js/sdk";
+import { useChat } from "@langgraph-js/sdk/react";
 import React from "react";
+import { RotateCcw, Undo } from "lucide-react";
 
 interface MessageHumanProps {
+    message: RenderMessage;
     content: string | any[];
 }
 
@@ -48,7 +52,8 @@ const parseFileTags = (text: string): any[] => {
     return [];
 };
 
-const MessageHuman: React.FC<MessageHumanProps> = ({ content }) => {
+const MessageHuman: React.FC<MessageHumanProps> = ({ message, content }) => {
+    const chat = useChat();
     const renderContent = () => {
         if (typeof content === "string") {
             return <div className="text-white whitespace-pre-wrap">{content}</div>;
@@ -124,7 +129,15 @@ const MessageHuman: React.FC<MessageHumanProps> = ({ content }) => {
     };
 
     return (
-        <div className="flex flex-row w-full justify-end">
+        <div className="flex flex-row w-full justify-end group/message-human">
+            <div className="hidden group-hover/message-human:flex gap-2 mx-2">
+                <button onClick={() => chat.revertChatTo(message.id!, true)} className="p-2 text-gray-700 transition-colors cursor-pointer" title="重试">
+                    <RotateCcw size={16} />
+                </button>
+                <button onClick={() => chat.revertChatTo(message.id!, false)} className="p-2 text-gray-700 transition-colors cursor-pointer" title="回退">
+                    <Undo size={16} />
+                </button>
+            </div>
             <div className="flex flex-col w-fit bg-blue-500/90 rounded-2xl text-white px-4 py-3 max-w-[80%]">{renderContent()}</div>
         </div>
     );

@@ -23,7 +23,6 @@ export const MessagesBox = ({
     toggleToolCollapse: (id: string) => void;
     client: LangGraphClient;
 }) => {
-    const chat = useChat();
     // 使用 Map 来管理每个消息的状态
     const [messageStates, setMessageStates] = useState<Map<string, MessageState>>(new Map());
     const messageRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
@@ -59,35 +58,6 @@ export const MessagesBox = ({
         [updateMessageState]
     );
 
-    const handleCopyMessage = useCallback(
-        (messageId: string, content: any) => {
-            navigator.clipboard.writeText(getMessageContent(content));
-            handleCloseContextMenu(messageId);
-        },
-        [handleCloseContextMenu]
-    );
-
-    const handleToggleDetail = useCallback((messageId: string) => {
-        setMessageStates((prev) => {
-            const newStates = new Map(prev);
-            const currentState = newStates.get(messageId);
-            if (currentState) {
-                newStates.set(messageId, {
-                    ...currentState,
-                    showDetail: !currentState.showDetail,
-                    showContextMenu: false,
-                });
-            } else {
-                newStates.set(messageId, {
-                    showDetail: true,
-                    showContextMenu: false,
-                    contextMenuPosition: { x: 0, y: 0 },
-                });
-            }
-            return newStates;
-        });
-    }, []);
-
     // 点击外部关闭右键菜单
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -109,7 +79,6 @@ export const MessagesBox = ({
             document.removeEventListener("click", handleClickOutside);
         };
     }, [messageStates, handleCloseContextMenu]);
-
     return (
         <div className="flex flex-col gap-5 w-full">
             {renderMessages.map((message, index) => {
@@ -131,52 +100,13 @@ export const MessagesBox = ({
                         onContextMenu={(e) => handleContextMenu(e, messageId)}
                     >
                         {message.type === "human" ? (
-                            <MessageHuman content={message.content} />
+                            <MessageHuman message={message} content={message.content} />
                         ) : message.type === "tool" ? (
-                            <MessageTool
-                                message={message}
-                                client={client!}
-                                getMessageContent={getMessageContent}
-                                formatTokens={formatTokens}
-                                isCollapsed={collapsedTools.includes(message.id!)}
-                                onToggleCollapse={() => toggleToolCollapse(message.id!)}
-                            />
+                            <MessageTool message={message} isCollapsed={collapsedTools.includes(message.id!)} onToggleCollapse={() => toggleToolCollapse(message.id!)} />
                         ) : (
                             <MessageAI message={message} />
                         )}
                         {messageState.showDetail && <CodeBlock code={JSON.stringify(message, null, 2)} language="json" />}
-                        {messageState.showContextMenu && (
-                            <div
-                                className="fixed bg-white/95 backdrop-blur-sm rounded-xl z-50 py-2 min-w-[150px] overflow-hidden"
-                                style={{ left: messageState.contextMenuPosition.x, top: messageState.contextMenuPosition.y }}
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                <button
-                                    className="w-full bg-transparent px-4 py-2.5 text-left hover:bg-gray-100/80 text-sm text-gray-700 transition-colors"
-                                    onClick={() => handleCopyMessage(messageId, message.content)}
-                                >
-                                    复制消息内容
-                                </button>
-                                <button
-                                    className="w-full bg-transparent px-4 py-2.5 text-left hover:bg-gray-100/80 text-sm text-gray-700 transition-colors"
-                                    onClick={() => handleToggleDetail(messageId)}
-                                >
-                                    {messageState.showDetail ? "隐藏详情" : "显示详情"}
-                                </button>
-                                <button
-                                    className="w-full bg-transparent px-4 py-2.5 text-left hover:bg-gray-100/80 text-sm text-gray-700 transition-colors"
-                                    onClick={() => chat.revertChatTo(messageId)}
-                                >
-                                    回滚到消息
-                                </button>
-                                <button
-                                    className="w-full bg-transparent px-4 py-2.5 text-left hover:bg-gray-100/80 text-sm text-gray-700 transition-colors"
-                                    onClick={() => chat.revertChatTo(messageId, true)}
-                                >
-                                    重发消息
-                                </button>
-                            </div>
-                        )}
                     </div>
                 );
             })}

@@ -413,6 +413,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
         }
         const data = await this.runFETool();
         if (data) streamRecord.push(...data);
+        this.humanInTheLoop = null;
         this.emit("done", {
             event: "done",
         });

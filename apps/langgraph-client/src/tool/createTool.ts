@@ -25,23 +25,20 @@ export interface UnionTool<Args extends ZodRawShape, Child extends Object = Obje
     isPureParams?: boolean;
 }
 export type ToolCallback<Args extends ZodRawShape> = (args: z.infer<z.ZodObject<Args>>, context?: any) => CallToolResult | Promise<CallToolResult>;
-
-export type CallToolResult =
-    | string
-    | { type: "text"; text: string }[]
-    | {
-          decisions: (
-              | { type: "approve" }
-              | {
-                    type: "edit";
-                    edited_action: {
-                        name: string;
-                        args: Record<string, any>;
-                    };
-                }
-              | { type: "reject"; message: string }
-          )[];
-      };
+export type InterruptResponse = {
+    decisions: (
+        | { type: "approve" }
+        | {
+              type: "edit";
+              edited_action: {
+                  name: string;
+                  args: Record<string, any>;
+              };
+          }
+        | { type: "reject"; message: string }
+    )[];
+};
+export type CallToolResult = string | { type: "text"; text: string }[] | InterruptResponse;
 
 /** 用于格式校验 */
 export const createTool = <Args extends ZodRawShape>(tool: UnionTool<Args>) => {

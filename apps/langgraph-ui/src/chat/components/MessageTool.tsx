@@ -1,5 +1,5 @@
 import React, { JSX, memo, useState } from "react";
-import { LangGraphClient, RenderMessage, ToolMessage, ToolRenderData } from "@langgraph-js/sdk";
+import { getMessageContent, LangGraphClient, RenderMessage, ToolMessage, ToolRenderData } from "@langgraph-js/sdk";
 import { UsageMetadata } from "./UsageMetadata";
 import { useChat } from "@langgraph-js/sdk/react";
 import { MessagesBox } from "./MessageBox";
@@ -10,9 +10,6 @@ const TOOL_COLORS = ["bg-white", "bg-white", "bg-white", "bg-white", "bg-white",
 
 interface MessageToolProps {
     message: ToolMessage & RenderMessage;
-    client: LangGraphClient;
-    getMessageContent: (content: any) => string;
-    formatTokens: (tokens: number) => string;
     isCollapsed: boolean;
     onToggleCollapse: () => void;
 }
@@ -26,7 +23,7 @@ const getToolColorClass = (tool_name: string = "") => {
     return TOOL_COLORS[index];
 };
 
-const MessageTool: React.FC<MessageToolProps> = ({ message, getMessageContent, formatTokens, isCollapsed, onToggleCollapse }) => {
+const MessageTool: React.FC<MessageToolProps> = ({ message, isCollapsed, onToggleCollapse }) => {
     const { getToolUIRender, client } = useChat();
     const render = getToolUIRender(message.name || "");
     const bgColorClass = getToolColorClass(message.name || "");
@@ -34,32 +31,34 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, getMessageContent, f
         return client?.doneFEToolWaiting(message.id as string, {
             decisions: [
                 {
-                    type: type,
+                    type: type as "approve",
                 },
             ],
         });
     };
+    const tool = new ToolRenderData(message, client!);
     const humanInTheLoopButton = () => {
-        const tool = new ToolRenderData(message, client!);
-        if (!tool.client.humanInTheLoop) return null;
-        for (let i of tool.client.humanInTheLoop) {
-            for (let j of i.value.reviewConfigs) {
-                if (j.actionName === message.name) {
-                    return j.allowedDecisions.map((k) => {
-                        return (
-                            <button
-                                key={k}
-                                className="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-                                onClick={() => onHumanClick(k)}
-                            >
-                                {k}
-                            </button>
-                        );
-                    });
+        const hasHumanInTheLoop = tool.state === "loading" && tool.client.humanInTheLoop?.some((i) => i.value.reviewConfigs.some((j) => j.actionName === message.name));
+        const inner = () => {
+            for (let i of tool.client.humanInTheLoop!) {
+                for (let j of i.value.reviewConfigs) {
+                    if (j.actionName === message.name) {
+                        return j.allowedDecisions.map((k) => {
+                            return (
+                                <button
+                                    key={k}
+                                    className="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                                    onClick={() => onHumanClick(k)}
+                                >
+                                    {k}
+                                </button>
+                            );
+                        });
+                    }
                 }
             }
-        }
-        return null;
+        };
+        return <>{hasHumanInTheLoop ? inner() : null}</>;
     };
     return (
         <div className="flex flex-col w-full">
@@ -71,13 +70,17 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, getMessageContent, f
                         <div className="text-xs font-medium text-gray-600" onClick={() => console.log(message)}>
                             {message.node_name} | {message.name}
                         </div>
-                        <div>{humanInTheLoopButton()}</div>
+                        <div>
+                            {humanInTheLoopButton()}
+
+                            <div className="text-sm">{tool.state}</div>
+                        </div>
                     </div>
 
                     {!isCollapsed && (
                         <div className="flex flex-col gap-4 px-5 pb-4">
-                            <Previewer content={message.tool_input || ""} />
-                            <Previewer content={getMessageContent(message.content)} />
+                            <Previewer content={JSON.stringify(tool.getInputRepaired(), null, 2) || ""} />
+                            <Previewer content={getMessageContent(message.content).repeat(200)} />
                             <UsageMetadata
                                 response_metadata={message.response_metadata as any}
                                 usage_metadata={message.usage_metadata || {}}
@@ -89,11 +92,11 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, getMessageContent, f
                     )}
                 </div>
             )}
-            {message.sub_messages && (
+            {message.sub_messages?.length ? (
                 <div className="flex flex-col pl-6 py-3 ml-4 border-l-2 border-gray-200">
                     <MessagesBox renderMessages={message.sub_messages} collapsedTools={[]} toggleToolCollapse={(id) => {}} client={client!} />
                 </div>
-            )}
+            ) : null}
         </div>
     );
 };
@@ -138,16 +141,27 @@ const Previewer = ({ content }: { content: string }) => {
                 )}
             </div>
 
-            <div className="flex flex-col max-h-[300px] overflow-auto bg-white border border-gray-200 rounded-xl p-3 w-full text-xs font-mono whitespace-pre-wrap">
-                {jsonMode && isJSON ? (
-                    <CodeBlock code={JSON.stringify(JSON.parse(content), null, 2)} language="json"></CodeBlock>
-                ) : markdownMode && isMarkdown ? (
-                    <div className="markdown-body">
-                        <Response>{content}</Response>
-                    </div>
-                ) : (
-                    <pre className="whitespace-pre-wrap">{content}</pre>
-                )}
+            <div className="flex flex-col max-h-[300px] bg-white border border-gray-200 rounded-xl p-3 w-full text-xs font-mono">
+                <div className="overflow-auto max-h-full">
+                    {jsonMode && isJSON ? (
+                        <div className="overflow-visible">
+                            <CodeBlock code={JSON.stringify(JSON.parse(content), null, 2)} language="json"></CodeBlock>
+                        </div>
+                    ) : markdownMode && isMarkdown ? (
+                        <div className="whitespace-pre-wrap">
+                            <Response>{content}</Response>
+                        </div>
+                    ) : (
+                        <pre
+                            className=" whitespace-pre-wrap"
+                            style={{
+                                overflowWrap: "break-word",
+                            }}
+                        >
+                            <code className="whitespace-pre-wrap">{content}</code>
+                        </pre>
+                    )}
+                </div>
             </div>
         </div>
     );

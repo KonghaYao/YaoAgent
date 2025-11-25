@@ -32,29 +32,15 @@ const ChatMessages: React.FC = () => {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const MessageContainer = useRef<HTMLDivElement>(null);
 
-    // 检查是否足够接近底部（距离底部 30% 以内）
-    const isNearBottom = () => {
-        if (!MessageContainer.current) return false;
-
-        const container = MessageContainer.current;
-        const scrollPosition = container.scrollTop + container.clientHeight;
-        const scrollHeight = container.scrollHeight;
-
-        return scrollHeight - scrollPosition <= 50;
-    };
-
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
     };
 
     useEffect(() => {
         if (renderMessages.length > 0 && MessageContainer.current) {
+            console.log(renderMessages);
             // 切换消息时，自动滚动到底部
             if (!loading) {
-                scrollToBottom();
-            }
-            // 只有当用户已经滚动到接近底部时，才自动滚动到底部
-            if (loading && isNearBottom()) {
                 scrollToBottom();
             }
         }
