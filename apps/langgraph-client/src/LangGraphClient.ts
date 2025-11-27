@@ -382,7 +382,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
             } else if (chunk.event === "messages/metadata") {
                 Object.assign(this.messagesMetadata, chunk.data);
                 continue;
-            } else if (chunk.event === "messages/partial") {
+            } else if (chunk.event === "messages/partial" || chunk.event === "messages/complete") {
                 for (const message of chunk.data) {
                     this.messageProcessor.updateStreamingMessage(message);
                 }

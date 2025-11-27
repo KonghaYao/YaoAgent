@@ -80,7 +80,7 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, isCollapsed, onToggl
                     {!isCollapsed && (
                         <div className="flex flex-col gap-4 px-5 pb-4">
                             <Previewer content={JSON.stringify(tool.getInputRepaired(), null, 2) || ""} />
-                            <Previewer content={getMessageContent(message.content).repeat(200)} />
+                            <Previewer content={getMessageContent(message.content)} />
                             <UsageMetadata
                                 response_metadata={message.response_metadata as any}
                                 usage_metadata={message.usage_metadata || {}}
