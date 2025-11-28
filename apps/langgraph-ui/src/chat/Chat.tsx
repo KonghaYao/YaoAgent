@@ -207,7 +207,7 @@ const Chat: React.FC = () => {
     const [isModelTesterOpen, setIsModelTesterOpen] = useState(false);
     const { showHistory, toggleHistoryVisible, showGraph, toggleGraphVisible, renderMessages, setTools, client } = useChat();
     const { extraParams, setExtraParams } = useExtraParams();
-    const { showArtifact, setShowArtifact } = useChat();
+    const { showArtifact, sendMessage } = useChat();
     const { openMonitor } = useMonitor();
     useEffect(() => {
         setTools([show_form, create_artifacts, __default_tool__]);
@@ -305,7 +305,29 @@ const Chat: React.FC = () => {
             {(showGraph || showArtifact) && (
                 <div className="overflow-hidden flex-1">
                     {showGraph && <GraphPanel />}
-                    {showArtifact && <ArtifactViewer />}
+                    {showArtifact && (
+                        <ArtifactViewer
+                            onSendBackToAI={(errorData) => {
+                                sendMessage(
+                                    [
+                                        {
+                                            type: "human",
+                                            content: [
+                                                {
+                                                    type: "text",
+                                                    text: `
+error react file: ${errorData.groupId} ${errorData.versionId} 
+                    
+${errorData.error}`,
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                    { extraParams }
+                                );
+                            }}
+                        />
+                    )}
                 </div>
             )}
         </div>

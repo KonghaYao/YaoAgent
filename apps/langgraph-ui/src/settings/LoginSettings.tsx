@@ -16,7 +16,7 @@ interface LoginSettingsData {
 const initialLoginSettings: LoginSettingsData = {
     headers: [{ key: "authorization", value: "" }],
     withCredentials: false,
-    apiUrl: "/api-langgraph",
+    apiUrl: "/api/langgraph",
     defaultAgent: "agent",
 };
 

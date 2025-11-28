@@ -1,6 +1,6 @@
 {
     "name": "@langgraph-js/ui",
-    "version": "5.0.2",
+    "version": "5.1.0",
     "description": "",
     "scripts": {
         "dev": "vite",
@@ -18,11 +18,11 @@
     "main": "./dist/react/src/index.js",
     "type": "module",
     "dependencies": {
-        "@langgraph-js/open-smith": "^2.0.0",
+        "@langgraph-js/open-smith": "^2.3.0",
         "@tailwindcss/vite": "^4.1.14",
         "@vitejs/plugin-basic-ssl": "^2.1.0",
         "@vitejs/plugin-react": "^5.0.4",
-        "ai-artifacts": "^1.2.2",
+        "ai-artifacts": "^1.3.0",
         "next-themes": "^0.4.6",
         "sonner": "^2.0.7",
         "@langchain/core": "^1.0.2",

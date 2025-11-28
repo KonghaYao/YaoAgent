@@ -4,6 +4,7 @@ import { createEntrypointGraph } from "@langgraph-js/pure-graph";
 import { ChatOpenAI } from "@langchain/openai";
 import { BaseMessage, createAgent, humanInTheLoopMiddleware, HumanMessage, tool, ToolMessage } from "langchain";
 import { withLangGraph } from "@langchain/langgraph/zod";
+import { create_artifacts } from "./create_artifacts";
 
 const State = z.object({
     task_store: z.record(z.string(), z.any()).default({}),
@@ -90,7 +91,7 @@ const workflow = entrypoint("test-entrypoint", async (state: z.infer<typeof Stat
             },
         }),
         systemPrompt: "你是一个智能助手",
-        tools: [show_form, interrupt_test, sub_agent_tool],
+        tools: [show_form, interrupt_test, sub_agent_tool, create_artifacts],
         middleware: [
             humanInTheLoopMiddleware({
                 interruptOn: {

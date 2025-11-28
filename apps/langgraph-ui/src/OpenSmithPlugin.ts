@@ -1,12 +1,23 @@
-import { Plugin } from "vite";
+import { loadEnv, Plugin } from "vite";
 import { Readable } from "stream";
-import { app } from "@langgraph-js/open-smith/dist/app.js";
 import appendLLMRouter from "../server/index";
+import { Hono } from "hono";
 export const OpenSmithPlugin = () =>
     ({
         name: "open-smith",
-        configureServer(server) {
-            console.log("open-smith is open on http://localhost:4173/api/open-smith/ui/index.html");
+        async configureServer(server) {
+            if (server.config.mode === "production") return;
+            const { app: OpenSmithApp } = await import("@langgraph-js/open-smith/dist/app.js");
+            console.log(`open-smith is open on http://localhost:${server.config.server.port}/api/open-smith/ui/index.html`);
+            const env = loadEnv(server.config.mode, process.cwd(), "LANGSMITH");
+            if (!env.LANGSMITH_TRACING) {
+                console.log(`
+Please add the following environment variables to your project to record the tracing data:
+
+LANGSMITH_TRACING=true
+LANGSMITH_ENDPOINT= http://localhost:${server.config.server.port}/api/open-smith
+`);
+            }
             server.middlewares.use("/api/open-smith", async (req, res, next) => {
                 try {
                     const body = Readable.toWeb(req);
@@ -20,6 +31,8 @@ export const OpenSmithPlugin = () =>
                     });
 
                     // Proxy the request to app.basePath handler
+                    const app = new Hono();
+                    app.route("/", OpenSmithApp);
                     const response = await appendLLMRouter(app).basePath("/api/open-smith").fetch(fetchRequest);
 
                     // Set status and headers
