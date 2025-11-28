@@ -334,8 +334,8 @@ importers:
         specifier: ^5.0.4
         version: 5.0.4(vite@7.2.2(@types/node@22.15.30)(jiti@2.6.1)(lightningcss@1.30.1)(tsx@4.19.4)(yaml@2.8.0))
       ai-artifacts:
-        specifier: ^1.3.0
-        version: 1.3.0
+        specifier: ^1.3.1
+        version: 1.3.1
       hono:
         specifier: ^4.10.4
         version: 4.10.6
@@ -2683,8 +2683,8 @@ packages:
     resolution: {integrity: sha512-jRR5wdylq8CkOe6hei19GGZnxM6rBGwFl3Bg0YItGDimvjGtAvdZk4Pu6Cl4u4Igsws4a1fd1Vq3ezrhn4KmFw==}
     engines: {node: '>= 14'}
 
-  ai-artifacts@1.3.0:
-    resolution: {integrity: sha512-17Nr9digQSbfh0+pHps2EqcD09UOrQw13Q70NKO9O2c+F6FY+xCnTp+FdpzRTpOmjMjGTD2RaPo5ScJWeCdj6g==}
+  ai-artifacts@1.3.1:
+    resolution: {integrity: sha512-x8Ok9qWn4TrFkiTWr+Q0MzpwQLUD3eJoQu1LoKOJ6Ph5qxCqc9N4URyedgxrn+qsV52Y3dfwTeQJ2K2/7Na5UQ==}
 
   ajv-formats@2.1.1:
     resolution: {integrity: sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==}
@@ -8435,7 +8435,7 @@ snapshots:
 
   agent-base@7.1.3: {}
 
-  ai-artifacts@1.3.0:
+  ai-artifacts@1.3.1:
     dependencies:
       comlink: 4.4.2
       mitt: 3.0.1

@@ -30,7 +30,14 @@ export const ArtifactViewer: React.FC<ArtifactViewerProps> = ({ onSendBackToAI }
             eventCenter.off("sendBackToAI", handleSendBackToAI);
         };
     }, []);
-    return <ai-artifacts store-id="default" group-id={currentArtifactId?.[0] || ""} version-id={currentArtifactId?.[1] || ""}></ai-artifacts>;
+    return (
+        <ai-artifacts
+            src="https://bafybeifi2u3a56o6t46fi5dsti3ikrmv42yywvzxbxi3akeu73zpwuu45q.pinme.dev"
+            store-id="default"
+            group-id={currentArtifactId?.[0] || ""}
+            version-id={currentArtifactId?.[1] || ""}
+        ></ai-artifacts>
+    );
 };
 
 declare module "react" {
