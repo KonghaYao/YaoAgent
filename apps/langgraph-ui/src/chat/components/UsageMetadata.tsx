@@ -25,7 +25,7 @@ export const UsageMetadata: React.FC<UsageMetadataProps> = ({ usage_metadata, sp
     const speed = spend_time ? ((usage_metadata.output_tokens || 0) * 1000) / (spend_time || 1) : 0;
     spend_time = spend_time && !isNaN(spend_time) ? spend_time : 0;
     const { currentChatId } = useChat();
-    const { openMonitorWithChat } = useMonitor();
+    const monitor = useMonitor();
     return (
         <div className="flex items-center justify-between text-xs text-gray-400 mt-3">
             <div className="flex items-center gap-3">
@@ -37,7 +37,7 @@ export const UsageMetadata: React.FC<UsageMetadataProps> = ({ usage_metadata, sp
                 {response_metadata?.model_name && <span className="text-gray-500">{response_metadata.model_name}</span>}
                 {tool_call_id && <span className="text-gray-400">Tool: {tool_call_id}</span>}
                 {id && (
-                    <span className="text-gray-400" onClick={() => openMonitorWithChat(currentChatId!, id)}>
+                    <span className="text-gray-400" onClick={() => monitor?.openMonitorWithChat(currentChatId!, id)}>
                         ID: {id}
                     </span>
                 )}

@@ -45,15 +45,12 @@ export const MonitorProvider: React.FC<{ children: ReactNode }> = ({ children })
 // Hook 用于在组件中使用 modal
 export const useMonitor = () => {
     const context = useContext(MonitorContext);
-    if (context === undefined) {
-        throw new Error("useModal must be used within a ModalProvider");
-    }
     return context;
 };
 
 // Modal 组件
 export const Monitor: React.FC = () => {
-    const { isOpen, url, closeModal } = useMonitor();
+    const { isOpen, url, closeModal } = useMonitor()!;
 
     if (!isOpen) return null;
 

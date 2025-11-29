@@ -11,7 +11,7 @@ import type { SupportedFileType } from "./components/FileList";
 import JsonEditorPopup from "./components/JsonEditorPopup";
 import { GraphPanel } from "../graph/GraphPanel";
 import { setLocalConfig } from "./store";
-import { History, Network, FileJson, Settings, Send, UploadCloudIcon, GitBranch, TestTube, Terminal, Printer, BotIcon } from "lucide-react";
+import { History, Network, FileJson, Settings, Send, UploadCloudIcon, GitBranch, TestTube, Terminal, Printer, BotIcon, Bug } from "lucide-react";
 import { ArtifactViewer } from "../artifacts/ArtifactViewer";
 import "github-markdown-css/github-markdown.css";
 
@@ -19,19 +19,20 @@ import "./index.css";
 import { show_form } from "./tools/index";
 import { create_artifacts } from "./tools/create_artifacts";
 import SettingPanel from "../settings/SettingPanel";
-import ModelTesterPopup from "./components/ModelTesterPopup";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 
 import { MonitorProvider, Monitor, useMonitor } from "../monitor";
 import UploadButton from "./components/UploadButton";
 import { __default_tool__ } from "./tools/human-in-the-loop";
+import DebugPanel from "../debugPanel/DebugPanel";
+import { useDebugPanel } from "../debugPanel/Context";
 
 const ChatMessages: React.FC = () => {
     const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse, isFELocking } = useChat();
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const MessageContainer = useRef<HTMLDivElement>(null);
-
+    const { setMessagesContext } = useDebugPanel();
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
     };
@@ -50,11 +51,11 @@ const ChatMessages: React.FC = () => {
 
     useEffect(() => {
         if (renderMessages.length > 0 && MessageContainer.current) {
-            console.log(renderMessages);
             // 切换消息时，自动滚动到底部
             if (!loading) {
                 scrollToBottom();
             }
+            setMessagesContext(renderMessages);
         }
     }, [renderMessages]);
 
@@ -89,7 +90,7 @@ const ChatMessages: React.FC = () => {
 const ChatInput: React.FC = () => {
     const { userInput, renderMessages, setUserInput, loading, sendMessage, stopGeneration, currentAgent, setCurrentAgent, client, currentChatId } = useChat();
     const { extraParams } = useExtraParams();
-    const { openMonitorWithChat } = useMonitor();
+    const monitor = useMonitor();
     const { mediaUrls, isFileTextMode, setIsFileTextMode } = useFileList();
     const _setCurrentAgent = (agent: string) => {
         localStorage.setItem("defaultAgent", agent);
@@ -216,7 +217,7 @@ const ChatInput: React.FC = () => {
                 <UsageMetadata usage_metadata={client?.tokenCounter || {}} />
                 <div className="flex items-center gap-2">
                     {!!currentChatId && (
-                        <span className="cursor-pointer text-xs text-gray-300 dark:text-gray-500" onClick={() => openMonitorWithChat(currentChatId)}>
+                        <span className="cursor-pointer text-xs text-gray-300 dark:text-gray-500" onClick={() => monitor?.openMonitorWithChat(currentChatId)}>
                             会话 ID: {currentChatId}
                         </span>
                     )}
@@ -229,11 +230,11 @@ const ChatInput: React.FC = () => {
 const Chat: React.FC = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const [isModelTesterOpen, setIsModelTesterOpen] = useState(false);
     const { showHistory, toggleHistoryVisible, showGraph, toggleGraphVisible, renderMessages, setTools, client } = useChat();
     const { extraParams, setExtraParams } = useExtraParams();
     const { showArtifact, sendMessage } = useChat();
-    const { openMonitor } = useMonitor();
+    const monitor = useMonitor();
+    const { toggleDebugPanel, isDebugPanelVisible } = useDebugPanel();
     useEffect(() => {
         setTools([show_form, create_artifacts, __default_tool__]);
     }, []);
@@ -265,13 +266,7 @@ const Chat: React.FC = () => {
                         <FileJson className="w-4 h-4" />
                         额外参数
                     </button>
-                    <button
-                        onClick={() => setIsModelTesterOpen(true)}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 cursor-pointer rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
-                    >
-                        <BotIcon className="w-4 h-4" />
-                        模型测试器
-                    </button>
+
                     <button
                         id="setting-button"
                         onClick={() => setIsSettingsOpen(true)}
@@ -290,6 +285,7 @@ const Chat: React.FC = () => {
                         <Printer className="w-4 h-4" />
                         打印 State
                     </button>
+
                     {/* <button
                         className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 cursor-pointer rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
                         onClick={() => {
@@ -303,11 +299,20 @@ const Chat: React.FC = () => {
                     <button
                         className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 cursor-pointer rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
                         onClick={() => {
-                            openMonitor("/api/open-smith/ui/index.html");
+                            monitor?.openMonitor("/api/open-smith/ui/index.html");
                         }}
                     >
                         <Terminal className="w-4 h-4" />
                         控制台
+                    </button>
+                    <button
+                        onClick={toggleDebugPanel}
+                        className={`px-4 py-2 text-sm font-medium cursor-pointer rounded-xl focus:outline-none transition-colors flex items-center gap-2 ${
+                            isDebugPanelVisible ? "text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100" : "text-gray-700 bg-white border border-gray-200 hover:bg-gray-100"
+                        }`}
+                    >
+                        <Bug className="w-4 h-4" />
+                        调试面板
                     </button>
                 </header>
                 <main className="flex-1 overflow-hidden max-w-6xl w-full h-full  flex flex-col">
@@ -324,7 +329,6 @@ const Chat: React.FC = () => {
                     title="编辑额外参数"
                     description="额外参数用于在发送消息时附加到 LangGraph 的 State 中。"
                 />
-                <ModelTesterPopup isOpen={isModelTesterOpen} onClose={() => setIsModelTesterOpen(false)} />
                 <SettingPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
             </section>
             {(showGraph || showArtifact) && (
