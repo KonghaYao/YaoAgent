@@ -6,6 +6,7 @@ import { ToolRenderData } from "../tool/ToolUI.js";
 import { UnionTool } from "../tool/createTool.js";
 import { createLangGraphServerClient } from "../client/LanggraphServer.js";
 import { useArtifacts } from "../artifacts/index.js";
+import { RevertChatToOptions } from "../time-travel/index.js";
 
 /**
  * @zh 格式化日期对象为时间字符串。
@@ -290,8 +291,8 @@ export const createChatStore = (
              * @zh 回滚到指定的消息。
              * @en Reverts to the specified message.
              */
-            async revertChatTo(messageId: string, resend = false, sendOptions?: SendMessageOptions) {
-                await client.get()?.revertChatTo(messageId);
+            async revertChatTo(messageId: string, resend = false, sendOptions?: SendMessageOptions & RevertChatToOptions) {
+                await client.get()?.revertChatTo(messageId, sendOptions || {});
                 if (resend) {
                     return sendMessage([], sendOptions, true);
                 } else {

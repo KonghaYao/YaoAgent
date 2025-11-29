@@ -4,7 +4,7 @@ import { ToolManager } from "./ToolManager.js";
 import { CallToolResult } from "./tool/createTool.js";
 import { type ILangGraphClient } from "@langgraph-js/pure-graph/dist/types.js";
 import { MessageProcessor } from "./MessageProcessor.js";
-import { revertChatTo } from "./time-travel/index.js";
+import { revertChatTo, RevertChatToOptions } from "./time-travel/index.js";
 
 export type RenderMessage = Message & {
     /** 对于 AIMessage 来说是节点名称，对于工具节点来说是工具名称 */
@@ -310,8 +310,8 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
      * @zh 回滚到指定的消息。但是不会触发数据的重新更新
      * @en Reverts to the specified message.
      */
-    async revertChatTo(messageId: string) {
-        const { state, checkpoint } = await revertChatTo(this.client as any, this.currentThread!.thread_id, messageId);
+    async revertChatTo(messageId: string, options: RevertChatToOptions) {
+        const { state, checkpoint } = await revertChatTo(this.client as any, this.currentThread!.thread_id, messageId, options);
         this.graphState = state;
         this.messageProcessor.clearStreamingMessages();
         this.messageProcessor.setGraphMessages(state.messages! as RenderMessage[]);
