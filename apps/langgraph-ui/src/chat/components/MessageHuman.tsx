@@ -1,7 +1,8 @@
 import { RenderMessage } from "@langgraph-js/sdk";
 import { useChat } from "@langgraph-js/sdk/react";
 import React, { useState } from "react";
-import { RotateCcw, Undo, ChevronDown, ChevronUp } from "lucide-react";
+import { RotateCcw, Undo, ChevronDown, ChevronUp, Edit3, Check, X } from "lucide-react";
+import { useExtraParams } from "../context/ExtraParamsContext";
 
 interface MessageHumanProps {
     message: RenderMessage;
@@ -54,10 +55,76 @@ const parseFileTags = (text: string): any[] => {
 
 const MessageHuman: React.FC<MessageHumanProps> = ({ message, content }) => {
     const chat = useChat();
+    const { extraParams } = useExtraParams();
     const [isExpanded, setIsExpanded] = useState(false);
-    const renderContent = () => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedContent, setEditedContent] = useState<string>("");
+
+    // 获取纯文本内容用于编辑
+    const getTextContent = (content: string | any[]): string => {
         if (typeof content === "string") {
-            return <div className="text-white whitespace-pre-wrap">{content}</div>;
+            return content;
+        }
+        if (Array.isArray(content)) {
+            return content
+                .filter((item) => item.type === "text" && typeof item.text === "string")
+                .map((item) => item.text)
+                .join("");
+        }
+        return "";
+    };
+
+    // 处理双击进入编辑模式
+    const handleDoubleClick = () => {
+        setIsEditing(true);
+        setEditedContent(getTextContent(content));
+    };
+
+    // 确认编辑并调用 revertChatTo + sendMessage
+    const handleEditConfirm = async () => {
+        if (editedContent.trim() !== getTextContent(content)) {
+            await chat.revertChatTo(message.id!, false, { includeMessageId: true }); // 先回退到该消息
+            await chat.sendMessage([{ type: "human", content: editedContent }], { extraParams }); // 发送编辑的内容
+        }
+        setIsEditing(false);
+        setEditedContent("");
+    };
+
+    // 取消编辑
+    const handleEditCancel = () => {
+        setIsEditing(false);
+        setEditedContent("");
+    };
+
+    const renderContent = () => {
+        if (isEditing) {
+            return (
+                <div className="flex flex-col gap-2">
+                    <textarea
+                        value={editedContent}
+                        onChange={(e) => setEditedContent(e.target.value)}
+                        className="w-full bg-transparent text-white rounded px-3 py-2 min-h-[120px] resize-none border-2 border-blue-400 outline-none"
+                        placeholder="编辑消息内容..."
+                        autoFocus
+                    />
+                    <div className="flex gap-2 justify-end">
+                        <button onClick={handleEditConfirm} className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors" title="确认编辑">
+                            <Check size={14} />
+                        </button>
+                        <button onClick={handleEditCancel} className="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 transition-colors" title="取消编辑">
+                            <X size={14} />
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        if (typeof content === "string") {
+            return (
+                <div className="text-white whitespace-pre-wrap cursor-pointer" onDoubleClick={handleDoubleClick} title="双击编辑">
+                    {content}
+                </div>
+            );
         }
 
         if (Array.isArray(content)) {
@@ -79,7 +146,7 @@ const MessageHuman: React.FC<MessageHumanProps> = ({ message, content }) => {
                     switch (item.type) {
                         case "text":
                             return (
-                                <div key={index} className="text-white whitespace-pre-wrap">
+                                <div key={index} className="text-white whitespace-pre-wrap cursor-pointer" onDoubleClick={handleDoubleClick} title="双击编辑">
                                     {item.text}
                                 </div>
                             );
@@ -135,14 +202,18 @@ const MessageHuman: React.FC<MessageHumanProps> = ({ message, content }) => {
                 <button onClick={() => chat.revertChatTo(message.id!, true)} className="p-2 text-gray-700 transition-colors cursor-pointer" title="重试">
                     <RotateCcw size={16} />
                 </button>
-                <button onClick={() => chat.revertChatTo(message.id!, false)} className="p-2 text-gray-700 transition-colors cursor-pointer" title="回退">
-                    <Undo size={16} />
+                <button onClick={handleDoubleClick} className="p-2 text-gray-700 transition-colors cursor-pointer" title="编辑">
+                    <Edit3 size={16} />
                 </button>
                 <button onClick={() => setIsExpanded(!isExpanded)} className="p-2 text-gray-700 transition-colors cursor-pointer" title={isExpanded ? "收起" : "展开"}>
                     {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </button>
             </div>
-            <div className={`flex flex-col w-fit bg-blue-500/90 rounded-2xl text-white px-4 py-3 max-w-[80%] ${isExpanded ? "max-h-40 overflow-y-auto" : ""}`}>{renderContent()}</div>
+            <div
+                className={`flex flex-col w-fit bg-blue-500/90 rounded-2xl text-white px-4 py-3 max-w-[80%] ${isExpanded || isEditing ? "" : "max-h-40 overflow-y-auto"} ${isEditing ? "w-full h-52" : ""}`}
+            >
+                {renderContent()}
+            </div>
         </div>
     );
 };

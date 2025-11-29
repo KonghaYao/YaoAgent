@@ -37,6 +37,18 @@ const ChatMessages: React.FC = () => {
     };
 
     useEffect(() => {
+        const container = MessageContainer.current;
+        if (!container) return;
+        const observer = new ResizeObserver(() => {
+            if (container.scrollHeight - container.scrollTop - container.clientHeight < 100) {
+                scrollToBottom();
+            }
+        });
+        observer.observe(container);
+        return () => observer.disconnect();
+    }, []);
+
+    useEffect(() => {
         if (renderMessages.length > 0 && MessageContainer.current) {
             console.log(renderMessages);
             // 切换消息时，自动滚动到底部
@@ -125,25 +137,38 @@ const ChatInput: React.FC = () => {
     };
 
     const [usingSingleMode, setUsingSingleMode] = useState(true);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
     useEffect(() => {
-        if (mediaUrls.length > 0) {
+        if (mediaUrls.length > 0 || (userInput && (userInput.length > 50 || userInput.includes("\n")))) {
             setUsingSingleMode(false);
         } else {
             setUsingSingleMode(true);
         }
-    }, [renderMessages.length, mediaUrls.length]);
+    }, [renderMessages.length, mediaUrls.length, userInput]);
+
+    useEffect(() => {
+        if (textareaRef.current) {
+            textareaRef.current.style.height = "auto";
+            if (!usingSingleMode) {
+                textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 96) + "px";
+            }
+        }
+    }, [userInput, usingSingleMode]);
+
     return (
         <div className=" pb-8 ">
-            <div className={"bg-white border border-gray-200 shadow-lg shadow-gray-200 " + (usingSingleMode ? "rounded-full px-3 py-3" : "rounded-4xl px-4 py-3")}>
+            <div className={"bg-white border border-gray-200 shadow-lg shadow-gray-200 " + (usingSingleMode ? "rounded-full px-3 py-3" : "rounded-[2rem] px-4 py-3")}>
                 {!usingSingleMode && mediaUrls.length > 0 && (
                     <div className="flex items-center justify-between mb-2 border-b border-gray-200 pb-2">
                         <FileList />
                     </div>
                 )}
-                <div className={`flex gap-3 items-center`}>
+                <div className={`flex gap-3 ${usingSingleMode ? "items-center" : "items-end"}`}>
                     <UploadButton />
                     <textarea
-                        className="flex-1 text-sm resize-none active:outline-none focus:outline-none"
+                        ref={textareaRef}
+                        className={`flex-1 text-sm resize-none active:outline-none focus:outline-none ${usingSingleMode ? "" : "py-2"}`}
                         rows={1}
                         value={userInput}
                         onChange={(e) => setUserInput(e.target.value)}
@@ -219,7 +244,7 @@ const Chat: React.FC = () => {
                     <HistoryList onClose={() => toggleHistoryVisible()} />
                 </div>
             )}
-            <section className="flex-1 flex flex-col overflow-auto items-center ">
+            <section className="flex-1 flex flex-col overflow-hidden items-center ">
                 <header className="flex items-center gap-2 px-3 py-2 justify-end h-16 mt-4  max-w-6xl w-full">
                     <button
                         className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 cursor-pointer rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
@@ -285,7 +310,7 @@ const Chat: React.FC = () => {
                         控制台
                     </button>
                 </header>
-                <main className="flex-1 overflow-y-auto overflow-x-hidden max-w-6xl w-full h-full  flex flex-col">
+                <main className="flex-1 overflow-hidden max-w-6xl w-full h-full  flex flex-col">
                     <ChatMessages />
                     <FileListProvider>
                         <ChatInput />
