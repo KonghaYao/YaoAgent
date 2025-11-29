@@ -316,7 +316,9 @@ const Chat: React.FC = () => {
                                                 {
                                                     type: "text",
                                                     text: `
-error react file: ${errorData.groupId} ${errorData.versionId} 
+error react file: 
+- filename: ${errorData.groupId} 
+- version: ${errorData.versionId} 
                     
 ${errorData.error}`,
                                                 },

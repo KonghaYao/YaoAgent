@@ -1,7 +1,7 @@
 import { RenderMessage } from "@langgraph-js/sdk";
 import { useChat } from "@langgraph-js/sdk/react";
-import React from "react";
-import { RotateCcw, Undo } from "lucide-react";
+import React, { useState } from "react";
+import { RotateCcw, Undo, ChevronDown, ChevronUp } from "lucide-react";
 
 interface MessageHumanProps {
     message: RenderMessage;
@@ -54,6 +54,7 @@ const parseFileTags = (text: string): any[] => {
 
 const MessageHuman: React.FC<MessageHumanProps> = ({ message, content }) => {
     const chat = useChat();
+    const [isExpanded, setIsExpanded] = useState(false);
     const renderContent = () => {
         if (typeof content === "string") {
             return <div className="text-white whitespace-pre-wrap">{content}</div>;
@@ -129,7 +130,7 @@ const MessageHuman: React.FC<MessageHumanProps> = ({ message, content }) => {
     };
 
     return (
-        <div className="flex flex-row w-full justify-end group/message-human">
+        <div className="flex flex-row w-full justify-end group/message-human ">
             <div className="hidden group-hover/message-human:flex gap-2 mx-2">
                 <button onClick={() => chat.revertChatTo(message.id!, true)} className="p-2 text-gray-700 transition-colors cursor-pointer" title="重试">
                     <RotateCcw size={16} />
@@ -137,8 +138,11 @@ const MessageHuman: React.FC<MessageHumanProps> = ({ message, content }) => {
                 <button onClick={() => chat.revertChatTo(message.id!, false)} className="p-2 text-gray-700 transition-colors cursor-pointer" title="回退">
                     <Undo size={16} />
                 </button>
+                <button onClick={() => setIsExpanded(!isExpanded)} className="p-2 text-gray-700 transition-colors cursor-pointer" title={isExpanded ? "收起" : "展开"}>
+                    {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </button>
             </div>
-            <div className="flex flex-col w-fit bg-blue-500/90 rounded-2xl text-white px-4 py-3 max-w-[80%]">{renderContent()}</div>
+            <div className={`flex flex-col w-fit bg-blue-500/90 rounded-2xl text-white px-4 py-3 max-w-[80%] ${isExpanded ? "max-h-40 overflow-y-auto" : ""}`}>{renderContent()}</div>
         </div>
     );
 };
