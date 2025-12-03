@@ -164,15 +164,13 @@ export class MessageProcessor {
                 const parentMessage = toolParentMessage.get(message.tool_call_id!);
                 if (assistantToolMessage) {
                     message.tool_input = typeof assistantToolMessage.args !== "string" ? JSON.stringify(assistantToolMessage.args) : assistantToolMessage.args;
-                    if (message.additional_kwargs) {
-                        message.additional_kwargs.done = true;
-                        message.done = true;
-                    } else {
-                        message.done = true;
-                        message.additional_kwargs = {
-                            done: true,
-                        };
-                    }
+                    const isDone = !!message.content;
+                    message.done = isDone;
+                    message.additional_kwargs = {
+                        ...(parentMessage?.additional_kwargs || {}),
+                        ...(message.additional_kwargs || {}),
+                        done: isDone,
+                    };
                 }
                 if (parentMessage) {
                     message.usage_metadata = parentMessage.usage_metadata;
