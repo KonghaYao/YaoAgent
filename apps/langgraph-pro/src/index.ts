@@ -6,3 +6,4 @@ export * from "./swarm/index.js";
 export * from "./createModelHelper.js";
 export * from "./ChatTemplate.js";
 export * from "./AgentState.js";
+export { ChatOpenAICompletions as ChatOpenAI } from "./openai/completion.js";
