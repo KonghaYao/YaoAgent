@@ -1,6 +1,6 @@
 {
     "name": "@langgraph-js/ui",
-    "version": "5.3.0",
+    "version": "5.5.0",
     "description": "",
     "scripts": {
         "dev": "vite",
@@ -24,6 +24,8 @@
         "@langgraph-js/open-smith": "^2.3.0",
         "@langgraph-js/pro": "^2.0.1",
         "@langgraph-js/pure-graph": "^2.5.1",
+        "@radix-ui/react-collapsible": "^1.1.12",
+        "@radix-ui/react-use-controllable-state": "^1.2.2",
         "@tailwindcss/vite": "^4.1.14",
         "@vitejs/plugin-basic-ssl": "^2.1.0",
         "@vitejs/plugin-react": "^5.1.1",
@@ -32,7 +34,7 @@
         "langchain": "^1.1.1",
         "next-themes": "^0.4.6",
         "sonner": "^2.0.7",
-        "vite": "^7"
+        "vite": "^6"
     },
     "devDependencies": {
         "@andypf/json-viewer": "^2.2.0",
