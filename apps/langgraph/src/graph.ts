@@ -1,7 +1,7 @@
-import { entrypoint, MessagesZodMeta, getConfig, interrupt, MemorySaver, Command } from "@langchain/langgraph";
+import { entrypoint, MessagesZodMeta, Command } from "@langchain/langgraph";
 import { z } from "zod/v3";
 import { createEntrypointGraph } from "@langgraph-js/pure-graph";
-import { ChatOpenAI } from "@langchain/openai";
+import { ChatOpenAI } from "@langgraph-js/pro";
 import { BaseMessage, createAgent, humanInTheLoopMiddleware, HumanMessage, tool, ToolMessage } from "langchain";
 import { withLangGraph } from "@langchain/langgraph/zod";
 import { create_artifacts } from "./create_artifacts";
@@ -10,6 +10,17 @@ const State = z.object({
     task_store: z.record(z.string(), z.any()).default({}),
     messages: withLangGraph(z.custom<BaseMessage[]>(), MessagesZodMeta),
 });
+const hello_world = tool(
+    (props) => {
+        console.log(props);
+        return "good";
+    },
+    {
+        name: "hello_world",
+        description: "hello_world",
+        schema: z.object({}),
+    }
+);
 const show_form = tool(
     (props) => {
         console.log(props);
@@ -43,7 +54,6 @@ const sub_agent_tool = tool(
         const agent = createAgent({
             model: new ChatOpenAI({
                 model: "gpt-4o-mini",
-                useResponsesApi: false,
                 tags: ["test"],
                 metadata: {
                     parent_id: toolId,
@@ -83,15 +93,14 @@ const workflow = entrypoint("test-entrypoint", async (state: z.infer<typeof Stat
     // console.log('Context:', config.configurable);
     const agent = createAgent({
         model: new ChatOpenAI({
-            model: "gpt-4o-mini",
-            useResponsesApi: false,
+            model: "deepseek-reasoner",
             tags: ["test"],
             metadata: {
                 subagent: true,
             },
         }),
         systemPrompt: "你是一个智能助手",
-        tools: [show_form, interrupt_test, sub_agent_tool, create_artifacts],
+        tools: [show_form, interrupt_test, sub_agent_tool, create_artifacts, hello_world],
         middleware: [
             humanInTheLoopMiddleware({
                 interruptOn: {
