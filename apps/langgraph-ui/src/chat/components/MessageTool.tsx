@@ -74,7 +74,7 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, isCollapsed, onToggl
     };
     const tool = new ToolRenderData(message, client!);
     const humanInTheLoopButton = () => {
-        const hasHumanInTheLoop = tool.state === "loading" && tool.client.humanInTheLoop?.some((i) => i.value.reviewConfigs.some((j) => j.actionName === message.name));
+        const hasHumanInTheLoop = tool.state === "loading" && tool.client.humanInTheLoop?.some((i) => i.value.reviewConfigs?.some((j) => j.actionName === message.name));
         const inner = () => {
             for (let i of tool.client.humanInTheLoop!) {
                 for (let j of i.value.reviewConfigs) {

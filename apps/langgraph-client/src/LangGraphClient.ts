@@ -5,7 +5,7 @@ import { CallToolResult } from "./tool/createTool.js";
 import { type ILangGraphClient } from "@langgraph-js/pure-graph/dist/types.js";
 import { MessageProcessor } from "./MessageProcessor.js";
 import { revertChatTo, RevertChatToOptions } from "./time-travel/index.js";
-
+import camelcaseKeys from "camelcase-keys";
 export type RenderMessage = Message & {
     /** 对于 AIMessage 来说是节点名称，对于工具节点来说是工具名称 */
     name?: string;
@@ -395,7 +395,9 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
                 };
 
                 if (data.__interrupt__) {
-                    this.humanInTheLoop = data.__interrupt__;
+                    this.humanInTheLoop = camelcaseKeys(data.__interrupt__, {
+                        deep: true,
+                    });
                 } else if (data.messages) {
                     const isResume = !!command?.resume;
                     const isLongerThanLocal = data.messages.length >= this.messageProcessor.getGraphMessages().length;
