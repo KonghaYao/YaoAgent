@@ -6,3 +6,4 @@ export * from "./ui-store/index.js";
 export * from "./ToolManager.js";
 export * from "./TestKit.js";
 export * from "./artifacts/index.js";
+export * from "./client/index.js";

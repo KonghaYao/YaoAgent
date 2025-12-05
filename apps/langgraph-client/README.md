@@ -57,6 +57,35 @@ pnpm add @langgraph-js/sdk
 
 - ✅ Read History from LangGraph
 
+## Legacy Mode
+
+Legacy mode is designed to be compatible with environments that don't support `AsyncGeneratorFunction` (such as WeChat Mini Programs). In these environments, standard async iterators may not work properly.
+
+### Legacy Mode Example
+
+```typescript
+import { TestLangGraphChat, createChatStore, createLowerJSClient } from "@langgraph-js/sdk";
+
+const client = await createLowerJSClient({
+    apiUrl: "http://localhost:8123",
+    defaultHeaders: {
+        Authorization: "Bearer 123",
+    },
+});
+
+createChatStore(
+    "graph",
+    {
+        defaultHeaders: {
+            Authorization: "Bearer 123",
+        },
+        client,
+        legacyMode: true,
+    },
+    {}
+);
+```
+
 ## Advanced Usage
 
 ### Creating a Chat Store

@@ -4,7 +4,7 @@ import HistoryList from "./components/HistoryList";
 import { ChatProvider, useChat } from "@langgraph-js/sdk/react";
 import { ExtraParamsProvider, useExtraParams } from "./context/ExtraParamsContext";
 import { UsageMetadata } from "./components/UsageMetadata";
-import { Message } from "@langgraph-js/sdk";
+import { createLowerJSClient, Message } from "@langgraph-js/sdk";
 import FileList from "./components/FileList";
 import { FileListProvider, useFileList } from "./components/FileListContext";
 import type { SupportedFileType } from "./components/FileList";
@@ -420,6 +420,19 @@ const ChatWrapper: React.FC = () => {
                 showHistory={config.showHistory}
                 showGraph={config.showGraph}
                 fallbackToAvailableAssistants={true}
+                // client={createLowerJSClient({
+                //     apiUrl: config.apiUrl,
+                //     defaultHeaders: config.defaultHeaders,
+                //     callerOptions: {
+                //         fetch: config.withCredentials
+                //             ? (url: string, options: RequestInit) => {
+                //                   options.credentials = "include";
+                //                   return fetch(url, options);
+                //               }
+                //             : fetch,
+                //     },
+                // })}
+                // legacyMode={true}
                 onInitError={(err, currentAgent) => {
                     // 默认错误处理
                     toast.error("请检查服务器配置: " + currentAgent + "\n" + err, {

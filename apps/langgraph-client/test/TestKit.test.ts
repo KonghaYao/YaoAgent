@@ -1,14 +1,22 @@
 import { expect, test } from "vitest";
-import { TestLangGraphChat, createChatStore } from "../src";
+import { TestLangGraphChat, createChatStore, createLowerJSClient } from "../src";
 
 test("test", async () => {
+    const client = await createLowerJSClient({
+        apiUrl: "http://localhost:8123",
+        defaultHeaders: {
+            Authorization: "Bearer 123",
+        },
+    });
     const testChat = new TestLangGraphChat(
         createChatStore(
-            "agent",
+            "graph",
             {
                 defaultHeaders: {
                     Authorization: "Bearer 123",
                 },
+                client,
+                legacyMode: true,
             },
             {}
         ),

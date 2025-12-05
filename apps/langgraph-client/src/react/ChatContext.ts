@@ -2,6 +2,7 @@ import { createElement, createContext, useContext, useMemo, ReactNode, useEffect
 
 import { createChatStore, UnionStore, useUnionStore } from "../ui-store/index.js";
 import { useStore } from "@nanostores/react";
+import { ILangGraphClient } from "@langgraph-js/pure-graph/dist/types.js";
 
 const ChatContext = createContext<UnionStore<ReturnType<typeof createChatStore>> | undefined>(undefined);
 
@@ -23,6 +24,8 @@ interface ChatProviderProps {
     showGraph?: boolean;
     fallbackToAvailableAssistants?: boolean;
     onInitError?: (error: any, currentAgent: string) => void;
+    client?: ILangGraphClient;
+    legacyMode?: boolean;
 }
 
 export const ChatProvider: React.FC<ChatProviderProps> = ({
@@ -35,6 +38,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     showGraph = false,
     fallbackToAvailableAssistants = false,
     onInitError,
+    client,
+    legacyMode = false,
 }) => {
     // 使用 useMemo 稳定 defaultHeaders 的引用
     const stableHeaders = useMemo(() => defaultHeaders || {}, [defaultHeaders]);
@@ -53,22 +58,22 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
               }
             : fetch;
 
-        return createChatStore(
-            defaultAgent,
-            {
-                apiUrl,
-                defaultHeaders: stableHeaders,
-                callerOptions: {
-                    fetch: F,
-                    maxRetries: 1,
-                },
+        const config = {
+            apiUrl,
+            defaultHeaders: stableHeaders,
+            callerOptions: {
+                fetch: F,
+                maxRetries: 1,
             },
-            {
-                showHistory,
-                showGraph,
-                fallbackToAvailableAssistants,
-            }
-        );
+            legacyMode,
+        };
+        /** @ts-ignore */
+        if (client) config.client = client;
+        return createChatStore(defaultAgent, config, {
+            showHistory,
+            showGraph,
+            fallbackToAvailableAssistants,
+        });
     }, [defaultAgent, apiUrl, stableHeaders, withCredentials, showHistory, showGraph, fallbackToAvailableAssistants]);
 
     const unionStore = useUnionStore(store, useStore);

@@ -85,6 +85,8 @@ export interface LangGraphClientConfig {
     defaultHeaders?: Record<string, string | null | undefined>;
     /** 自定义客户端实现，如果不提供则使用官方 Client */
     client: ILangGraphClient<any>;
+    /** 是否使用 legacy 模式，默认 false */
+    legacyMode?: boolean;
 }
 
 // 定义事件数据类型
@@ -118,10 +120,11 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
     stopController: AbortController | null = null;
     /** Message 处理器 */
     private messageProcessor: MessageProcessor;
-
+    private legacyMode: boolean;
     constructor(config: LangGraphClientConfig) {
         super();
         this.client = config.client;
+        this.legacyMode = config.legacyMode ?? false;
         this.messageProcessor = new MessageProcessor();
     }
 
@@ -345,12 +348,26 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
                       content: input,
                   } as HumanMessage,
               ];
+
+        const streamRecord: any[] = [];
+        this.emit("start", {
+            event: "start",
+        });
         const createStreamResponse = async () => {
             if (_debug?.streamResponse) {
                 return _debug.streamResponse;
             }
+            const onCallback = this.legacyMode
+                ? (chunk: any) => {
+                      streamRecord.push(chunk);
+                      this.processStreamChunk(chunk, command);
+                  }
+                : undefined;
             if (joinRunId) {
-                return this.runs.joinStream(this.currentThread!.thread_id, joinRunId);
+                return this.runs.joinStream(this.currentThread!.thread_id, joinRunId, {
+                    /** @ts-ignore */
+                    onCallback,
+                });
             }
 
             return this.runs.stream(this.currentThread!.thread_id, this.currentAssistant!.assistant_id, {
@@ -364,53 +381,16 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
                 streamMode: ["messages", "values"],
                 streamSubgraphs: true,
                 command,
+                /** @ts-ignore 为兼容不支持 AsyncIterableFunction 的环境*/
+                onCallback,
             });
         };
         const streamResponse = await createStreamResponse();
-
-        const streamRecord: any[] = [];
-        this.emit("start", {
-            event: "start",
-        });
-
-        for await (const chunk of streamResponse) {
-            streamRecord.push(chunk);
-            if (chunk.event === "metadata") {
-                this.currentRun = chunk.data;
-            } else if (chunk.event === "error" || chunk.event === "Error" || chunk.event === "__stream_error__") {
-                this.emit("error", chunk);
-            } else if (chunk.event === "messages/metadata") {
-                Object.assign(this.messagesMetadata, chunk.data);
-                continue;
-            } else if (chunk.event === "messages/partial" || chunk.event === "messages/complete") {
-                for (const message of chunk.data) {
-                    this.messageProcessor.updateStreamingMessage(message);
-                }
-                this.emit("message", chunk);
-                continue;
-            } else if (chunk.event === "values") {
-                const data = chunk.data as {
-                    __interrupt__?: InterruptData;
-                    messages: Message[];
-                };
-
-                if (data.__interrupt__) {
-                    this.humanInTheLoop = camelcaseKeys(data.__interrupt__, {
-                        deep: true,
-                    });
-                } else if (data.messages) {
-                    const isResume = !!command?.resume;
-                    const isLongerThanLocal = data.messages.length >= this.messageProcessor.getGraphMessages().length;
-                    // resume 情况下，长度低于前端 message 的统统不接受
-                    if (!isResume || (isResume && isLongerThanLocal)) {
-                        this.messageProcessor.setGraphMessages(data.messages as RenderMessage[]);
-                        this.emit("value", chunk);
-                    }
-                    this.graphState = chunk.data;
-                }
-                continue;
-            } else if (chunk.event.startsWith("values|")) {
-                this.graphPosition = chunk.event.split("|")[1];
+        if (!this.legacyMode) {
+            // 正常的 JS 环境都可以执行，但是部分环境不支持 AsyncGeneratorFunction（比如 sb 的微信小程序）
+            for await (const chunk of streamResponse) {
+                streamRecord.push(chunk);
+                this.processStreamChunk(chunk, command);
             }
         }
         const data = await this.runFETool();
@@ -436,6 +416,52 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
     getGraphNodeNow() {
         const position = this.getGraphPosition();
         return position[position.length - 1];
+    }
+
+    /**
+     * @zh 处理流式响应的单个 chunk。
+     * @en Processes a single chunk from the stream response.
+     * @returns 是否需要跳过后续处理 (continue)
+     */
+    private processStreamChunk(chunk: any, command?: Command): boolean {
+        if (chunk.event === "metadata") {
+            this.currentRun = chunk.data;
+        } else if (chunk.event === "error" || chunk.event === "Error" || chunk.event === "__stream_error__") {
+            this.emit("error", chunk);
+        } else if (chunk.event === "messages/metadata") {
+            Object.assign(this.messagesMetadata, chunk.data);
+            return true;
+        } else if (chunk.event === "messages/partial" || chunk.event === "messages/complete") {
+            for (const message of chunk.data) {
+                this.messageProcessor.updateStreamingMessage(message);
+            }
+            this.emit("message", chunk);
+            return true;
+        } else if (chunk.event === "values") {
+            const data = chunk.data as {
+                __interrupt__?: InterruptData;
+                messages: Message[];
+            };
+
+            if (data.__interrupt__) {
+                this.humanInTheLoop = camelcaseKeys(data.__interrupt__, {
+                    deep: true,
+                });
+            } else if (data.messages) {
+                const isResume = !!command?.resume;
+                const isLongerThanLocal = data.messages.length >= this.messageProcessor.getGraphMessages().length;
+                // resume 情况下，长度低于前端 message 的统统不接受
+                if (!isResume || (isResume && isLongerThanLocal)) {
+                    this.messageProcessor.setGraphMessages(data.messages as RenderMessage[]);
+                    this.emit("value", chunk);
+                }
+                this.graphState = chunk.data;
+            }
+            return true;
+        } else if (chunk.event.startsWith("values|")) {
+            this.graphPosition = chunk.event.split("|")[1];
+        }
+        return false;
     }
 
     private runFETool() {

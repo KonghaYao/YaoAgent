@@ -2,6 +2,7 @@ import { defineComponent, inject, provide, onMounted, defineExpose, type Injecti
 import { createChatStore } from "../ui-store/index.js";
 import { useStore } from "@nanostores/vue";
 import { PreinitializedWritableAtom, StoreValue } from "nanostores";
+import { ILangGraphClient } from "@langgraph-js/pure-graph/dist/types.js";
 
 /**
  * @zh UnionStore 类型用于合并 store 的 data 和 mutations，使其可以直接访问。
@@ -55,6 +56,8 @@ export interface ChatProviderProps {
     showGraph?: boolean;
     fallbackToAvailableAssistants?: boolean;
     onInitError?: (error: any, currentAgent: string) => void;
+    client?: ILangGraphClient;
+    legacyMode?: boolean;
 }
 
 /**
@@ -78,6 +81,8 @@ export const useChatProvider = (props: ChatProviderProps) => {
                 fetch: F,
                 maxRetries: 1,
             },
+            client: props.client,
+            legacyMode: props.legacyMode,
         },
         {
             showHistory: props.showHistory,
