@@ -93,7 +93,7 @@ const workflow = entrypoint("test-entrypoint", async (state: z.infer<typeof Stat
     // console.log('Context:', config.configurable);
     const agent = createAgent({
         model: new ChatOpenAI({
-            model: "deepseek-reasoner",
+            model: "gpt-4o-mini",
             tags: ["test"],
             metadata: {
                 subagent: true,

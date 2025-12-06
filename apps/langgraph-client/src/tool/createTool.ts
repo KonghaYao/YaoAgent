@@ -25,6 +25,9 @@ export interface UnionTool<Args extends ZodRawShape, Child extends Object = Obje
     isPureParams?: boolean;
 }
 export type ToolCallback<Args extends ZodRawShape> = (args: z.infer<z.ZodObject<Args>>, context?: any) => CallToolResult | Promise<CallToolResult>;
+/**
+ * HumanInTheLoop 的标准回复格式
+ */
 export type InterruptResponse = {
     decisions: (
         | { type: "approve" }
@@ -35,7 +38,7 @@ export type InterruptResponse = {
                   args: Record<string, any>;
               };
           }
-        | { type: "reject"; message: string }
+        | { type: "reject"; message?: string }
     )[];
 };
 export type CallToolResult = string | { type: "text"; text: string }[] | InterruptResponse;

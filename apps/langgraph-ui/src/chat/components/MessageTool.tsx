@@ -6,6 +6,7 @@ import { MessagesBox } from "./MessageBox";
 import { Response } from "@/components/ai-elements/response";
 import { CodeBlock } from "../../components/ai-elements/code-block";
 import { Reasoning } from "./Reasoning";
+import { HumanInTheLoopControls } from "./HumanInTheLoopControls";
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -55,53 +56,9 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, isCollapsed, onToggl
     const { getToolUIRender, client } = useChat();
     const render = getToolUIRender(message.name || "");
     const bgColorClass = getToolColorClass(message.name || "");
-    const [processingDecision, setProcessingDecision] = useState<string | null>(null);
 
-    const onHumanClick = async (type: string) => {
-        setProcessingDecision(type);
-        try {
-            await client?.doneFEToolWaiting(message.id as string, {
-                decisions: [
-                    {
-                        type: type as "approve",
-                    },
-                ],
-            });
-        } finally {
-            // 短暂延迟后清除处理状态，让状态更新有时间生效
-            setTimeout(() => setProcessingDecision(null), 500);
-        }
-    };
     const tool = new ToolRenderData(message, client!);
-    const humanInTheLoopButton = () => {
-        const hasHumanInTheLoop = tool.state === "loading" && tool.client.humanInTheLoop?.some((i) => i.value.reviewConfigs?.some((j) => j.actionName === message.name));
-        const inner = () => {
-            for (let i of tool.client.humanInTheLoop!) {
-                for (let j of i.value.reviewConfigs) {
-                    if (j.actionName === message.name) {
-                        return j.allowedDecisions.map((k) => {
-                            const isProcessing = processingDecision === k;
-                            return (
-                                <button
-                                    key={k}
-                                    className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${
-                                        isProcessing
-                                            ? "text-orange-700 bg-orange-100 border border-orange-300 cursor-not-allowed"
-                                            : "text-gray-700 bg-white border border-gray-200 hover:bg-gray-100 cursor-pointer"
-                                    }`}
-                                    onClick={() => !isProcessing && onHumanClick(k)}
-                                    disabled={isProcessing}
-                                >
-                                    {isProcessing ? "处理中..." : k}
-                                </button>
-                            );
-                        });
-                    }
-                }
-            }
-        };
-        return <>{hasHumanInTheLoop ? inner() : null}</>;
-    };
+
     return (
         <div className="flex flex-col w-full">
             {render ? (
@@ -113,8 +70,7 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, isCollapsed, onToggl
                             {message.node_name} | {message.name}
                         </div>
                         <div className="flex gap-2">
-                            {humanInTheLoopButton()}
-
+                            {tool.state === "interrupted" ? <HumanInTheLoopControls tool={tool} /> : null}
                             <div className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md border ${getStatusColor(tool.state)}`}>
                                 <span>{getStatusIcon(tool.state)}</span>
                                 <span>{tool.state}</span>
@@ -125,7 +81,7 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, isCollapsed, onToggl
                     {!isCollapsed && (
                         <div className="flex flex-col gap-4 px-5 pb-4">
                             {message.additional_kwargs?.reasoning_content ? <Reasoning message={message} /> : null}
-                            <Previewer content={JSON.stringify(tool.getInputRepaired(), null, 2) || ""} />
+                            <Previewer content={JSON.stringify(tool.getInputRepaired(), null, 2) || ""} mode="json" />
                             <Previewer content={getMessageContent(message.content)} />
                             <UsageMetadata
                                 response_metadata={message.response_metadata as any}
@@ -147,7 +103,7 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, isCollapsed, onToggl
     );
 };
 
-const Previewer = ({ content }: { content: string }) => {
+const Previewer = ({ content, mode }: { content: string; mode?: string }) => {
     const validJSON = () => {
         try {
             JSON.parse(content);
@@ -156,8 +112,8 @@ const Previewer = ({ content }: { content: string }) => {
             return false;
         }
     };
-    const isJSON = content.startsWith("{") && content.endsWith("}") && validJSON();
-    const isMarkdown = content.includes("#") || content.includes("```") || content.includes("*");
+    const isJSON = mode === "json" || (content.startsWith("{") && content.endsWith("}") && validJSON());
+    const isMarkdown = mode === "markdown" || content.includes("#") || content.includes("```") || content.includes("*");
     const [jsonMode, setJsonMode] = useState(isJSON);
     const [markdownMode, setMarkdownMode] = useState(false);
     const copyToClipboard = () => {
