@@ -121,6 +121,8 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
     /** Message 处理器 */
     private messageProcessor: MessageProcessor;
     private legacyMode: boolean;
+    /** 当前流式状态 */
+    private _status: "idle" | "busy" | "interrupted" | "error" = "idle";
     constructor(config: LangGraphClientConfig) {
         super();
         this.client = config.client;
@@ -141,6 +143,11 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
     /** 代理 runs 属性到内部 client */
     get runs(): ILangGraphClient["runs"] {
         return this.client.runs;
+    }
+
+    /** 获取当前流式状态 */
+    get status() {
+        return this._status;
     }
     private listAssistants() {
         return this.assistants.search({
@@ -211,10 +218,19 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
      * @zh 列出所有的 Thread。
      * @en Lists all Threads.
      */
-    async listThreads() {
+    async listThreads(
+        options: {
+            sortOrder?: "asc" | "desc";
+            sortBy?: "created_at" | "updated_at";
+            offset?: number;
+            limit?: number;
+        } = {}
+    ) {
         return this.threads.search({
-            sortOrder: "desc",
-            sortBy: "updated_at",
+            sortOrder: options.sortOrder || "desc",
+            sortBy: options.sortBy || "updated_at",
+            offset: options.offset || 0,
+            limit: options.limit || 10,
         });
     }
     async deleteThread(threadId: string) {
@@ -350,6 +366,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
               ];
 
         const streamRecord: any[] = [];
+        this._status = "busy";
         this.emit("start", {
             event: "start",
         });
@@ -396,6 +413,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
         const data = await this.runFETool();
         if (data) streamRecord.push(...data);
         this.humanInTheLoop = null;
+        this._status = "idle";
         this.emit("done", {
             event: "done",
         });
@@ -427,6 +445,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
         if (chunk.event === "metadata") {
             this.currentRun = chunk.data;
         } else if (chunk.event === "error" || chunk.event === "Error" || chunk.event === "__stream_error__") {
+            this._status = "error";
             this.emit("error", chunk);
         } else if (chunk.event === "messages/metadata") {
             Object.assign(this.messagesMetadata, chunk.data);
@@ -444,6 +463,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
             };
 
             if (data.__interrupt__) {
+                this._status = "interrupted";
                 this.humanInTheLoop = camelcaseKeys(data.__interrupt__, {
                     deep: true,
                 });
@@ -481,6 +501,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
                 // json 校验
                 return this.callFETool(toolMessage, tool.args);
             });
+            this._status = "interrupted";
             this.currentThread!.status = "interrupted"; // 修复某些机制下，状态不为 interrupted 与后端有差异
             return Promise.all(result);
         }
@@ -545,6 +566,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
         this.messageProcessor.clearStreamingMessages();
         this.currentRun = undefined;
         this.tools.clearWaiting();
+        this._status = "idle";
         this.emit("value", {
             event: "messages/partial",
             data: {

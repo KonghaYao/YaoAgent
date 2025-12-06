@@ -55,6 +55,8 @@ export interface ChatProviderProps {
     showHistory?: boolean;
     showGraph?: boolean;
     fallbackToAvailableAssistants?: boolean;
+    /** 初始化时是否自动激活最近的历史会话（默认 false，创建新会话） */
+    autoRestoreLastSession?: boolean;
     onInitError?: (error: any, currentAgent: string) => void;
     client?: ILangGraphClient;
     legacyMode?: boolean;
@@ -88,6 +90,7 @@ export const useChatProvider = (props: ChatProviderProps) => {
             showHistory: props.showHistory,
             showGraph: props.showGraph,
             fallbackToAvailableAssistants: props.fallbackToAvailableAssistants,
+            autoRestoreLastSession: props.autoRestoreLastSession,
         }
     );
 
@@ -146,6 +149,10 @@ export const ChatProvider = defineComponent({
             default: false,
         },
         showGraph: {
+            type: Boolean as PropType<boolean>,
+            default: false,
+        },
+        autoRestoreLastSession: {
             type: Boolean as PropType<boolean>,
             default: false,
         },
