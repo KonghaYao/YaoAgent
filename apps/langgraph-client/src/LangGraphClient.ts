@@ -55,7 +55,7 @@ export type InterruptData = {
         }[];
         reviewConfigs: {
             actionName: string;
-            allowedDecisions: ("approve" | "edit" | "reject")[];
+            allowedDecisions: ("approve" | "edit" | "reject" | "respond")[];
         }[];
     };
 }[];

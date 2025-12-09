@@ -1,6 +1,6 @@
 {
     "name": "@langgraph-js/ui",
-    "version": "5.5.2",
+    "version": "5.5.3",
     "description": "",
     "scripts": {
         "dev": "vite",

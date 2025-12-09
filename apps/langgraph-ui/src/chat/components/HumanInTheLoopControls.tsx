@@ -66,6 +66,23 @@ export const HumanInTheLoopControls = ({ tool }: { tool: ToolRenderData<any, any
                         </button>
                     );
                 }
+                if (decision === "respond") {
+                    return (
+                        <button
+                            key={decision}
+                            className="px-3 py-1 text-xs font-medium text-purple-700 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors cursor-pointer"
+                            onClick={() => {
+                                const message = window.prompt("Please enter response message:");
+                                if (message !== null) {
+                                    /** @ts-ignore */
+                                    tool.sendResumeData({ type: "respond", message: message ? message : undefined });
+                                }
+                            }}
+                        >
+                            Respond
+                        </button>
+                    );
+                }
                 return null;
             })}
         </div>
