@@ -7,7 +7,7 @@ import type { ComponentProps, HTMLAttributes, ReactNode } from "react";
 import { createContext, useContext, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark, oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
-
+import copy from "copy-to-clipboard";
 type CodeBlockContextType = {
     code: string;
 };
@@ -90,13 +90,8 @@ export const CodeBlockCopyButton = ({ onCopy, onError, timeout = 2000, children,
     const { code } = useContext(CodeBlockContext);
 
     const copyToClipboard = async () => {
-        if (typeof window === "undefined" || !navigator.clipboard.writeText) {
-            onError?.(new Error("Clipboard API not available"));
-            return;
-        }
-
         try {
-            await navigator.clipboard.writeText(code);
+            await copy(code);
             setIsCopied(true);
             onCopy?.();
             setTimeout(() => setIsCopied(false), timeout);

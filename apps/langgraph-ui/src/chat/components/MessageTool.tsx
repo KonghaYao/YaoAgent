@@ -7,7 +7,7 @@ import { Response } from "@/components/ai-elements/response";
 import { CodeBlock } from "../../components/ai-elements/code-block";
 import { Reasoning } from "./Reasoning";
 import { HumanInTheLoopControls } from "./HumanInTheLoopControls";
-
+import copy from "copy-to-clipboard";
 const getStatusColor = (status: string) => {
     switch (status) {
         case "done":
@@ -117,7 +117,7 @@ const Previewer = ({ content, mode }: { content: string; mode?: string }) => {
     const [jsonMode, setJsonMode] = useState(isJSON);
     const [markdownMode, setMarkdownMode] = useState(false);
     const copyToClipboard = () => {
-        navigator.clipboard.writeText(content);
+        copy(content);
     };
     return (
         <div className={`flex flex-col`}>
