@@ -288,7 +288,7 @@ export class History {
      * @zh 初始化 History（必须先调用）
      * @en Initializes History (must be called first)
      */
-    async init(agentName?: string) {
-        return this.virtualClient.initAssistant(agentName);
+    async init(agentName?: string, config?: { fallbackToAvailableAssistants?: boolean }) {
+        return this.virtualClient.initAssistant(agentName, config);
     }
 }

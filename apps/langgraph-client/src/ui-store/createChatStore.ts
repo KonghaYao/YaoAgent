@@ -124,7 +124,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
             ...config,
             client: config.client ?? (await createLangGraphServerClient(config as LangGraphClientConfig)),
         });
-        await historyManager.init(currentAgent.get());
+        await historyManager.init(currentAgent.get(), { fallbackToAvailableAssistants: context.fallbackToAvailableAssistants });
         history.set(historyManager);
 
         // 同步远程会话列表
