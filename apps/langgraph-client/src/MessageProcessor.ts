@@ -307,23 +307,26 @@ export class MessageProcessor {
             if (rootMessage.type === "tool" && childrenMap.has(rootMessage.tool_call_id)) {
                 rootMessage.sub_messages.unshift(...childrenMap.get(rootMessage.tool_call_id)!);
                 // 根据 id 去重
-                rootMessage.sub_messages = rootMessage.sub_messages.filter((i, index, self) => self.findIndex((t) => t.id === i.id) === index);
+                const sub_messages = rootMessage.sub_messages.filter((i, index, self) => self.findIndex((t) => t.id === i.id) === index);
+                rootMessage.sub_messages = this.beforeFold(sub_messages);
             }
         }
         return rootMessages;
+    }
+    private beforeFold(messages: RenderMessage[]) {
+        // 1. 组合工具消息
+        const composedMessages = this.composeToolMessages(messages);
+
+        // 2. 附加信息
+        const messagesWithInfo = this.attachInfoForMessage(composedMessages);
+        return messagesWithInfo;
     }
     /**
      * @zh 统一的消息处理入口，按顺序执行所有处理步骤
      * @en Unified message processing entry point, executing all processing steps in order
      */
     processMessages(messages: RenderMessage[], graphState?: any, messagesMetadata?: Record<string, any>): RenderMessage[] {
-        // 1. 组合工具消息
-        const composedMessages = this.composeToolMessages(messages);
-
-        // 2. 附加信息
-        const messagesWithInfo = this.attachInfoForMessage(composedMessages);
-
         // 3. 折叠树状消息（如果提供了 messagesMetadata）
-        return this.foldTreeMessages(messagesWithInfo, graphState, messagesMetadata);
+        return this.foldTreeMessages(this.beforeFold(messages), graphState, messagesMetadata);
     }
 }
