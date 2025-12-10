@@ -12,7 +12,6 @@ export const create_artifacts = createUITool({
         const { setCurrentArtifactById, setShowArtifact } = useChat();
 
         const toggleExpand = () => {
-            console.log(data.id, tool.message.id);
             setCurrentArtifactById(data.id, tool.message.id!);
             setShowArtifact(true);
         };

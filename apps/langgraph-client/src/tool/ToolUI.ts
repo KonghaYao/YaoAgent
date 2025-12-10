@@ -59,7 +59,7 @@ export class ToolRenderData<I, D> {
             return "done";
         }
         if (this.client.status === "interrupted" && humanInTheLoopData?.actionRequest) {
-            return "done";
+            return "interrupted";
         }
         if (this.message.tool_input) {
             return "loading";

@@ -39,8 +39,6 @@ const TOOL_COLORS = ["bg-white", "bg-white", "bg-white", "bg-white", "bg-white",
 
 interface MessageToolProps {
     message: ToolMessage & RenderMessage;
-    isCollapsed: boolean;
-    onToggleCollapse: () => void;
 }
 
 const getToolColorClass = (tool_name: string = "") => {
@@ -52,7 +50,8 @@ const getToolColorClass = (tool_name: string = "") => {
     return TOOL_COLORS[index];
 };
 
-const MessageTool: React.FC<MessageToolProps> = ({ message, isCollapsed, onToggleCollapse }) => {
+const MessageTool: React.FC<MessageToolProps> = ({ message }) => {
+    const [isCollapsed, setIsCollapsed] = useState(false);
     const { getToolUIRender, client } = useChat();
     const render = getToolUIRender(message.name || "");
     const bgColorClass = getToolColorClass(message.name || "");
@@ -65,7 +64,7 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, isCollapsed, onToggl
                 (render(message) as JSX.Element)
             ) : (
                 <div className={`flex flex-col w-full ${bgColorClass} rounded-2xl overflow-hidden`}>
-                    <div className="flex items-center justify-between px-5 py-3 cursor-pointer hover:bg-gray-100 transition-colors" onClick={onToggleCollapse}>
+                    <div className="flex items-center justify-between px-5 py-3 cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => setIsCollapsed(!isCollapsed)}>
                         <div className="text-xs font-medium text-gray-600" onClick={() => console.log(message)}>
                             {message.node_name} | {message.name}
                         </div>
@@ -96,7 +95,7 @@ const MessageTool: React.FC<MessageToolProps> = ({ message, isCollapsed, onToggl
             )}
             {message.sub_messages?.length ? (
                 <div className="flex flex-col pl-6 py-3 ml-4 border-l-2 border-gray-200">
-                    <MessagesBox renderMessages={message.sub_messages} collapsedTools={[]} toggleToolCollapse={(id) => {}} client={client!} />
+                    <MessagesBox renderMessages={message.sub_messages} />
                 </div>
             ) : null}
         </div>

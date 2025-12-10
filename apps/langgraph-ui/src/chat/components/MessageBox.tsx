@@ -11,17 +11,7 @@ interface MessageState {
     contextMenuPosition: { x: number; y: number };
 }
 
-export const MessagesBox = ({
-    renderMessages,
-    collapsedTools,
-    toggleToolCollapse,
-    client,
-}: {
-    renderMessages: RenderMessage[];
-    collapsedTools: string[];
-    toggleToolCollapse: (id: string) => void;
-    client: LangGraphClient;
-}) => {
+export const MessagesBox = ({ renderMessages }: { renderMessages: RenderMessage[] }) => {
     // 使用 Map 来管理每个消息的状态
     const [messageStates, setMessageStates] = useState<Map<string, MessageState>>(new Map());
     const messageRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
@@ -101,7 +91,7 @@ export const MessagesBox = ({
                         {message.type === "human" ? (
                             <MessageHuman message={message} content={message.content} />
                         ) : message.type === "tool" ? (
-                            <MessageTool message={message} isCollapsed={collapsedTools.includes(message.id!)} onToggleCollapse={() => toggleToolCollapse(message.id!)} />
+                            <MessageTool message={message} />
                         ) : (
                             <MessageAI message={message} />
                         )}
