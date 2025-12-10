@@ -102,15 +102,18 @@ export class ToolManager {
             return false;
         }
     }
+    isAllToolCompleted() {
+        return this.waitingMap.size;
+    }
 
     /**
      * @zh 等待指定 ID 的工具完成。
      * @en Waits for the tool with the specified ID to complete.
      */
     waitForDone(id: string) {
-        if (this.waitingMap.has(id)) {
-            return this.waitingMap.get(id);
-        }
+        // if (this.waitingMap.has(id)) {
+        //     return this.waitingMap.get(id);
+        // }
         const promise = new Promise((resolve, reject) => {
             this.waitingMap.set(id, resolve);
         });

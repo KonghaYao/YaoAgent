@@ -1,9 +1,10 @@
 import { actionParametersToJsonSchema, convertJsonSchemaToZodRawShape } from "./utils.js";
-import { z, ZodRawShape } from "zod";
+import { uuidv4, z, ZodRawShape } from "zod";
 import { Action, Parameter } from "./copilotkit-actions.js";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { Message } from "@langchain/langgraph-sdk";
 import { ToolRenderData } from "./ToolUI.js";
+import { HumanInTheLoopDecision, InterruptResponse as HumanInTheLoopResponse } from "../humanInTheLoop.js";
 
 export interface UnionTool<Args extends ZodRawShape, Child extends Object = Object, ResponseType = any> {
     name: string;
@@ -25,23 +26,8 @@ export interface UnionTool<Args extends ZodRawShape, Child extends Object = Obje
     isPureParams?: boolean;
 }
 export type ToolCallback<Args extends ZodRawShape> = (args: z.infer<z.ZodObject<Args>>, context?: any) => CallToolResult | Promise<CallToolResult>;
-/**
- * HumanInTheLoop 的标准回复格式
- */
-export type InterruptResponse = {
-    decisions: (
-        | { type: "approve" }
-        | {
-              type: "edit";
-              edited_action: {
-                  name: string;
-                  args: Record<string, any>;
-              };
-          }
-        | { type: "reject"; message?: string }
-    )[];
-};
-export type CallToolResult = string | { type: "text"; text: string }[] | InterruptResponse;
+
+export type CallToolResult = string | { type: "text"; text: string }[] | HumanInTheLoopDecision | HumanInTheLoopResponse;
 
 /** 用于格式校验 */
 export const createTool = <Args extends ZodRawShape>(tool: UnionTool<Args>) => {

@@ -2,6 +2,7 @@ import type { Thread, Message, Assistant, HumanMessage, AIMessage, ToolMessage, 
 import { EventEmitter } from "eventemitter3";
 import { ToolManager } from "./ToolManager.js";
 import { CallToolResult } from "./tool/createTool.js";
+import { createActionRequestID, HumanInTheLoopDecision, HumanInTheLoopState, InterruptData } from "./humanInTheLoop.js";
 import { type ILangGraphClient } from "@langgraph-js/pure-graph/dist/types.js";
 import { MessageProcessor } from "./MessageProcessor.js";
 import { revertChatTo, RevertChatToOptions } from "./time-travel/index.js";
@@ -45,20 +46,7 @@ export type SendMessageOptions = {
     command?: Command;
     joinRunId?: string;
 };
-export type InterruptData = {
-    id: string;
-    value: {
-        actionRequests: {
-            name: string;
-            description: string;
-            args: any;
-        }[];
-        reviewConfigs: {
-            actionName: string;
-            allowedDecisions: ("approve" | "edit" | "reject" | "respond")[];
-        }[];
-    };
-}[];
+
 export interface LangGraphClientConfig {
     apiUrl?: string;
     apiKey?: string;
@@ -337,7 +325,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
         return state;
     }
     public messagesMetadata = {};
-    public humanInTheLoop: InterruptData | null = null;
+    public humanInTheLoop: HumanInTheLoopState | null = null;
     /**
      * @zh 发送消息到 LangGraph 后端。
      * @en Sends a message to the LangGraph backend.
@@ -411,8 +399,8 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
             }
         }
         const data = await this.runFETool();
+        await this.responseHumanInTheLoop();
         if (data) streamRecord.push(...data);
-        this.humanInTheLoop = null;
         this._status = "idle";
         this.emit("done", {
             event: "done",
@@ -457,17 +445,40 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
             this.emit("message", chunk);
             return true;
         } else if (chunk.event === "values") {
-            const data = chunk.data as {
-                __interrupt__?: InterruptData;
-                messages: Message[];
-            };
+            const data = chunk.data as
+                | {
+                      __interrupt__?: InterruptData;
+                      messages: Message[];
+                  }
+                | undefined;
 
-            if (data.__interrupt__) {
+            if (data?.__interrupt__) {
                 this._status = "interrupted";
-                this.humanInTheLoop = camelcaseKeys(data.__interrupt__, {
-                    deep: true,
+                const humanInTheLoop = data?.__interrupt__.map((i) => {
+                    // 修复 python 版本是以下划线命名的，而 js 版本是以驼峰命名的
+                    if (i && "review_configs" in i.value) {
+                        return {
+                            id: i.id,
+                            value: {
+                                /** @ts-ignore */
+                                actionRequests: i.value.action_requests,
+                                reviewConfigs: camelcaseKeys(i.value.review_configs as any[], { deep: true }),
+                            },
+                        } as InterruptData[number];
+                    }
+                    return i;
                 });
-            } else if (data.messages) {
+                humanInTheLoop.forEach((i) => {
+                    i.value.actionRequests.forEach((j) => {
+                        j.id = j.id || createActionRequestID(j);
+                    });
+                    return i;
+                });
+                this.humanInTheLoop = {
+                    interruptData: humanInTheLoop,
+                    result: {},
+                };
+            } else if (data?.messages) {
                 const isResume = !!command?.resume;
                 const isLongerThanLocal = data.messages.length >= this.messageProcessor.getGraphMessages().length;
                 // resume 情况下，长度低于前端 message 的统统不接受
@@ -503,7 +514,19 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
             });
             this._status = "interrupted";
             this.currentThread!.status = "interrupted"; // 修复某些机制下，状态不为 interrupted 与后端有差异
+            console.log("batch call tools", result.length);
             return Promise.all(result);
+        }
+    }
+    private async responseHumanInTheLoop() {
+        if (this.humanInTheLoop) {
+            const humanInTheLoop = this.humanInTheLoop;
+            this.humanInTheLoop = null;
+            return this.resume({
+                decisions: humanInTheLoop.interruptData[0].value.actionRequests.map((i) => {
+                    return humanInTheLoop.result[i.id!] as HumanInTheLoopDecision;
+                }),
+            });
         }
     }
     private async callFETool(message: ToolMessage, args: any) {
@@ -512,7 +535,6 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
         if (!result) {
             return;
         }
-        return this.resume(result);
     }
     extraParams: Record<string, any> = {};
 
@@ -530,11 +552,24 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
     /**
      * @zh 标记前端工具等待已完成。
      * @en Marks the frontend tool waiting as completed.
+     * @deprecated 请使用 doneHumanInTheLoopWaiting 和规范的 humanInTheLoop 协议定义状态
      */
     doneFEToolWaiting(id: string, result: CallToolResult) {
         const done = this.tools.doneWaiting(id, result);
         if (!done && this.currentThread?.status === "interrupted") {
             this.resume(result);
+        }
+    }
+
+    /**
+     * @zh 标记人机交互等待已完成。
+     * @en Marks the human in the loop waiting as completed.
+     */
+    doneHumanInTheLoopWaiting(tool_id: string, action_request_id: string, result: HumanInTheLoopDecision) {
+        // 移除等待状态
+        this.tools.doneWaiting(tool_id, result);
+        if (this.humanInTheLoop) {
+            this.humanInTheLoop.result[action_request_id] = result;
         }
     }
 
