@@ -7,6 +7,7 @@ import { type ILangGraphClient } from "@langgraph-js/pure-graph/dist/types.js";
 import { MessageProcessor } from "./MessageProcessor.js";
 import { revertChatTo, RevertChatToOptions } from "./time-travel/index.js";
 import camelcaseKeys from "camelcase-keys";
+import z from "zod";
 export type RenderMessage = Message & {
     /** 对于 AIMessage 来说是节点名称，对于工具节点来说是工具名称 */
     name?: string;
@@ -91,6 +92,8 @@ export interface LangGraphEvents {
     thread: { event: "thread/create"; data: { thread: Thread } };
     /** 流完成事件 */
     done: { event: "done" };
+    /** 中断事件 */
+    interruptChange: { event: "interruptChange" };
 }
 
 /**
@@ -219,6 +222,8 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
             sortBy: options.sortBy || "updated_at",
             offset: options.offset || 0,
             limit: options.limit || 10,
+            /** @ts-ignore: 用于删除不需要的字段 */
+            without_details: true,
         });
     }
     async deleteThread(threadId: string) {
@@ -326,6 +331,8 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
     }
     public messagesMetadata = {};
     public humanInTheLoop: HumanInTheLoopState | null = null;
+    /** 此 interruptData 不包括 humanInTheLoop 的数据 */
+    public interruptData: any | null = null;
     /**
      * @zh 发送消息到 LangGraph 后端。
      * @en Sends a message to the LangGraph backend.
@@ -343,7 +350,12 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
                 },
             });
         }
-
+        if (this.interruptData) {
+            this.interruptData = null;
+            this.emit("interruptChange", {
+                event: "interruptChange",
+            });
+        }
         const messagesToSend = Array.isArray(input)
             ? input
             : [
@@ -451,33 +463,17 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
                       messages: Message[];
                   }
                 | undefined;
-
             if (data?.__interrupt__) {
                 this._status = "interrupted";
-                const humanInTheLoop = data?.__interrupt__.map((i) => {
-                    // 修复 python 版本是以下划线命名的，而 js 版本是以驼峰命名的
-                    if (i && "review_configs" in i.value) {
-                        return {
-                            id: i.id,
-                            value: {
-                                /** @ts-ignore */
-                                actionRequests: i.value.action_requests,
-                                reviewConfigs: camelcaseKeys(i.value.review_configs as any[], { deep: true }),
-                            },
-                        } as InterruptData[number];
-                    }
-                    return i;
+                const humanInTheLoopData = this.getHumanInTheLoopData(data?.__interrupt__);
+                if (humanInTheLoopData) {
+                    this.humanInTheLoop = humanInTheLoopData;
+                } else {
+                    this.interruptData = data.__interrupt__;
+                }
+                this.emit("interruptChange", {
+                    event: "interruptChange",
                 });
-                humanInTheLoop.forEach((i) => {
-                    i.value.actionRequests.forEach((j) => {
-                        j.id = j.id || createActionRequestID(j);
-                    });
-                    return i;
-                });
-                this.humanInTheLoop = {
-                    interruptData: humanInTheLoop,
-                    result: {},
-                };
             } else if (data?.messages) {
                 const isResume = !!command?.resume;
                 const isLongerThanLocal = data.messages.length >= this.messageProcessor.getGraphMessages().length;
@@ -516,6 +512,47 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
             this.currentThread!.status = "interrupted"; // 修复某些机制下，状态不为 interrupted 与后端有差异
             console.log("batch call tools", result.length);
             return Promise.all(result);
+        }
+    }
+    private getHumanInTheLoopData(interruptData: any) {
+        const humanInTheLoopData = z
+            .array(
+                z.object({
+                    id: z.string(),
+                    value: z.union([
+                        z.object({
+                            review_configs: z.array(z.any()),
+                        }),
+                        z.object({ reviewConfigs: z.array(z.any()) }),
+                    ]),
+                })
+            )
+            .safeParse(interruptData);
+        if (humanInTheLoopData.success) {
+            const humanInTheLoop: HumanInTheLoopState["interruptData"] = interruptData.map((i: any) => {
+                // 修复 python 版本是以下划线命名的，而 js 版本是以驼峰命名的
+                if (i && "review_configs" in i.value) {
+                    return {
+                        id: i.id,
+                        value: {
+                            /** @ts-ignore */
+                            actionRequests: i.value.action_requests,
+                            reviewConfigs: camelcaseKeys(i.value.review_configs as any[], { deep: true }),
+                        },
+                    } as InterruptData[number];
+                }
+                return i;
+            });
+            humanInTheLoop.forEach((i) => {
+                i.value.actionRequests.forEach((j) => {
+                    j.id = j.id || createActionRequestID(j);
+                });
+                return i;
+            });
+            return {
+                interruptData: humanInTheLoop,
+                result: {},
+            };
         }
     }
     private async responseHumanInTheLoop() {

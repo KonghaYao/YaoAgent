@@ -8,6 +8,7 @@ import { createLangGraphServerClient } from "../client/LanggraphServer.js";
 import { useArtifacts } from "../artifacts/index.js";
 import { RevertChatToOptions } from "../time-travel/index.js";
 import { History, SessionInfo } from "../History.js";
+import { InterruptData, InterruptResponse } from "../humanInTheLoop.js";
 
 // ============ 工具函数 ============
 
@@ -68,6 +69,10 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
     const currentChatId = atom<string | null>(null);
     const currentNodeName = atom<string>("__start__");
 
+    // Interrupt 状态
+    const interruptData = atom<InterruptData | null>(null);
+    const isInterrupted = atom<boolean>(false);
+
     // 工具和图表
     const tools = atom<UnionTool<any>[]>([]);
     const collapsedTools = atom<string[]>([]);
@@ -87,7 +92,8 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
     const updateLoadingFromClientStatus = () => {
         const c = client.get();
         if (c) {
-            loading.set(c.status === "busy");
+            // interrupted 状态也应该被视为 loading，因为用户需要处理中断
+            loading.set(c.status === "busy" || c.status === "interrupted");
         }
     };
 
@@ -225,12 +231,27 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
             }
         };
 
+        const onInterrupted = (event: any) => {
+            if (!isActiveClient()) return;
+
+            const interruptInfo = newClient.interruptData;
+            if (interruptInfo) {
+                interruptData.set(interruptInfo);
+                isInterrupted.set(true);
+                updateLoadingFromClientStatus();
+            } else {
+                interruptData.set(null);
+                isInterrupted.set(false);
+            }
+        };
+
         newClient.on("start", onStart);
         newClient.on("thread", onThread);
         newClient.on("done", onDone);
         newClient.on("error", onError);
         newClient.on("message", onMessage);
         newClient.on("value", onValue);
+        newClient.on("interruptChange", onInterrupted);
 
         return () => {
             newClient.off("start", onStart);
@@ -239,6 +260,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
             newClient.off("error", onError);
             newClient.off("message", onMessage);
             newClient.off("value", onValue);
+            newClient.off("interruptChange", onInterrupted);
         };
     }
 
@@ -255,6 +277,8 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
             }
 
             inChatError.set(null);
+            interruptData.set(null);
+            isInterrupted.set(false);
 
             const session = await historyManager.activateSession(sessionId);
             const activeClient = session.client;
@@ -280,6 +304,15 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
                 if (currentThread && (currentThread.status === "running" || currentThread.status === "pending")) {
                     await activeClient.resetStream();
                 }
+
+                // 检查是否处于中断状态
+                if (currentThread?.status === "interrupted") {
+                    const interruptInfo = activeClient.interruptData;
+                    if (interruptInfo) {
+                        interruptData.set(interruptInfo);
+                        isInterrupted.set(true);
+                    }
+                }
             }
         } catch (error) {
             console.error("Failed to activate session:", error);
@@ -289,7 +322,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
 
     // ============ 消息和交互逻辑 ============
 
-    async function sendMessage(message?: Message[], extraData?: SendMessageOptions, withoutCheck = false) {
+    async function sendMessage(message?: Message[], extraData?: SendMessageOptions, withoutCheck = false, isResume = false) {
         const c = client.get();
         if ((!withoutCheck && !userInput.get().trim() && !message?.length) || !c) return;
 
@@ -361,6 +394,10 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
             currentChatId,
             currentNodeName,
 
+            // Interrupt 状态
+            interruptData,
+            isInterrupted,
+
             // 工具和图表
             tools,
             collapsedTools,
@@ -421,7 +458,17 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
                 currentAgent.set(agent);
                 return initClient();
             },
-
+            resumeFromInterrupt(data: any) {
+                return sendMessage(
+                    [],
+                    {
+                        command: {
+                            resume: data,
+                        },
+                    },
+                    true
+                );
+            },
             // 历史记录（兼容旧 API）
             addToHistory,
             createNewChat: createNewSession,
