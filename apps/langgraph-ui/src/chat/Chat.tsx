@@ -27,6 +27,7 @@ import UploadButton from "./components/UploadButton";
 import { __default_tool__ } from "./tools/human-in-the-loop";
 import DebugPanel from "../debugPanel/DebugPanel";
 import { useDebugPanel } from "../debugPanel/Context";
+import InterruptPanel from "./components/InterruptPanel";
 
 const ChatMessages: React.FC = () => {
     const { renderMessages, loading, inChatError, client, collapsedTools, toggleToolCollapse, isFELocking } = useChat();
@@ -72,7 +73,7 @@ const ChatMessages: React.FC = () => {
                     </div>
                 </div>
             ) : (
-                <MessagesBox renderMessages={renderMessages} collapsedTools={collapsedTools} toggleToolCollapse={toggleToolCollapse} client={client!} />
+                <MessagesBox renderMessages={renderMessages} />
             )}
             {/* {isFELocking() && <div className="flex items-center justify-center py-4 text-gray-500">请你继续操作</div>} */}
             {loading && !isFELocking() && (
@@ -317,9 +318,12 @@ const Chat: React.FC = () => {
                 </header>
                 <main className="flex-1 overflow-hidden max-w-6xl w-full h-full  flex flex-col">
                     <ChatMessages />
-                    <FileListProvider>
-                        <ChatInput />
-                    </FileListProvider>
+                    <div className="flex flex-col">
+                        <InterruptPanel />
+                        <FileListProvider>
+                            <ChatInput />
+                        </FileListProvider>
+                    </div>
                 </main>
                 <JsonEditorPopup
                     isOpen={isPopupOpen}
