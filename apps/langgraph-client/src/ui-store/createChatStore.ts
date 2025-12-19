@@ -301,7 +301,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
                 refreshTools();
 
                 const currentThread = activeClient.getCurrentThread() as any;
-                if (currentThread && (currentThread.status === "running" || currentThread.status === "pending")) {
+                if (currentThread && (currentThread.status === "busy" || currentThread.status === "pending")) {
                     await activeClient.resetStream();
                 }
 
