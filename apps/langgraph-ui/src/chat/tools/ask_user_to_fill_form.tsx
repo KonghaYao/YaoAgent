@@ -8,29 +8,45 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+// 错误信息显示组件
+const ErrorMessage = ({ errors }: { errors?: string[] }) => {
+    if (!errors || errors.length === 0) return null;
+    return (
+        <div className="flex items-start gap-1.5 mt-1">
+            <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
+            <span className="text-xs text-red-600">{errors[0]}</span>
+        </div>
+    );
+};
+
 // 自定义文本输入组件
 const CustomTextWidget = (props: any) => {
     const hasMinLength = props.options?.minLength;
     const hasMaxLength = props.options?.maxLength;
     const currentLength = props.value?.length || 0;
+    const hasError = props.rawErrors && props.rawErrors.length > 0;
 
     return (
         <div className="mb-4">
             {props.label && (
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                     {props.label}
                     {props.required && <span className="text-red-500 ml-1">*</span>}
                 </label>
             )}
             <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className={cn(
+                    "w-full rounded-lg border bg-gray-50/50 p-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 transition-all",
+                    hasError ? "border-red-500 focus:ring-red-100 focus:border-red-500" : "border-gray-200 focus:ring-blue-100 focus:border-blue-400"
+                )}
                 value={props.value || ""}
                 onChange={(e) => props.onChange(e.target.value)}
                 placeholder={props.placeholder}
                 disabled={props.disabled}
                 maxLength={hasMaxLength ? props.options.maxLength : undefined}
             />
+            <ErrorMessage errors={props.rawErrors} />
             {props.description && <p className="text-xs text-gray-500 mt-1">{props.description}</p>}
             {(hasMinLength || hasMaxLength) && (
                 <div className="flex justify-end mt-1">
@@ -50,11 +66,12 @@ const CustomTextWidget = (props: any) => {
 // 自定义密码输入组件
 const CustomPasswordWidget = (props: any) => {
     const [showPassword, setShowPassword] = useState(false);
+    const hasError = props.rawErrors && props.rawErrors.length > 0;
 
     return (
         <div className="mb-4">
             {props.label && (
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                     {props.label}
                     {props.required && <span className="text-red-500 ml-1">*</span>}
                 </label>
@@ -62,7 +79,10 @@ const CustomPasswordWidget = (props: any) => {
             <div className="relative">
                 <input
                     type={showPassword ? "text" : "password"}
-                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    className={cn(
+                        "w-full rounded-lg border bg-gray-50/50 p-2 pr-10 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 transition-all",
+                        hasError ? "border-red-500 focus:ring-red-100 focus:border-red-500" : "border-gray-200 focus:ring-blue-100 focus:border-blue-400"
+                    )}
                     value={props.value || ""}
                     onChange={(e) => props.onChange(e.target.value)}
                     placeholder={props.placeholder}
@@ -72,6 +92,7 @@ const CustomPasswordWidget = (props: any) => {
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
             </div>
+            <ErrorMessage errors={props.rawErrors} />
             {props.description && <p className="text-xs text-gray-500 mt-1">{props.description}</p>}
         </div>
     );
@@ -82,17 +103,21 @@ const CustomTextareaWidget = (props: any) => {
     const hasMinLength = props.options?.minLength;
     const hasMaxLength = props.options?.maxLength;
     const currentLength = props.value?.length || 0;
+    const hasError = props.rawErrors && props.rawErrors.length > 0;
 
     return (
         <div className="mb-4">
             {props.label && (
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                     {props.label}
                     {props.required && <span className="text-red-500 ml-1">*</span>}
                 </label>
             )}
             <textarea
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-vertical"
+                className={cn(
+                    "w-full rounded-lg border bg-gray-50/50 p-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 transition-all resize-none",
+                    hasError ? "border-red-500 focus:ring-red-100 focus:border-red-500" : "border-gray-200 focus:ring-blue-100 focus:border-blue-400"
+                )}
                 value={props.value || ""}
                 onChange={(e) => props.onChange(e.target.value)}
                 placeholder={props.placeholder}
@@ -100,6 +125,7 @@ const CustomTextareaWidget = (props: any) => {
                 rows={props.options?.rows || 4}
                 maxLength={hasMaxLength ? props.options.maxLength : undefined}
             />
+            <ErrorMessage errors={props.rawErrors} />
             {props.description && <p className="text-xs text-gray-500 mt-1">{props.description}</p>}
             {(hasMinLength || hasMaxLength) && (
                 <div className="flex justify-end mt-1">
@@ -118,17 +144,22 @@ const CustomTextareaWidget = (props: any) => {
 
 // 自定义选择框组件
 const CustomSelectWidget = (props: any) => {
+    const hasError = props.rawErrors && props.rawErrors.length > 0;
+
     return (
         <div className="mb-4">
             {props.label && (
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                     {props.label}
                     {props.required && <span className="text-red-500 ml-1">*</span>}
                 </label>
             )}
             <div className="relative">
                 <select
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors appearance-none"
+                    className={cn(
+                        "w-full rounded-lg border bg-gray-50/50 p-2 pr-10 text-sm text-gray-900 focus:outline-none focus:ring-2 transition-all appearance-none",
+                        hasError ? "border-red-500 focus:ring-red-100 focus:border-red-500" : "border-gray-200 focus:ring-blue-100 focus:border-blue-400"
+                    )}
                     value={props.value || ""}
                     onChange={(e) => props.onChange(e.target.value)}
                     disabled={props.disabled}
@@ -146,6 +177,7 @@ const CustomSelectWidget = (props: any) => {
                 </select>
                 <ChevronDown size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
             </div>
+            <ErrorMessage errors={props.rawErrors} />
             {props.description && <p className="text-xs text-gray-500 mt-1">{props.description}</p>}
         </div>
     );
@@ -153,15 +185,17 @@ const CustomSelectWidget = (props: any) => {
 
 // 自定义多选框组件
 const CustomCheckboxWidget = (props: any) => {
+    const hasError = props.rawErrors && props.rawErrors.length > 0;
+
     return (
         <div className="mb-4">
             {props.label && (
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-900 mb-2">
                     {props.label}
                     {props.required && <span className="text-red-500 ml-1">*</span>}
                 </label>
             )}
-            <div className="space-y-2">
+            <div className={cn("space-y-2", hasError && "p-2 border border-red-200 rounded-lg bg-red-50/30")}>
                 {props.options?.enumOptions?.map((option: any, index: number) => (
                     <label key={index} className="flex items-center">
                         <input
@@ -182,6 +216,7 @@ const CustomCheckboxWidget = (props: any) => {
                     </label>
                 ))}
             </div>
+            <ErrorMessage errors={props.rawErrors} />
             {props.description && <p className="text-xs text-gray-500 mt-1">{props.description}</p>}
         </div>
     );
@@ -189,15 +224,17 @@ const CustomCheckboxWidget = (props: any) => {
 
 // 自定义单选按钮组件
 const CustomRadioWidget = (props: any) => {
+    const hasError = props.rawErrors && props.rawErrors.length > 0;
+
     return (
         <div className="mb-4">
             {props.label && (
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-900 mb-2">
                     {props.label}
                     {props.required && <span className="text-red-500 ml-1">*</span>}
                 </label>
             )}
-            <div className="space-y-2">
+            <div className={cn("space-y-2", hasError && "p-2 border border-red-200 rounded-lg bg-red-50/30")}>
                 {props.options?.enumOptions?.map((option: any, index: number) => (
                     <label key={index} className="flex items-center">
                         <input
@@ -213,6 +250,7 @@ const CustomRadioWidget = (props: any) => {
                     </label>
                 ))}
             </div>
+            <ErrorMessage errors={props.rawErrors} />
             {props.description && <p className="text-xs text-gray-500 mt-1">{props.description}</p>}
         </div>
     );
@@ -220,17 +258,22 @@ const CustomRadioWidget = (props: any) => {
 
 // 自定义数字输入组件
 const CustomNumberWidget = (props: any) => {
+    const hasError = props.rawErrors && props.rawErrors.length > 0;
+
     return (
         <div className="mb-4">
             {props.label && (
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                     {props.label}
                     {props.required && <span className="text-red-500 ml-1">*</span>}
                 </label>
             )}
             <input
                 type="number"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className={cn(
+                    "w-full rounded-lg border bg-gray-50/50 p-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 transition-all",
+                    hasError ? "border-red-500 focus:ring-red-100 focus:border-red-500" : "border-gray-200 focus:ring-blue-100 focus:border-blue-400"
+                )}
                 value={props.value || ""}
                 onChange={(e) => props.onChange(Number(e.target.value))}
                 placeholder={props.placeholder}
@@ -239,6 +282,7 @@ const CustomNumberWidget = (props: any) => {
                 max={props.options?.max}
                 step={props.options?.step}
             />
+            <ErrorMessage errors={props.rawErrors} />
             {props.description && <p className="text-xs text-gray-500 mt-1">{props.description}</p>}
         </div>
     );
@@ -246,15 +290,17 @@ const CustomNumberWidget = (props: any) => {
 
 // 自定义滑块组件
 const CustomRangeWidget = (props: any) => {
+    const hasError = props.rawErrors && props.rawErrors.length > 0;
+
     return (
         <div className="mb-4">
             {props.label && (
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-900 mb-2">
                     {props.label}
                     {props.required && <span className="text-red-500 ml-1">*</span>}
                 </label>
             )}
-            <div className="px-2">
+            <div className={cn("px-2", hasError && "p-2 border border-red-200 rounded-lg bg-red-50/30")}>
                 <input
                     type="range"
                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
@@ -271,6 +317,7 @@ const CustomRangeWidget = (props: any) => {
                     <span>{props.options?.max || 100}</span>
                 </div>
             </div>
+            <ErrorMessage errors={props.rawErrors} />
             {props.description && <p className="text-xs text-gray-500 mt-1">{props.description}</p>}
         </div>
     );
@@ -278,21 +325,27 @@ const CustomRangeWidget = (props: any) => {
 
 // 自定义日期选择器组件
 const CustomDateWidget = (props: any) => {
+    const hasError = props.rawErrors && props.rawErrors.length > 0;
+
     return (
         <div className="mb-4">
             {props.label && (
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                     {props.label}
                     {props.required && <span className="text-red-500 ml-1">*</span>}
                 </label>
             )}
             <input
                 type="date"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className={cn(
+                    "w-full rounded-lg border bg-gray-50/50 p-2 text-sm text-gray-900 focus:outline-none focus:ring-2 transition-all",
+                    hasError ? "border-red-500 focus:ring-red-100 focus:border-red-500" : "border-gray-200 focus:ring-blue-100 focus:border-blue-400"
+                )}
                 value={props.value || ""}
                 onChange={(e) => props.onChange(e.target.value)}
                 disabled={props.disabled}
             />
+            <ErrorMessage errors={props.rawErrors} />
             {props.description && <p className="text-xs text-gray-500 mt-1">{props.description}</p>}
         </div>
     );
@@ -300,21 +353,27 @@ const CustomDateWidget = (props: any) => {
 
 // 自定义日期时间选择器组件
 const CustomDateTimeWidget = (props: any) => {
+    const hasError = props.rawErrors && props.rawErrors.length > 0;
+
     return (
         <div className="mb-4">
             {props.label && (
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                     {props.label}
                     {props.required && <span className="text-red-500 ml-1">*</span>}
                 </label>
             )}
             <input
                 type="datetime-local"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className={cn(
+                    "w-full rounded-lg border bg-gray-50/50 p-2 text-sm text-gray-900 focus:outline-none focus:ring-2 transition-all",
+                    hasError ? "border-red-500 focus:ring-red-100 focus:border-red-500" : "border-gray-200 focus:ring-blue-100 focus:border-blue-400"
+                )}
                 value={props.value || ""}
                 onChange={(e) => props.onChange(e.target.value)}
                 disabled={props.disabled}
             />
+            <ErrorMessage errors={props.rawErrors} />
             {props.description && <p className="text-xs text-gray-500 mt-1">{props.description}</p>}
         </div>
     );
@@ -322,23 +381,28 @@ const CustomDateTimeWidget = (props: any) => {
 
 // 自定义布尔值组件
 const CustomBooleanWidget = (props: any) => {
+    const hasError = props.rawErrors && props.rawErrors.length > 0;
+
     return (
         <div className="mb-4">
-            {props.label && (
-                <label className="flex items-center">
-                    <input
-                        type="checkbox"
-                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 mr-2"
-                        checked={props.value || false}
-                        onChange={(e) => props.onChange(e.target.checked)}
-                        disabled={props.disabled}
-                    />
-                    <span className="text-sm text-gray-700">
-                        {props.label}
-                        {props.required && <span className="text-red-500 ml-1">*</span>}
-                    </span>
-                </label>
-            )}
+            <div className={cn(hasError && "p-2 border border-red-200 rounded-lg bg-red-50/30")}>
+                {props.label && (
+                    <label className="flex items-center">
+                        <input
+                            type="checkbox"
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 mr-2"
+                            checked={props.value || false}
+                            onChange={(e) => props.onChange(e.target.checked)}
+                            disabled={props.disabled}
+                        />
+                        <span className="text-sm text-gray-700">
+                            {props.label}
+                            {props.required && <span className="text-red-500 ml-1">*</span>}
+                        </span>
+                    </label>
+                )}
+            </div>
+            <ErrorMessage errors={props.rawErrors} />
             {props.description && <p className="text-xs text-gray-500 mt-1 ml-6">{props.description}</p>}
         </div>
     );
@@ -346,6 +410,7 @@ const CustomBooleanWidget = (props: any) => {
 
 // 自定义文件上传组件
 const CustomFileWidget = (props: any) => {
+    const hasError = props.rawErrors && props.rawErrors.length > 0;
     const handleFileChange = (e: any) => {
         const files = e.target.files;
         if (props.multiple) {
@@ -360,19 +425,23 @@ const CustomFileWidget = (props: any) => {
     return (
         <div className="mb-4">
             {props.label && (
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                     {props.label}
                     {props.required && <span className="text-red-500 ml-1">*</span>}
                 </label>
             )}
             <input
                 type="file"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors file:mr-3 file:py-1 file:px-3 file:border-0 file:bg-blue-50 file:text-blue-700 file:rounded file:font-medium"
+                className={cn(
+                    "w-full rounded-lg border bg-gray-50/50 p-2 text-sm text-gray-900 focus:outline-none focus:ring-2 transition-all file:mr-3 file:py-1 file:px-3 file:border-0 file:bg-blue-50 file:text-blue-700 file:rounded file:font-medium",
+                    hasError ? "border-red-500 focus:ring-red-100 focus:border-red-500" : "border-gray-200 focus:ring-blue-100 focus:border-blue-400"
+                )}
                 onChange={handleFileChange}
                 disabled={props.disabled}
                 multiple={props.multiple}
                 accept={props.accept}
             />
+            <ErrorMessage errors={props.rawErrors} />
             {props.description && <p className="text-xs text-gray-500 mt-1">{props.description}</p>}
         </div>
     );
@@ -380,15 +449,17 @@ const CustomFileWidget = (props: any) => {
 
 // 自定义数组字段组件
 const CustomArrayField = (props: any) => {
+    const hasError = props.rawErrors && props.rawErrors.length > 0;
+
     return (
         <div className="mb-4">
             {props.label && (
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-900 mb-2">
                     {props.label}
                     {props.required && <span className="text-red-500 ml-1">*</span>}
                 </label>
             )}
-            <div className="space-y-2">
+            <div className={cn("space-y-2", hasError && "p-2 border border-red-200 rounded-lg bg-red-50/30")}>
                 {props.items.map((item: any, index: number) => (
                     <div key={index} className="flex items-start gap-2 p-3 border border-gray-200 rounded-lg">
                         <div className="flex-1">{item.children}</div>
@@ -402,6 +473,7 @@ const CustomArrayField = (props: any) => {
                     添加项目
                 </button>
             </div>
+            <ErrorMessage errors={props.rawErrors} />
             {props.description && <p className="text-xs text-gray-500 mt-1">{props.description}</p>}
         </div>
     );
@@ -412,12 +484,12 @@ const CustomFieldTemplate = (props: any) => {
     return <div className={`${props.className} mb-4`}>{props.children}</div>;
 };
 
-// 自定义对象字段模板
+// 自定义对象字段模板 - 默认竖向排列
 const CustomObjectFieldTemplate = (props: any) => {
     return (
         <div className="mb-4">
             {props.title && <h3 className="text-sm font-medium text-gray-700 mb-2">{props.title}</h3>}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pl-4 border-l-2 border-gray-200">
+            <div className="space-y-3 pl-4 border-l-2 border-gray-200">
                 {props.properties.map((prop: any) => (
                     <div key={prop.name}>{prop.content}</div>
                 ))}
@@ -460,7 +532,7 @@ export const ask_user_to_fill_form = createUITool({
             const data = tool.getInputRepaired();
             const output = tool.getJSONOutputSafe();
             const formSchema = data?.schema || {};
-            const canInteract = tool.state === "interrupted";
+            const canInteract = tool.state === "interrupted" || tool.state === "loading";
 
             const handleSubmit = (formData: any) => {
                 try {
@@ -543,8 +615,8 @@ export const ask_user_to_fill_form = createUITool({
                                 </div>
                             </div>
                         </div>
-                        <div className="p-4 space-y-3">
-                            {data?.description && <div className="text-sm text-gray-600">{data.description}</div>}
+                        <div className="p-3 space-y-3">
+                            {data?.description && <div className="text-sm font-medium text-gray-900">{data.description}</div>}
                             <ErrorBoundary>
                                 <Form
                                     readonly={!canInteract}
@@ -578,6 +650,25 @@ export const ask_user_to_fill_form = createUITool({
         } catch (error) {
             // 外层错误边界，捕获所有未处理的错误
             console.error("表单组件渲染错误:", error);
+            const errorMessage = error instanceof Error ? error.message : "表单配置有误，请检查 schema 格式是否正确。";
+
+            // 如果可以交互，直接将错误响应到远端
+            const canInteract = tool.state === "interrupted" || tool.state === "loading";
+            if (canInteract) {
+                try {
+                    tool.sendResumeData({
+                        /** @ts-ignore */
+                        type: "respond",
+                        message: JSON.stringify({
+                            error: "表单加载失败",
+                            message: errorMessage,
+                        }),
+                    });
+                } catch (sendError) {
+                    console.error("发送错误响应失败:", sendError);
+                }
+            }
+
             return (
                 <div className="w-full my-1 border border-red-200 bg-red-50 rounded-xl overflow-hidden">
                     <div className="p-4">
@@ -585,7 +676,7 @@ export const ask_user_to_fill_form = createUITool({
                             <AlertCircle className="w-5 h-5 text-red-600" />
                             <h3 className="text-sm font-medium text-red-900">表单加载失败</h3>
                         </div>
-                        <p className="text-xs text-red-700">表单配置有误，请检查 schema 格式是否正确。</p>
+                        <p className="text-xs text-red-700">{errorMessage}</p>
                     </div>
                 </div>
             );
