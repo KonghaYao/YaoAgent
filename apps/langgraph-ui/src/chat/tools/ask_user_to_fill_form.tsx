@@ -1,10 +1,12 @@
 import { createUITool, ToolManager } from "@langgraph-js/sdk";
 import Form, { IChangeEvent } from "@rjsf/core";
 import ErrorBoundary from "../components/ErrorBoundary";
-import { FileText, Eye, EyeOff, ChevronDown, X, Plus, Minus } from "lucide-react";
+import { FileText, Eye, EyeOff, ChevronDown, X, Plus, CheckCircle, AlertCircle } from "lucide-react";
 import { z } from "zod";
 import validator from "@rjsf/validator-ajv8";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 // 自定义文本输入组件
 const CustomTextWidget = (props: any) => {
@@ -428,89 +430,165 @@ const CustomObjectFieldTemplate = (props: any) => {
 // 自定义按钮组件
 const CustomSubmitButton = (props: any) => {
     return (
-        <button
+        <Button
             type="submit"
-            className="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors disabled:cursor-not-allowed"
             disabled={props.disabled}
+            className={cn(
+                "px-5 rounded-full transition-all duration-200",
+                props.disabled ? "bg-gray-100 text-gray-400" : "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg hover:shadow-blue-200"
+            )}
         >
-            {props.submitText || "提交"}
-        </button>
+            {props.submitText || "提交表单"}
+        </Button>
     );
 };
 
-export const show_form = createUITool({
-    name: "show_form",
-    description: "显示动态表单，等待用户填写",
-    parameters: {
-        schema: z.any(),
-    },
+const AskUserToFillFormSchema = {
+    title: z.string().describe("Form title"),
+    description: z.string().optional().describe("Optional form description"),
+    schema: z.record(z.string(), z.any()).describe("JSON Schema for the form (react-jsonschema-form compatible)"),
+};
+
+export const ask_user_to_fill_form = createUITool({
+    name: "ask_user_to_fill_form",
+    description: "Present a form to the user for filling out. Schema follows react-jsonschema-form format.",
+    parameters: AskUserToFillFormSchema,
     onlyRender: false,
     handler: ToolManager.waitForUIDone,
     render(tool) {
-        const data = tool.getInputRepaired();
-        const output = tool.getJSONOutputSafe();
-        const formSchema = data.schema;
+        try {
+            const data = tool.getInputRepaired();
+            const output = tool.getJSONOutputSafe();
+            const formSchema = data?.schema || {};
+            const canInteract = tool.state === "interrupted";
 
-        const handleSubmit = (formData: any) => {
-            console.log("Form submitted:", formData);
-            tool.response(formData);
-        };
+            const handleSubmit = (formData: any) => {
+                try {
+                    tool.sendResumeData({
+                        /** @ts-ignore */
+                        type: "respond",
+                        message: JSON.stringify(formData),
+                    });
+                } catch (error) {
+                    console.error("提交表单数据时出错:", error);
+                }
+            };
 
-        // 自定义控件配置
-        const customWidgets = {
-            text: CustomTextWidget,
-            password: CustomPasswordWidget,
-            textarea: CustomTextareaWidget,
-            select: CustomSelectWidget,
-            checkboxes: CustomCheckboxWidget,
-            radio: CustomRadioWidget,
-            number: CustomNumberWidget,
-            range: CustomRangeWidget,
-            date: CustomDateWidget,
-            datetime: CustomDateTimeWidget,
-            file: CustomFileWidget,
-            boolean: CustomBooleanWidget,
-        };
+            // 自定义控件配置
+            const customWidgets = {
+                text: CustomTextWidget,
+                password: CustomPasswordWidget,
+                textarea: CustomTextareaWidget,
+                select: CustomSelectWidget,
+                checkboxes: CustomCheckboxWidget,
+                radio: CustomRadioWidget,
+                number: CustomNumberWidget,
+                range: CustomRangeWidget,
+                date: CustomDateWidget,
+                datetime: CustomDateTimeWidget,
+                file: CustomFileWidget,
+                boolean: CustomBooleanWidget,
+            };
 
-        const customFields = {
-            array: CustomArrayField,
-        };
+            const customFields = {
+                array: CustomArrayField,
+            };
 
-        const customTemplates = {
-            FieldTemplate: CustomFieldTemplate,
-            ObjectFieldTemplate: CustomObjectFieldTemplate,
-            ButtonTemplates: {
-                SubmitButton: CustomSubmitButton,
-            },
-        };
-        return (
-            <div className="p-4 bg-white rounded-lg border border-gray-200">
-                <div className="flex items-center gap-1.5 text-gray-700 mb-3 font-bold">
-                    <FileText className="w-4 h-4 text-blue-500" />
-                    <span>AI 表单</span>
-                </div>
-                <ErrorBoundary>
-                    <Form
-                        readonly={tool.state === "done"}
-                        schema={formSchema || {}}
-                        formData={output}
-                        onSubmit={(data: IChangeEvent<any>) => handleSubmit(data.formData)}
-                        validator={validator}
-                        onError={(errors) => {
-                            console.error("表单校验错误:", errors);
-                            alert("表单填写有误，请检查后再提交。");
-                        }}
-                        widgets={customWidgets}
-                        fields={customFields}
-                        templates={customTemplates}
-                        className="custom-form"
-                    >
-                        <div className="flex gap-2 mt-4">
-                            <CustomSubmitButton />
+            const customTemplates = {
+                FieldTemplate: CustomFieldTemplate,
+                ObjectFieldTemplate: CustomObjectFieldTemplate,
+                ButtonTemplates: {
+                    SubmitButton: CustomSubmitButton,
+                },
+            };
+
+            // 完成状态视图
+            if (!canInteract && tool.output) {
+                let submittedData;
+                try {
+                    submittedData = typeof tool.output === "string" ? JSON.parse(tool.output) : tool.output;
+                } catch (error) {
+                    submittedData = tool.output;
+                }
+                return (
+                    <div className="flex flex-col gap-2 my-1 p-3 bg-gray-50/50 border border-gray-200 rounded-xl">
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
+                                <CheckCircle className="w-3 h-3" />
+                            </div>
+                            <span className="font-medium">Form Submitted</span>
                         </div>
-                    </Form>
+
+                        <div className="space-y-2">
+                            <div className="text-sm text-gray-600 pl-1">{data?.title || "表单"}</div>
+                            <div className="text-sm text-gray-900 bg-white px-3 py-2.5 rounded-xl border border-gray-200">
+                                <pre className="text-xs whitespace-pre-wrap break-all">{JSON.stringify(submittedData, null, 2)}</pre>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            // 交互状态视图
+            return (
+                <ErrorBoundary>
+                    <div className="w-[70%] my-1 border border-gray-200 bg-white shadow-none rounded-xl overflow-hidden">
+                        <div className="pb-2 p-3 border-b border-gray-50 bg-gray-50/30">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-7 h-7 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                                        <FileText className="w-3.5 h-3.5" />
+                                    </div>
+                                    <h3 className="text-sm font-medium text-gray-900">{data?.title || "表单"}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-4 space-y-3">
+                            {data?.description && <div className="text-sm text-gray-600">{data.description}</div>}
+                            <ErrorBoundary>
+                                <Form
+                                    readonly={!canInteract}
+                                    schema={formSchema}
+                                    formData={output}
+                                    onSubmit={(formData: IChangeEvent<any>) => {
+                                        try {
+                                            handleSubmit(formData.formData);
+                                        } catch (error) {
+                                            console.error("表单提交处理错误:", error);
+                                        }
+                                    }}
+                                    validator={validator}
+                                    onError={(errors) => {
+                                        console.error("表单校验错误:", errors);
+                                    }}
+                                    widgets={customWidgets}
+                                    fields={customFields}
+                                    templates={customTemplates}
+                                    className="custom-form"
+                                >
+                                    <div className="flex justify-end pt-2">
+                                        <CustomSubmitButton disabled={!canInteract} />
+                                    </div>
+                                </Form>
+                            </ErrorBoundary>
+                        </div>
+                    </div>
                 </ErrorBoundary>
-            </div>
-        );
+            );
+        } catch (error) {
+            // 外层错误边界，捕获所有未处理的错误
+            console.error("表单组件渲染错误:", error);
+            return (
+                <div className="w-full my-1 border border-red-200 bg-red-50 rounded-xl overflow-hidden">
+                    <div className="p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                            <AlertCircle className="w-5 h-5 text-red-600" />
+                            <h3 className="text-sm font-medium text-red-900">表单加载失败</h3>
+                        </div>
+                        <p className="text-xs text-red-700">表单配置有误，请检查 schema 格式是否正确。</p>
+                    </div>
+                </div>
+            );
+        }
     },
 });

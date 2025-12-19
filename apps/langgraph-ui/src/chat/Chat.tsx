@@ -16,15 +16,14 @@ import { ArtifactViewer } from "../artifacts/ArtifactViewer";
 import "github-markdown-css/github-markdown.css";
 
 import "./index.css";
-import { show_form } from "./tools/index";
-import { create_artifacts } from "./tools/create_artifacts";
+import { default_tools } from "./tools/index";
 import SettingPanel from "../settings/SettingPanel";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 
 import { MonitorProvider, Monitor, useMonitor } from "../monitor";
 import UploadButton from "./components/UploadButton";
-import { __default_tool__ } from "./tools/human-in-the-loop";
+
 import DebugPanel from "../debugPanel/DebugPanel";
 import { useDebugPanel } from "../debugPanel/Context";
 import InterruptPanel from "./components/InterruptPanel";
@@ -237,7 +236,7 @@ const Chat: React.FC = () => {
     const monitor = useMonitor();
     const { toggleDebugPanel, isDebugPanelVisible } = useDebugPanel();
     useEffect(() => {
-        setTools([show_form, create_artifacts, __default_tool__]);
+        setTools(default_tools);
     }, []);
     return (
         <div className="langgraph-chat-container flex h-full w-full overflow-hidden bg-gray-100">

@@ -1,6 +1,6 @@
 {
     "name": "@langgraph-js/ui",
-    "version": "5.6.0",
+    "version": "5.7.0",
     "description": "",
     "scripts": {
         "dev": "vite",
@@ -34,6 +34,7 @@
         "hono": "^4.10.4",
         "langchain": "^1.1.1",
         "next-themes": "^0.4.6",
+        "recharts": "^3.2.1",
         "sonner": "^2.0.7",
         "vite": "^6"
     },
