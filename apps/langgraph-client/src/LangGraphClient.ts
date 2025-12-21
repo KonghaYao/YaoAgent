@@ -236,8 +236,10 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
      */
     async resetThread(agent: string, threadId: string) {
         await this.initAssistant(agent);
+
         this.currentThread = await this.threads.get(threadId);
         this.graphState = (this.currentThread as any).values;
+
         const graphMessages = this.graphState?.messages || [];
         this.messageProcessor.setGraphMessages(graphMessages);
         this.emit("value", {
@@ -246,6 +248,10 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
                 messages: this.messageProcessor.getGraphMessages(),
             },
         });
+        if (this.currentThread?.status === "interrupted") {
+            this.sendMessage([], { joinRunId: this.currentThread.thread_id });
+        }
+
         return this.currentThread;
     }
     // 从历史中恢复时，应该恢复流式状态
