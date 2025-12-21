@@ -91,19 +91,12 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
         }
         initializedRef.current = true;
 
-        unionStore
-            .initClient()
-            .then((res) => {
-                if (unionStore.showHistory) {
-                    unionStore.refreshHistoryList();
-                }
-            })
-            .catch((err) => {
-                console.error(err);
-                if (onInitErrorRef.current) {
-                    onInitErrorRef.current(err, unionStore.currentAgent);
-                }
-            });
+        unionStore.initClient().catch((err) => {
+            console.error(err);
+            if (onInitErrorRef.current) {
+                onInitErrorRef.current(err, unionStore.currentAgent);
+            }
+        });
     }, [unionStore]);
 
     return createElement(ChatContext.Provider, { value: unionStore }, children);

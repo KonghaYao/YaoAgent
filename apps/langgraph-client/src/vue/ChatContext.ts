@@ -101,19 +101,12 @@ export const useChatProvider = (props: ChatProviderProps) => {
 
     // 初始化客户端
     onMounted(() => {
-        unionStore
-            .initClient()
-            .then(() => {
-                if (unionStore.showHistory) {
-                    unionStore.refreshHistoryList();
-                }
-            })
-            .catch((err) => {
-                console.error(err);
-                if (props.onInitError) {
-                    props.onInitError(err, unionStore.currentAgent.value);
-                }
-            });
+        unionStore.initClient().catch((err) => {
+            console.error(err);
+            if (props.onInitError) {
+                props.onInitError(err, unionStore.currentAgent.value);
+            }
+        });
     });
 
     return {

@@ -255,7 +255,7 @@ export class History {
         }
 
         const threads = await this.listRemoteSessions({
-            limit: options.limit || 100,
+            limit: options.limit || 10,
             sortBy: "updated_at",
             sortOrder: "desc",
         });

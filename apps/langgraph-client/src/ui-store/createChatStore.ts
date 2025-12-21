@@ -134,13 +134,15 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
         history.set(historyManager);
 
         // 同步远程会话列表
-        await refreshSessionList();
 
         // 根据配置决定初始化行为
-        const syncedSessions = sessions.get();
-        if (context.autoRestoreLastSession && syncedSessions.length > 0) {
-            // 自动激活最近的历史会话
-            await activateSession(syncedSessions[0].sessionId);
+        if (context.autoRestoreLastSession) {
+            await refreshSessionList();
+            if (sessions.get().length > 0) {
+                const syncedSessions = sessions.get();
+                // 自动激活最近的历史会话
+                await activateSession(syncedSessions[0].sessionId);
+            }
         } else {
             // 创建新会话
             await createNewSession();
@@ -154,7 +156,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
         if (!historyManager) return;
 
         try {
-            const syncedSessions = await historyManager.syncFromRemote({ limit: 100 });
+            const syncedSessions = await historyManager.syncFromRemote({ limit: 10 });
             sessions.set(syncedSessions);
             historyList.set(syncedSessions.filter((s) => s.thread).map((s) => s.thread!));
         } catch (error) {
@@ -243,6 +245,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
                 interruptData.set(null);
                 isInterrupted.set(false);
             }
+            updateUI(newClient);
         };
 
         newClient.on("start", onStart);
