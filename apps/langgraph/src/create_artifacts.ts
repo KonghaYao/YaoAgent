@@ -24,23 +24,23 @@ export const create_artifacts = tool(
         name: "create_artifacts",
         description: `What is Artifact?
 
-- An Artifact is an independent content container you create to store substantial content that can be saved, edited, and reused. It presents code, documents, creative works, etc., as standalone entities rather than mixing them into the conversation.
-
-- Artifacts can accommodate various types of content: code and applications in different programming languages, Markdown documents, HTML web pages, React components, SVG graphics, Mermaid diagrams, and any form of creative writing. Artifacts are especially suitable for content meant to be used beyond the conversation context, such as complete web applications, technical documentation, stories, reports, study guides, and more.
+- An Artifact is a standalone container primarily designed to render interactive React components. It keeps substantial UI content separate from the conversation flow.
 
 - Artifacts run in a restricted browser environment. It can't use localStorage, sessionStorage, or ANY browser storage APIs in artifacts, instead, you must use React state or JavaScript variables.
 
+Command Usage:
+- "create": Create a new artifact. Use this when introducing a new component. Required 'content'.
+- "update": Smartly update existing code by finding and replacing text. Use this for small fixes or modifications. Required 'old_str' (exact match) and 'new_str'.
+- "rewrite": Completely replace the artifact content. Use this for major refactoring or when 'update' is difficult to apply. Required 'content'.
+
 When to use the "create_artifacts" tool:
-- When you need to present any visual output, UI component, or interactive element to the user.
-- When generating source code exceeding 20 lines.
-- When composing creative works, such as stories, poems, or scripts.
-- When producing content that the user intends to save, reuse, or reference.
-- When the user requests the creation of a web page, dashboard, or similar UI artifact.
+- ONLY when the user explicitly requests to draw a web page, dashboard, UI component, or data visualization.
+- DO NOT use this tool for general code generation (even if it's long) unless it is a visual artifact requested by the user.
 
 When NOT to use the "create_artifacts" tool:
 - When providing conversational responses, such as explaining concepts or answering questions.
 - When giving advice, recommendations, or engaging in discussions.
-- When showing short code examples (less than 100 lines).
+- When showing code examples (regardless of length) that are not meant to be rendered as a standalone UI/diagram.
 - When sharing temporary information only relevant to the current conversation.
 - When providing content that doesn't need to be saved or reused.
 - When creating simple lists or brief answers.
@@ -65,6 +65,9 @@ Usage Notes:
     - Create functional, working components (not placeholders)
     - Implement all routes for multi-page apps with interconnected data via context
     - Use responsive designs with full-screen layout and proper contrast
+    - **Single File Policy:** All code (including component logic, styles, and helpers) MUST be contained in a SINGLE file.
+    - **No External CSS:** Do NOT create or import .css files. Use TailwindCSS classes for all styling.
+
 
 4. **Available Artifacts to Show:**
     - React Components: "application/vnd.ant.react".
@@ -82,7 +85,7 @@ Usage Notes:
             - Chart.js: import Chart from 'chart.js'
             - Tone: import Tone from 'tone'
             - Motion: import { motion } from 'framer-motion'
-    - Mermaid Diagrams: "application/vnd.ant.mermaid".
+
 
 <extra-libraries>
     <how-to-highlight-code>

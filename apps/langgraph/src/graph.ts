@@ -93,11 +93,7 @@ const workflow = entrypoint("test-entrypoint", async (state: z.infer<typeof Stat
     // console.log('Context:', config.configurable);
     const agent = createAgent({
         model: new ChatOpenAI({
-            model: "gpt-4o-mini",
-            tags: ["test"],
-            metadata: {
-                subagent: true,
-            },
+            model: "mimo-v2-flash",
         }),
         systemPrompt: "你是一个智能助手",
         tools: [show_form, interrupt_test, sub_agent_tool, create_artifacts, hello_world],

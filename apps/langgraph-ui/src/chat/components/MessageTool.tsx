@@ -61,7 +61,7 @@ const MessageTool: React.FC<MessageToolProps> = ({ message }) => {
     return (
         <div className="flex flex-col w-full">
             {render ? (
-                (render(message) as JSX.Element)
+                <>{render(message) as JSX.Element}</>
             ) : (
                 <div className={`flex flex-col w-full ${bgColorClass} rounded-2xl overflow-hidden`}>
                     <div className="flex items-center justify-between px-5 py-3 cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => setIsCollapsed(!isCollapsed)}>

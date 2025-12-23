@@ -1,6 +1,7 @@
 import React, { useState, useEffect, ReactNode } from "react";
 import LoginSettings from "./LoginSettings"; // 导入新的 LoginSettings 组件
 import ConsoleSettings from "./ConsoleSettings"; // 导入控制台设置组件
+import ArtifactsSettings from "./ArtifactsSettings"; // 导入 artifacts 设置组件
 
 interface SettingPanelProps {
     isOpen: boolean;
@@ -26,6 +27,11 @@ const SettingPanel: React.FC<SettingPanelProps> = ({ isOpen, onClose, tabs: exte
             id: "console",
             title: "控制台",
             component: <ConsoleSettings />,
+        },
+        {
+            id: "artifacts",
+            title: "Artifacts",
+            component: <ArtifactsSettings />,
         },
         // 更多设置页面将在这里添加
     ];
