@@ -334,6 +334,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
 
         inChatError.set(null);
         try {
+            loading.set(true);
             await c.sendMessage(message || userInput.get(), extraData);
         } catch (e) {
             const isThreadRunning = (e as Error).message.includes("422");
