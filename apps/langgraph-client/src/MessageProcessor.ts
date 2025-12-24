@@ -1,5 +1,7 @@
 import { Message, AIMessage, ToolMessage } from "@langchain/langgraph-sdk";
 import { RenderMessage } from "./LangGraphClient.js";
+import { SpendTime } from "./SpendTime.js";
+import { formatFullTime, formatTime } from "./ui-store/createChatStore.js";
 
 /**
  * @zh StreamingMessageType 类用于判断消息的类型。
@@ -25,7 +27,7 @@ export class MessageProcessor {
     private streamingMessage: RenderMessage[] = [];
     /** 图发过来的更新信息 */
     private graphMessages: RenderMessage[] = [];
-
+    public spendTime = new SpendTime();
     constructor() {}
 
     /**
@@ -117,11 +119,14 @@ export class MessageProcessor {
         const result = [...messages]; // 创建副本避免修改原数组
 
         for (const message of result) {
-            const createTime = message.response_metadata?.create_time || "";
+            const createTime = message.additional_kwargs?.create_time || formatFullTime(this.spendTime.getStartTime(message.id!));
+            const updateTime = message.additional_kwargs?.update_time || formatFullTime(this.spendTime.getEndTime(message.id!));
+            message.additional_kwargs!.create_time = createTime;
+            message.additional_kwargs!.update_time = updateTime;
             // 工具必须要使用 tool_call_id 来保证一致性
             message.unique_id = message.tool_call_id! || message.id!;
 
-            message.spend_time = new Date(createTime).getTime() - new Date(lastMessage?.response_metadata?.create_time || createTime).getTime();
+            message.spend_time = new Date(updateTime).getTime() - new Date(createTime).getTime();
             if (!message.usage_metadata && (message as AIMessage).response_metadata?.usage) {
                 const usage = (message as AIMessage).response_metadata!.usage as {
                     prompt_tokens: number;
@@ -170,7 +175,7 @@ export class MessageProcessor {
                         ...(parentMessage?.additional_kwargs || {}),
                         ...(message.additional_kwargs || {}),
                         done: isDone,
-                    };
+                    } as RenderMessage["additional_kwargs"];
                 }
                 if (parentMessage) {
                     message.usage_metadata = parentMessage.usage_metadata;

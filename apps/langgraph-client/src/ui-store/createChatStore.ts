@@ -13,6 +13,16 @@ import { InterruptData, InterruptResponse } from "../humanInTheLoop.js";
 // ============ 工具函数 ============
 
 export const formatTime = (date: Date) => date.toLocaleTimeString();
+export const formatFullTime = (date: Date) => {
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    const yyyy = date.getFullYear();
+    const mm = pad(date.getMonth() + 1);
+    const dd = pad(date.getDate());
+    const hh = pad(date.getHours());
+    const mi = pad(date.getMinutes());
+    const ss = pad(date.getSeconds());
+    return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`;
+};
 export const formatTokens = (tokens: number) => tokens.toLocaleString("en");
 
 export const getMessageContent = (content: any) => {

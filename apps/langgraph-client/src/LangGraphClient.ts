@@ -2,6 +2,7 @@ import type { Thread, Message, Assistant, HumanMessage, AIMessage, ToolMessage, 
 import { EventEmitter } from "eventemitter3";
 import { ToolManager } from "./ToolManager.js";
 import { CallToolResult } from "./tool/createTool.js";
+import { SpendTime } from "./SpendTime.js";
 import { createActionRequestID, HumanInTheLoopDecision, HumanInTheLoopState, InterruptData } from "./humanInTheLoop.js";
 import { type ILangGraphClient } from "@langgraph-js/pure-graph/dist/types.js";
 import { MessageProcessor } from "./MessageProcessor.js";
@@ -16,6 +17,8 @@ export type RenderMessage = Message & {
     /** 工具入参 ，聚合而来*/
     tool_input?: string;
     additional_kwargs?: {
+        create_time: string;
+        update_time: string;
         done?: boolean;
         tool_calls?: {
             function: {
@@ -29,9 +32,6 @@ export type RenderMessage = Message & {
         output_tokens: number;
     };
     tool_call_id?: string;
-    response_metadata?: {
-        create_time: string;
-    };
     // 子消息
     sub_messages?: RenderMessage[];
     /** 耗时 */
@@ -105,6 +105,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
     private currentAssistant: Assistant | null = null;
     private currentThread: Thread<TStateType> | null = null;
     tools: ToolManager = new ToolManager();
+
     availableAssistants: Assistant[] = [];
     graphState: any = {};
     currentRun?: { run_id: string };
@@ -459,6 +460,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
         } else if (chunk.event === "messages/partial" || chunk.event === "messages/complete") {
             for (const message of chunk.data) {
                 this.messageProcessor.updateStreamingMessage(message);
+                this.messageProcessor.spendTime.setSpendTime(message.id!);
             }
             this.emit("message", chunk);
             return true;
