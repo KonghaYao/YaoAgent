@@ -50,6 +50,7 @@ export class ToolRenderData<I, D> {
 
         return this.client.doneHumanInTheLoopWaiting(this.message.id!, this.getToolActionRequestID(), response);
     }
+
     get state() {
         if (this.message.type === "tool" && this.message?.additional_kwargs?.done) {
             return "done";

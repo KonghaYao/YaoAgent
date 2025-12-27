@@ -472,16 +472,12 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
                   }
                 | undefined;
             if (data?.__interrupt__) {
-                this._status = "interrupted";
                 const humanInTheLoopData = this.getHumanInTheLoopData(data?.__interrupt__);
                 if (humanInTheLoopData) {
                     this.humanInTheLoop = humanInTheLoopData;
                 } else {
                     this.interruptData = data.__interrupt__;
                 }
-                this.emit("interruptChange", {
-                    event: "interruptChange",
-                });
             } else if (data?.messages) {
                 const isResume = !!command?.resume;
                 const isLongerThanLocal = data.messages.length >= this.messageProcessor.getGraphMessages().length;
@@ -516,9 +512,13 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
                 // json 校验
                 return this.callFETool(toolMessage, tool.args);
             });
+            console.log("batch call tools", result.length);
+            // 只有当卡住流程时，才改变状态为 interrupted
             this._status = "interrupted";
             this.currentThread!.status = "interrupted"; // 修复某些机制下，状态不为 interrupted 与后端有差异
-            console.log("batch call tools", result.length);
+            this.emit("interruptChange", {
+                event: "interruptChange",
+            });
             return Promise.all(result);
         }
     }

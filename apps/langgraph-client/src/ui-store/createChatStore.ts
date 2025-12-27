@@ -78,7 +78,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
     const currentAgent = atom<string>(initClientName);
     const currentChatId = atom<string | null>(null);
     const currentNodeName = atom<string>("__start__");
-
+    const currentStatus = atom<string>("idle");
     // Interrupt 状态
     const interruptData = atom<InterruptData | null>(null);
     const isInterrupted = atom<boolean>(false);
@@ -117,6 +117,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
 
         currentNodeName.set(lastMessage?.node_name || lastMessage?.name || "__start__");
         renderMessages.set(messages);
+        currentStatus.set(newClient.status);
     }, 10);
     // ============ 工具和图表辅助函数 ============
 
@@ -256,6 +257,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
                 isInterrupted.set(false);
             }
             updateUI(newClient);
+            client.set(client.get());
         };
 
         newClient.on("start", onStart);
@@ -383,9 +385,8 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
     function getToolUIRender(tool_name: string) {
         const c = client.get();
         if (!c) return null;
-        const toolsDefine = c.tools.getAllTools();
-        const tool = toolsDefine.find((i) => i.name === tool_name!)?.render;
-        return tool ? (message: RenderMessage) => tool(new ToolRenderData(message, c)) : null;
+        const toolRender = c.tools.getTool(tool_name)?.render;
+        return toolRender ? (message: RenderMessage) => toolRender(new ToolRenderData(message, c)) : null;
     }
 
     // ============ 返回 Store API ============
@@ -407,6 +408,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
             currentAgent,
             currentChatId,
             currentNodeName,
+            currentStatus,
 
             // Interrupt 状态
             interruptData,
