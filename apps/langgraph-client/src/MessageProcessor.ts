@@ -119,6 +119,10 @@ export class MessageProcessor {
         const result = [...messages]; // 创建副本避免修改原数组
 
         for (const message of result) {
+            if (!message.additional_kwargs) {
+                /** @ts-ignore 初始化，一些前端传递的 message 是没有这个字段的 */
+                message.additional_kwargs = {};
+            }
             const createTime = message.additional_kwargs?.create_time || formatFullTime(this.spendTime.getStartTime(message.id!));
             const updateTime = message.additional_kwargs?.update_time || formatFullTime(this.spendTime.getEndTime(message.id!));
             message.additional_kwargs!.create_time = createTime;
