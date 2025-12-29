@@ -78,11 +78,11 @@ export class History {
      * @zh 激活指定会话（懒加载创建 Client）
      * @en Activates the specified session (lazy load client)
      */
-    async activateSession(sessionId: string): Promise<SessionInfo> {
-        const session = this.sessions.get(sessionId);
-        if (!session) {
-            throw new Error(`Session ${sessionId} not found`);
-        }
+    async activateSession(sessionId: string, mustResetStream = false): Promise<SessionInfo> {
+        const session: SessionInfo = this.sessions.get(sessionId) || {
+            sessionId,
+            agentName: this.virtualClient.getCurrentAssistant()?.graph_id!,
+        };
 
         // 懒加载：只在激活时创建 Client
         if (!session.client) {
@@ -91,7 +91,7 @@ export class History {
 
             // 只有在有 thread 的情况下才重置（恢复已有会话）
             // 新会话的 thread 会在发送第一条消息时自动创建
-            if (session.thread) {
+            if (session.thread || mustResetStream) {
                 await client.resetThread(session.agentName, sessionId);
             }
 

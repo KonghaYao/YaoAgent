@@ -281,7 +281,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
 
     // ============ 会话激活逻辑 ============
 
-    async function activateSession(sessionId: string) {
+    async function activateSession(sessionId: string, mustResetStream = false) {
         const historyManager = history.get();
         if (!historyManager) return;
 
@@ -295,7 +295,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
             interruptData.set(null);
             isInterrupted.set(false);
 
-            const session = await historyManager.activateSession(sessionId);
+            const session = await historyManager.activateSession(sessionId, mustResetStream);
             const activeClient = session.client;
 
             if (activeClient) {
@@ -488,7 +488,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
             // 历史记录（兼容旧 API）
             addToHistory,
             createNewChat: createNewSession,
-            toHistoryChat: (thread: Thread<{ messages: Message[] }>) => activateSession(thread.thread_id),
+            toHistoryChat: (thread: Thread<{ messages: Message[] }>) => activateSession(thread.thread_id, true),
             async deleteHistoryChat(thread: Thread<{ messages: Message[] }>) {
                 const historyManager = history.get();
                 if (historyManager) {
