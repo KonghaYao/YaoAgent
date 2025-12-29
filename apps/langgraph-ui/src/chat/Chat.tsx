@@ -230,7 +230,7 @@ const ChatInput: React.FC = () => {
 const Chat: React.FC = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const { showHistory, toggleHistoryVisible, showGraph, toggleGraphVisible, renderMessages, setTools, client } = useChat();
+    const { showHistory, toggleHistoryVisible, showGraph, toHistoryChat, renderMessages, setTools, client } = useChat();
     const { extraParams, setExtraParams } = useExtraParams();
     const { showArtifact, sendMessage } = useChat();
     const monitor = useMonitor();
@@ -279,7 +279,7 @@ const Chat: React.FC = () => {
                         className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 cursor-pointer rounded-xl hover:bg-gray-100 focus:outline-none transition-colors flex items-center gap-2"
                         onClick={() => {
                             toast.info("数据已打印到控制台，请 F12 查看");
-                            console.log(client?.graphState);
+                            console.log(client?.graphState, renderMessages);
                         }}
                     >
                         <Printer className="w-4 h-4" />

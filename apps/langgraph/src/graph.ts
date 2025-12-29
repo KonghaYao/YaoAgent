@@ -1,10 +1,11 @@
 import { entrypoint, MessagesZodMeta, Command, interrupt } from "@langchain/langgraph";
-import { z } from "zod/v3";
+import { z } from "zod";
 import { createEntrypointGraph } from "@langgraph-js/pure-graph";
-import { ChatOpenAI } from "@langgraph-js/pro";
+// import { ChatOpenAI } from "@langgraph-js/pro";
+import { ChatOpenAI } from "@langchain/openai";
 import { BaseMessage, createAgent, humanInTheLoopMiddleware, HumanMessage, tool, ToolMessage } from "langchain";
-import { withLangGraph } from "@langchain/langgraph/zod";
 import { create_artifacts } from "./create_artifacts";
+import { withLangGraph } from "@langchain/langgraph/zod";
 
 const State = z.object({
     task_store: z.record(z.string(), z.any()).default({}),
