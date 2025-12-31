@@ -20,6 +20,7 @@ interface ChatProviderProps {
     apiUrl?: string;
     defaultHeaders?: Record<string, string>;
     withCredentials?: boolean;
+    fetch?: typeof fetch;
     showHistory?: boolean;
     showGraph?: boolean;
     fallbackToAvailableAssistants?: boolean;
@@ -62,14 +63,15 @@ export const ChatProvider = (props: ChatProviderProps) => {
     const stableHeaders = createMemo(() => props.defaultHeaders || {});
 
     // 使用 createMemo 创建 fetch 函数
-    const F = createMemo(() =>
-        props.withCredentials
+    const F = createMemo(() => {
+        const baseFetch = props.fetch || globalThis.fetch;
+        return props.withCredentials
             ? (url: string, options: RequestInit) => {
                   options.credentials = "include";
-                  return fetch(url, options);
+                  return baseFetch(url, options);
               }
-            : fetch
-    );
+            : baseFetch;
+    });
 
     const store = createMemo(() => {
         const config = {

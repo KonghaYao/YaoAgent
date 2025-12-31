@@ -20,6 +20,7 @@ interface ChatProviderProps {
     apiUrl?: string;
     defaultHeaders?: Record<string, string>;
     withCredentials?: boolean;
+    fetch?: typeof fetch;
     showHistory?: boolean;
     showGraph?: boolean;
     fallbackToAvailableAssistants?: boolean;
@@ -36,6 +37,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     apiUrl = "http://localhost:8123",
     defaultHeaders,
     withCredentials = false,
+    fetch,
     showHistory = false,
     showGraph = false,
     fallbackToAvailableAssistants = false,
@@ -54,12 +56,13 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     }, [onInitError]);
 
     const store = useMemo(() => {
+        const baseFetch = fetch || globalThis.fetch;
         const F = withCredentials
             ? (url: string, options: RequestInit) => {
                   options.credentials = "include";
-                  return fetch(url, options);
+                  return baseFetch(url, options);
               }
-            : fetch;
+            : baseFetch;
 
         const config = {
             apiUrl,
@@ -78,7 +81,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
             fallbackToAvailableAssistants,
             autoRestoreLastSession,
         });
-    }, [defaultAgent, apiUrl, stableHeaders, withCredentials, showHistory, showGraph, fallbackToAvailableAssistants, autoRestoreLastSession]);
+    }, [defaultAgent, apiUrl, stableHeaders, withCredentials, fetch, showHistory, showGraph, fallbackToAvailableAssistants, autoRestoreLastSession]);
 
     const unionStore = useUnionStore(store, useStore);
 

@@ -52,6 +52,7 @@ export interface ChatProviderProps {
     apiUrl?: string;
     defaultHeaders?: Record<string, string>;
     withCredentials?: boolean;
+    fetch?: typeof fetch;
     showHistory?: boolean;
     showGraph?: boolean;
     fallbackToAvailableAssistants?: boolean;
@@ -67,12 +68,13 @@ export interface ChatProviderProps {
  * @en Chat Provider Hook, used directly in setup
  */
 export const useChatProvider = (props: ChatProviderProps) => {
+    const baseFetch = props.fetch || globalThis.fetch;
     const F = props.withCredentials
         ? (url: string, options: RequestInit) => {
               options.credentials = "include";
-              return fetch(url, options);
+              return baseFetch(url, options);
           }
-        : fetch;
+        : baseFetch;
 
     const store = createChatStore(
         props.defaultAgent || "",
@@ -136,6 +138,10 @@ export const ChatProvider = defineComponent({
         withCredentials: {
             type: Boolean as PropType<boolean>,
             default: false,
+        },
+        fetch: {
+            type: Function as PropType<typeof fetch>,
+            default: undefined,
         },
         showHistory: {
             type: Boolean as PropType<boolean>,

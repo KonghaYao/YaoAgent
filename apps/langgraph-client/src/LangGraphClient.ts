@@ -510,7 +510,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
                     additional_kwargs: {},
                 };
                 // json 校验
-                return this.callFETool(toolMessage, tool.args);
+                return this.callFETool(toolMessage, tool.args).catch((e) => console.warn(e));
             });
             console.log("batch call tools", result.length);
             // 只有当卡住流程时，才改变状态为 interrupted
