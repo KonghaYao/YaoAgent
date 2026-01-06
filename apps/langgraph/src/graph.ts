@@ -107,7 +107,9 @@ const workflow = entrypoint("test-entrypoint", async (state: z.infer<typeof Stat
         ],
         stateSchema: State,
     });
-    return agent.invoke(state);
+    const response = await agent.invoke(state);
+    console.log(response);
+    return response;
 });
 
 export const graph = createEntrypointGraph({

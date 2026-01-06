@@ -1,6 +1,6 @@
 import { entrypoint } from "@langchain/langgraph";
 import { z } from "zod";
-import { createEntrypointGraph } from "@langgraph-js/pure-graph";
+import { createStateEntrypoint } from "@langgraph-js/pure-graph";
 import { ChatOpenAI } from "@langchain/openai";
 import { createAgent, humanInTheLoopMiddleware } from "langchain";
 import { AgentState } from "@langgraph-js/pro";
@@ -13,7 +13,7 @@ const State = AgentState.merge(
     })
 );
 
-const workflow = entrypoint({ name: "debug-agent" }, async (state: z.infer<typeof State>) => {
+const workflow = async (state: z.infer<typeof State>) => {
     const model = new ChatOpenAI({
         model: state.model_name,
         useResponsesApi: false,
@@ -34,9 +34,12 @@ const workflow = entrypoint({ name: "debug-agent" }, async (state: z.infer<typeo
         stateSchema: State,
     });
     return agent.invoke(state);
-});
+};
 
-export const graph = createEntrypointGraph({
-    stateSchema: State,
-    graph: workflow,
-});
+export const graph = createStateEntrypoint(
+    {
+        name: "debug-agent",
+        stateSchema: State,
+    },
+    workflow
+);
