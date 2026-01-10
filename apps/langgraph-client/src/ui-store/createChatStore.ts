@@ -154,6 +154,8 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
                 const syncedSessions = sessions.get();
                 // 自动激活最近的历史会话
                 await activateSession(syncedSessions[0].sessionId);
+            } else {
+                await createNewSession();
             }
         } else {
             // 创建新会话
