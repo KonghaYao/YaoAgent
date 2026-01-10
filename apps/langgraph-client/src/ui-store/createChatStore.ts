@@ -33,6 +33,7 @@ export const getMessageContent = (content: any) => {
                 if (typeof item === "string") return item;
                 if (item.type === "text") return item.text;
                 if (item.type === "image_url") return `[图片]`;
+                if (item.type === "tool_use") return "";
                 return JSON.stringify(item);
             })
             .join("");
