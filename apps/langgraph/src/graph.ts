@@ -1,8 +1,8 @@
 import { entrypoint, MessagesZodMeta, Command, interrupt } from "@langchain/langgraph";
 import { z } from "zod";
 import { createEntrypointGraph } from "@langgraph-js/pure-graph";
-// import { ChatOpenAI } from "@langgraph-js/pro";
-import { ChatOpenAI } from "@langchain/openai";
+import { ChatOpenAI } from "@langgraph-js/pro";
+// import { ChatOpenAI } from "@langchain/openai";
 import { BaseMessage, createAgent, humanInTheLoopMiddleware, HumanMessage, tool, ToolMessage } from "langchain";
 import { create_artifacts } from "./create_artifacts";
 import { withLangGraph } from "@langchain/langgraph/zod";
@@ -95,6 +95,7 @@ const workflow = entrypoint("test-entrypoint", async (state: z.infer<typeof Stat
     const agent = createAgent({
         model: new ChatOpenAI({
             model: "mimo-v2-flash",
+            modelKwargs: { thinking: { type: "enabled" } },
         }),
         systemPrompt: "你是一个智能助手",
         tools: [show_form, interrupt_test, sub_agent_tool, create_artifacts, hello_world],

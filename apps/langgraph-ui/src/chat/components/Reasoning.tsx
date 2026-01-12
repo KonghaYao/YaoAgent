@@ -9,12 +9,12 @@ import {
 } from "../../components/ai-elements/chain-of-thought";
 import { RenderMessage } from "@langgraph-js/sdk";
 
-export const Reasoning = (props: { message: RenderMessage; className?: string }) => {
+export const Reasoning = (props: { reasoning_content: string; className?: string }) => {
     return (
         <ChainOfThought defaultOpen className={props.className}>
             <ChainOfThoughtHeader>思考内容</ChainOfThoughtHeader>
             <ChainOfThoughtContent>
-                <ChainOfThoughtStep label={(props.message.additional_kwargs?.reasoning_content as string) || ""} status="complete" />
+                <ChainOfThoughtStep label={(props.reasoning_content as string) || ""} status="complete" />
             </ChainOfThoughtContent>
         </ChainOfThought>
     );

@@ -8,3 +8,4 @@ export * from "./TestKit.js";
 export * from "./artifacts/index.js";
 export * from "./client/index.js";
 export * from "./History.js";
+export * from "./utils/index.js";
