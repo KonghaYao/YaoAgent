@@ -2,7 +2,7 @@ import { RenderMessage } from "../LangGraphClient.js";
 
 import { LangGraphClient } from "../LangGraphClient.js";
 import { getMessageContent } from "../ui-store/createChatStore.js";
-import { jsonrepair } from "jsonrepair";
+import { parse, Allow } from "partial-json";
 import { createActionRequestID, HumanInTheLoopDecision, InterruptResponse } from "../humanInTheLoop.js";
 
 export type DeepPartial<T> = {
@@ -90,7 +90,7 @@ export class ToolRenderData<I, D> {
     }
     getInputRepaired(): DeepPartial<I> {
         try {
-            return JSON.parse(jsonrepair(this.message.tool_input || ""));
+            return parse(this.message.tool_input || "", Allow.ALL);
         } catch (e) {
             return {};
         }
