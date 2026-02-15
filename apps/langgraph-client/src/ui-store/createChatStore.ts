@@ -227,6 +227,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
                             sessionId: thread.thread_id,
                             thread,
                             agentName: currentAgent.get(),
+                            metadata: thread.metadata as Record<string, any> | undefined,
                         }) as SessionInfo
                 )
             );
@@ -405,7 +406,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
 
     // ============ 消息和交互逻辑 ============
 
-    async function sendMessage(message?: Message[], extraData?: SendMessageOptions, withoutCheck = false, isResume = false) {
+    async function sendMessage(message?: Message[], options?: SendMessageOptions, withoutCheck = false, isResume = false) {
         const c = client.get();
         if ((!withoutCheck && !userInput.get().trim() && !message?.length) || !c) return;
 
@@ -415,7 +416,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
         inChatError.set(null);
         try {
             loading.set(true);
-            await c.sendMessage(message || userInput.get(), extraData);
+            await c.sendMessage(message || userInput.get(), options);
         } catch (e) {
             const isThreadRunning = (e as Error).message.includes("422");
             if (isThreadRunning) {
@@ -559,7 +560,19 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
             },
             // 历史记录（兼容旧 API）
             addToHistory,
-            createNewChat: createNewSession,
+            async createNewChat(metadata?: Record<string, any>) {
+                const historyManager = history.get();
+                if (!historyManager) return;
+
+                try {
+                    const session = await historyManager.createSession({ metadata });
+                    await refreshSessionList();
+                    await activateSession(session.sessionId);
+                } catch (error) {
+                    console.error("Failed to create new chat:", error);
+                    inChatError.set((error as Error).message);
+                }
+            },
             toHistoryChat: (thread: Thread<{ messages: Message[] }>) => activateSession(thread.thread_id, true),
             async deleteHistoryChat(thread: Thread<{ messages: Message[] }>) {
                 const historyManager = history.get();

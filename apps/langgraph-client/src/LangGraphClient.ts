@@ -46,6 +46,7 @@ export type SendMessageOptions = {
     _debug?: { streamResponse?: any };
     command?: Command;
     joinRunId?: string;
+    metadata?: Record<string, any>;
 };
 
 export interface LangGraphClientConfig {
@@ -188,9 +189,10 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
      * @zh 创建一个新的 Thread。
      * @en Creates a new Thread.
      */
-    async createThread({ threadId, graphId }: { threadId?: string; graphId?: string } = {}) {
+    async createThread({ threadId, graphId, metadata }: { threadId?: string; graphId?: string; metadata?: Record<string, any> } = {}) {
         try {
             this.currentThread = await this.threads.create({
+                metadata,
                 threadId,
                 graphId,
             });
@@ -363,12 +365,15 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
      * @zh 发送消息到 LangGraph 后端。
      * @en Sends a message to the LangGraph backend.
      */
-    async sendMessage(input: string | Message[], { joinRunId, extraParams, _debug, command }: SendMessageOptions = {}) {
+    async sendMessage(input: string | Message[], { joinRunId, extraParams, _debug, command, metadata }: SendMessageOptions = {}) {
         if (!this.currentAssistant) {
             throw new Error("Thread or Assistant not initialized");
         }
         if (!this.currentThread) {
-            await this.createThread({ graphId: this.currentAssistant!.graph_id! });
+            await this.createThread({ 
+                graphId: this.currentAssistant!.graph_id!,
+                metadata,
+            });
             this.emit("thread", {
                 event: "thread/create",
                 data: {

@@ -10,6 +10,8 @@ export interface SessionInfo {
     thread?: Thread<any>;
     /** Agent 名称 */
     agentName: string;
+    /** 会话元数据 */
+    metadata?: Record<string, any>;
 }
 
 export interface CreateSessionOptions {
@@ -21,6 +23,8 @@ export interface CreateSessionOptions {
     restore?: boolean;
     /** Graph ID */
     graphId?: string;
+    /** 会话元数据 */
+    metadata?: Record<string, any>;
 }
 
 /**
@@ -61,6 +65,7 @@ export class History {
         const sessionInfo: SessionInfo = {
             sessionId,
             agentName,
+            metadata: options.metadata,
         };
 
         // 如果是从已有 Thread 恢复，则立即获取 Thread
@@ -89,8 +94,15 @@ export class History {
             const client = new LangGraphClient(this.clientConfig);
             await client.initAssistant(session.agentName);
 
-            // 只有在有 thread 的情况下才重置（恢复已有会话）
-            // 新会话的 thread 会在发送第一条消息时自动创建
+            // 如果有 metadata，立即创建 Thread 并带上 metadata
+            if (session.metadata && !session.thread) {
+                await client.createThread({ 
+                    graphId: client.getCurrentAssistant()?.graph_id,
+                    metadata: session.metadata,
+                });
+            }
+
+            // 如果已有 thread 或者必须重置，则从历史恢复
             if (session.thread || mustResetStream) {
                 await client.resetThread(session.agentName, sessionId);
             }
