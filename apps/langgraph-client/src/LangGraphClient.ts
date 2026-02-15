@@ -212,20 +212,39 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
      */
     async listThreads(
         options: {
-            sortOrder?: "asc" | "desc";
-            sortBy?: "created_at" | "updated_at";
-            offset?: number;
+            ids?: string[];
+            metadata?: Record<string, any>;
+            status?: "idle" | "busy" | "interrupted" | "error";
+            values?: any;
             limit?: number;
+            offset?: number;
+            sortBy?: "thread_id" | "status" | "created_at" | "updated_at";
+            sortOrder?: "asc" | "desc";
+            select?: Array<"thread_id" | "created_at" | "updated_at" | "metadata" | "config" | "context" | "status" | "values" | "interrupts">;
+            withoutDetails?: boolean;
         } = {}
     ) {
-        return this.threads.search({
-            sortOrder: options.sortOrder || "desc",
-            sortBy: options.sortBy || "updated_at",
-            offset: options.offset || 0,
-            limit: options.limit || 10,
-            /** @ts-ignore: 用于删除不需要的字段 */
-            without_details: true,
-        });
+        const searchOptions: any = {};
+
+        if (options.ids) searchOptions.ids = options.ids;
+        if (options.metadata) searchOptions.metadata = options.metadata;
+        if (options.status) searchOptions.status = options.status;
+        if (options.values) searchOptions.values = options.values;
+        if (options.limit !== undefined) searchOptions.limit = options.limit;
+        if (options.offset !== undefined) searchOptions.offset = options.offset;
+        if (options.sortBy) searchOptions.sortBy = options.sortBy;
+        if (options.sortOrder) searchOptions.sortOrder = options.sortOrder;
+        if (options.select) searchOptions.select = options.select;
+        if (options.withoutDetails !== undefined) searchOptions.without_details = options.withoutDetails;
+
+        // 设置默认值
+        if (!options.sortBy) searchOptions.sortBy = "updated_at";
+        if (!options.sortOrder) searchOptions.sortOrder = "desc";
+        if (!options.limit) searchOptions.limit = 10;
+        if (!options.offset) searchOptions.offset = 0;
+        if (!options.withoutDetails) searchOptions.without_details = true;
+
+        return this.threads.search(searchOptions);
     }
     async deleteThread(threadId: string) {
         return this.threads.delete(threadId);

@@ -292,7 +292,7 @@ export class TestLangGraphChat {
      * const lastHuman = testChat.findLast("human");
      * ```
      */
-    findLast(type: "human" | "ai" | "tool", options: { before?: (item: RenderMessage) => boolean } = {}) {
+    findLast(type: "human" | "ai" | "tool", options: { before?: (item: RenderMessage) => boolean } = {}): RenderMessage {
         const messages = this.getMessages();
 
         for (let i = messages.length - 1; i >= 0; i--) {

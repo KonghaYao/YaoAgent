@@ -15,7 +15,7 @@
         "@langchain/langgraph": "^1.0.7",
         "@langchain/openai": "^1.1.2",
         "@langgraph-js/pro": "workspace:^*",
-        "@langgraph-js/pure-graph": "^2.7.4",
+        "@langgraph-js/pure-graph": "^3",
         "hono": "^4.10.6",
         "langchain": "1.1.1",
         "openai": "^6.9.1",

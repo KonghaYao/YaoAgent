@@ -61,6 +61,21 @@ interface ChatStoreContext {
     autoRestoreLastSession?: boolean;
 }
 
+// 分页状态类型
+export interface HistoryPagination {
+    page: number;
+    pageSize: number;
+    total: number;
+}
+
+// 历史记录筛选类型
+export interface HistoryFilter {
+    metadata: Record<string, any> | null;
+    status: "idle" | "busy" | "interrupted" | "error" | null;
+    sortBy: "thread_id" | "status" | "created_at" | "updated_at";
+    sortOrder: "asc" | "desc";
+}
+
 // ============ Store 创建函数 ============
 
 export const createChatStore = (initClientName: string, config: Partial<LangGraphClientConfig>, context: ChatStoreContext = {}) => {
@@ -90,6 +105,21 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
     const showHistory = atom<boolean>(context.showHistory ?? false);
     const showGraph = atom<boolean>(context.showGraph ?? false);
     const graphVisualize = atom<AssistantGraph | null>(null);
+
+    // 分页状态
+    const historyPagination = atom<HistoryPagination>({
+        page: 1,
+        pageSize: 10,
+        total: 0,
+    });
+
+    // 历史记录筛选状态
+    const historyFilter = atom<HistoryFilter>({
+        metadata: null,
+        status: null,
+        sortBy: "updated_at",
+        sortOrder: "desc",
+    });
 
     // ============ 内部状态 ============
 
@@ -145,8 +175,6 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
         await historyManager.init(currentAgent.get(), { fallbackToAvailableAssistants: context.fallbackToAvailableAssistants });
         history.set(historyManager);
 
-        // 同步远程会话列表
-
         // 根据配置决定初始化行为
         if (context.autoRestoreLastSession) {
             await refreshSessionList();
@@ -170,9 +198,46 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
         if (!historyManager) return;
 
         try {
-            const syncedSessions = await historyManager.syncFromRemote({ limit: 10 });
-            sessions.set(syncedSessions);
-            historyList.set(syncedSessions.filter((s) => s.thread).map((s) => s.thread!));
+            const pagination = historyPagination.get();
+            const filter = historyFilter.get();
+
+            // 计算偏移量
+            const offset = (pagination.page - 1) * pagination.pageSize;
+
+            // 使用 listRemoteSessions 支持筛选
+            const threads = await historyManager.listRemoteSessions({
+                limit: pagination.pageSize,
+                offset,
+                metadata: filter.metadata || undefined,
+                status: filter.status || undefined,
+                sortBy: filter.sortBy,
+                sortOrder: filter.sortOrder,
+                withoutDetails: true,
+            });
+
+            // 注意：后端可能不返回总数，这里需要根据返回的记录数判断是否有下一页
+            // 如果返回的记录数小于 pageSize，说明没有更多数据了
+            const hasMore = threads.length === pagination.pageSize;
+            const estimatedTotal = (pagination.page - 1) * pagination.pageSize + threads.length;
+
+            sessions.set(
+                threads.map(
+                    (thread) =>
+                        ({
+                            sessionId: thread.thread_id,
+                            thread,
+                            agentName: currentAgent.get(),
+                        }) as SessionInfo
+                )
+            );
+
+            historyList.set(threads as Thread<{ messages: Message[] }>[]);
+
+            // 更新分页状态（注意：这里只是估计值，实际总数可能需要从后端获取）
+            historyPagination.set({
+                ...pagination,
+                total: hasMore ? pagination.page * pagination.pageSize + 1 : estimatedTotal,
+            });
         } catch (error) {
             console.error("Failed to sync sessions:", error);
         }
@@ -427,6 +492,10 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
             showHistory,
             historyList,
 
+            // 分页和筛选
+            historyPagination,
+            historyFilter,
+
             ...artifactHook.data,
         },
         mutations: {
@@ -498,6 +567,47 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
                     await historyManager.deleteSession(thread.thread_id);
                     await refreshSessionList();
                 }
+            },
+
+            // 分页和筛选操作
+            setHistoryPage(page: number) {
+                historyPagination.set({
+                    ...historyPagination.get(),
+                    page,
+                });
+                refreshSessionList();
+            },
+            setHistoryPageSize(pageSize: number) {
+                historyPagination.set({
+                    ...historyPagination.get(),
+                    pageSize,
+                    page: 1, // 重置到第一页
+                });
+                refreshSessionList();
+            },
+            setHistoryFilter(filter: Partial<HistoryFilter>) {
+                historyFilter.set({
+                    ...historyFilter.get(),
+                    ...filter,
+                });
+                historyPagination.set({
+                    ...historyPagination.get(),
+                    page: 1, // 筛选变更时重置到第一页
+                });
+                refreshSessionList();
+            },
+            resetHistoryFilter() {
+                historyFilter.set({
+                    metadata: null,
+                    status: null,
+                    sortBy: "updated_at",
+                    sortOrder: "desc",
+                });
+                historyPagination.set({
+                    ...historyPagination.get(),
+                    page: 1,
+                });
+                refreshSessionList();
             },
 
             ...artifactHook.mutation,

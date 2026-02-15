@@ -230,10 +230,16 @@ export class History {
      */
     async listRemoteSessions(
         options: {
-            sortOrder?: "asc" | "desc";
-            sortBy?: "created_at" | "updated_at";
-            offset?: number;
+            ids?: string[];
+            metadata?: Record<string, any>;
+            status?: "idle" | "busy" | "interrupted" | "error";
+            values?: any;
             limit?: number;
+            offset?: number;
+            sortBy?: "thread_id" | "status" | "created_at" | "updated_at";
+            sortOrder?: "asc" | "desc";
+            select?: Array<"thread_id" | "created_at" | "updated_at" | "metadata" | "config" | "context" | "status" | "values" | "interrupts">;
+            withoutDetails?: boolean;
         } = {}
     ) {
         return this.virtualClient.listThreads(options);
