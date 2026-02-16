@@ -40,6 +40,8 @@ export type RenderMessage = Message & {
     unique_id?: string;
     /** 工具调用是否完成 */
     done?: boolean;
+    /** 标记工具消息的原始 ai 消息 */
+    source_ai_message_id?: string;
 };
 export type SendMessageOptions = {
     extraParams?: Record<string, any>;
@@ -370,7 +372,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
             throw new Error("Thread or Assistant not initialized");
         }
         if (!this.currentThread) {
-            await this.createThread({ 
+            await this.createThread({
                 graphId: this.currentAssistant!.graph_id!,
                 metadata,
             });

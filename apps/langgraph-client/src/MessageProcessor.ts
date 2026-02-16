@@ -184,6 +184,8 @@ export class MessageProcessor {
                 if (parentMessage) {
                     message.usage_metadata = parentMessage.usage_metadata;
                     message.node_name = parentMessage.name;
+                    /** @ts-ignore 用于标记原始的 AI message 的id */
+                    message.source_ai_message_id = parentMessage.id;
                     // 修补特殊情况下，tool name 丢失的问题
                     if (!message.name) {
                         message.name = (parentMessage as AIMessage).tool_calls!.find((i) => i.id === message.tool_call_id)?.name;
@@ -294,10 +296,11 @@ export class MessageProcessor {
         const rootMessages: RenderMessage[] = [];
 
         for (const message of messages) {
-            const isRoot = !nonRootMessageId.has(message.id!);
+            const sourceId = message.source_ai_message_id || message.id!;
+            const isRoot = !nonRootMessageId.has(sourceId!);
             if (!isRoot) {
                 // 处理子消息
-                const parentId = parentPointer.get(message.id!)!;
+                const parentId = parentPointer.get(sourceId)!;
                 const children = childrenMap.get(parentId);
                 if (children) {
                     children.push(message);
