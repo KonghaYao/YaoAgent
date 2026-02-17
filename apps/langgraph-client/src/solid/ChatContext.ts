@@ -29,6 +29,8 @@ interface ChatProviderProps {
     onInitError?: (error: any, currentAgent: string) => void;
     client?: ILangGraphClient;
     legacyMode?: boolean;
+    /** 历史记录筛选的默认参数 */
+    historyFilter?: import("../ui-store/createChatStore.js").HistoryFilter;
 }
 /**
  * @zh UnionStore 类型用于合并 store 的 data 和 mutations，使其可以直接访问。
@@ -90,6 +92,7 @@ export const ChatProvider = (props: ChatProviderProps) => {
             showGraph: props.showGraph || false,
             fallbackToAvailableAssistants: props.fallbackToAvailableAssistants || false,
             autoRestoreLastSession: props.autoRestoreLastSession || false,
+            historyFilter: props.historyFilter,
         });
     });
 

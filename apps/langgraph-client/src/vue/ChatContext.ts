@@ -61,6 +61,8 @@ export interface ChatProviderProps {
     onInitError?: (error: any, currentAgent: string) => void;
     client?: ILangGraphClient;
     legacyMode?: boolean;
+    /** 历史记录筛选的默认参数 */
+    historyFilter?: import("../ui-store/createChatStore.js").HistoryFilter;
 }
 
 /**
@@ -93,6 +95,7 @@ export const useChatProvider = (props: ChatProviderProps) => {
             showGraph: props.showGraph,
             fallbackToAvailableAssistants: props.fallbackToAvailableAssistants,
             autoRestoreLastSession: props.autoRestoreLastSession,
+            historyFilter: props.historyFilter,
         }
     );
 
@@ -157,6 +160,10 @@ export const ChatProvider = defineComponent({
         },
         onInitError: {
             type: Function as PropType<(error: any, currentAgent: string) => void>,
+            default: undefined,
+        },
+        historyFilter: {
+            type: Object as PropType<any>,
             default: undefined,
         },
     },

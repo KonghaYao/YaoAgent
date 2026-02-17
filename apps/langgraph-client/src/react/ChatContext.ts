@@ -29,6 +29,8 @@ interface ChatProviderProps {
     onInitError?: (error: any, currentAgent: string) => void;
     client?: ILangGraphClient;
     legacyMode?: boolean;
+    /** 历史记录筛选的默认参数 */
+    historyFilter?: import("../ui-store/createChatStore.js").HistoryFilter;
 }
 
 export const ChatProvider: React.FC<ChatProviderProps> = ({
@@ -45,6 +47,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     onInitError,
     client,
     legacyMode = false,
+    historyFilter,
 }) => {
     // 使用 useMemo 稳定 defaultHeaders 的引用
     const stableHeaders = useMemo(() => defaultHeaders || {}, [defaultHeaders]);
@@ -80,8 +83,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
             showGraph,
             fallbackToAvailableAssistants,
             autoRestoreLastSession,
+            historyFilter,
         });
-    }, [defaultAgent, apiUrl, stableHeaders, withCredentials, fetch, showHistory, showGraph, fallbackToAvailableAssistants, autoRestoreLastSession]);
+    }, [defaultAgent, apiUrl, stableHeaders, withCredentials, fetch, showHistory, showGraph, fallbackToAvailableAssistants, autoRestoreLastSession, client, legacyMode, historyFilter]);
 
     const unionStore = useUnionStore(store, useStore);
 

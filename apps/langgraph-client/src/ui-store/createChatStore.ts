@@ -59,6 +59,8 @@ interface ChatStoreContext {
     onInit?: (client: LangGraphClient) => void;
     /** 初始化时是否自动激活最近的历史会话（默认 false，创建新会话） */
     autoRestoreLastSession?: boolean;
+    /** 历史记录筛选的默认参数 */
+    historyFilter?: Partial<HistoryFilter>;
 }
 
 // 分页状态类型
@@ -113,13 +115,15 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
         total: 0,
     });
 
-    // 历史记录筛选状态
-    const historyFilter = atom<HistoryFilter>({
-        metadata: null,
-        status: null,
-        sortBy: "updated_at",
-        sortOrder: "desc",
-    });
+    // 历史记录筛选状态 - 使用 context 中的默认值
+    const defaultHistoryFilter: HistoryFilter = {
+        metadata: context.historyFilter?.metadata ?? null,
+        status: context.historyFilter?.status ?? null,
+        sortBy: context.historyFilter?.sortBy ?? "updated_at",
+        sortOrder: context.historyFilter?.sortOrder ?? "desc",
+    };
+
+    const historyFilter = atom<HistoryFilter>(defaultHistoryFilter);
 
     // ============ 内部状态 ============
 
@@ -611,10 +615,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
             },
             resetHistoryFilter() {
                 historyFilter.set({
-                    metadata: null,
-                    status: null,
-                    sortBy: "updated_at",
-                    sortOrder: "desc",
+                    ...defaultHistoryFilter,
                 });
                 historyPagination.set({
                     ...historyPagination.get(),
