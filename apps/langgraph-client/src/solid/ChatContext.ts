@@ -1,5 +1,5 @@
 import { createContext, useContext, createMemo, onMount, type JSX, type Component, createComponent, Accessor } from "solid-js";
-import { createChatStore, UnionStore } from "../ui-store/index.js";
+import { createChatStore, HistoryFilter, UnionStore } from "../ui-store/index.js";
 import { useStore } from "@nanostores/solid";
 import { ILangGraphClient } from "@langgraph-js/pure-graph/dist/types.js";
 import { PreinitializedWritableAtom, StoreValue } from "nanostores";
@@ -30,7 +30,9 @@ interface ChatProviderProps {
     client?: ILangGraphClient;
     legacyMode?: boolean;
     /** 历史记录筛选的默认参数 */
-    historyFilter?: import("../ui-store/createChatStore.js").HistoryFilter;
+    historyFilter?: HistoryFilter;
+    /** UI 更新的防抖时间（毫秒，默认 10） */
+    debounceTime?: number;
 }
 /**
  * @zh UnionStore 类型用于合并 store 的 data 和 mutations，使其可以直接访问。
@@ -93,6 +95,7 @@ export const ChatProvider = (props: ChatProviderProps) => {
             fallbackToAvailableAssistants: props.fallbackToAvailableAssistants || false,
             autoRestoreLastSession: props.autoRestoreLastSession || false,
             historyFilter: props.historyFilter,
+            debounceTime: props.debounceTime,
         });
     });
 

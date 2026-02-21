@@ -1,6 +1,6 @@
 import { createElement, createContext, useContext, useMemo, ReactNode, useEffect, useRef } from "react";
 
-import { createChatStore, UnionStore, useUnionStore } from "../ui-store/index.js";
+import { createChatStore, HistoryFilter, UnionStore, useUnionStore } from "../ui-store/index.js";
 import { useStore } from "@nanostores/react";
 import { ILangGraphClient } from "@langgraph-js/pure-graph/dist/types.js";
 
@@ -30,7 +30,9 @@ interface ChatProviderProps {
     client?: ILangGraphClient;
     legacyMode?: boolean;
     /** 历史记录筛选的默认参数 */
-    historyFilter?: import("../ui-store/createChatStore.js").HistoryFilter;
+    historyFilter?: HistoryFilter;
+    /** UI 更新的防抖时间（毫秒，默认 10） */
+    debounceTime?: number;
 }
 
 export const ChatProvider: React.FC<ChatProviderProps> = ({
@@ -48,6 +50,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     client,
     legacyMode = false,
     historyFilter,
+    debounceTime,
 }) => {
     // 使用 useMemo 稳定 defaultHeaders 的引用
     const stableHeaders = useMemo(() => defaultHeaders || {}, [defaultHeaders]);
@@ -84,8 +87,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
             fallbackToAvailableAssistants,
             autoRestoreLastSession,
             historyFilter,
+            debounceTime,
         });
-    }, [defaultAgent, apiUrl, stableHeaders, withCredentials, fetch, showHistory, showGraph, fallbackToAvailableAssistants, autoRestoreLastSession, client, legacyMode, historyFilter]);
+    }, [defaultAgent, apiUrl, stableHeaders, withCredentials, fetch, showHistory, showGraph, fallbackToAvailableAssistants, autoRestoreLastSession, client, legacyMode, historyFilter, debounceTime]);
 
     const unionStore = useUnionStore(store, useStore);
 

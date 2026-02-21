@@ -1,5 +1,5 @@
 import { defineComponent, inject, provide, onMounted, defineExpose, type InjectionKey, type PropType, Ref } from "vue";
-import { createChatStore } from "../ui-store/index.js";
+import { createChatStore, HistoryFilter } from "../ui-store/index.js";
 import { useStore } from "@nanostores/vue";
 import { PreinitializedWritableAtom, StoreValue } from "nanostores";
 import { ILangGraphClient } from "@langgraph-js/pure-graph/dist/types.js";
@@ -62,7 +62,9 @@ export interface ChatProviderProps {
     client?: ILangGraphClient;
     legacyMode?: boolean;
     /** 历史记录筛选的默认参数 */
-    historyFilter?: import("../ui-store/createChatStore.js").HistoryFilter;
+    historyFilter?: HistoryFilter;
+    /** UI 更新的防抖时间（毫秒，默认 10） */
+    debounceTime?: number;
 }
 
 /**
@@ -96,6 +98,7 @@ export const useChatProvider = (props: ChatProviderProps) => {
             fallbackToAvailableAssistants: props.fallbackToAvailableAssistants,
             autoRestoreLastSession: props.autoRestoreLastSession,
             historyFilter: props.historyFilter,
+            debounceTime: props.debounceTime,
         }
     );
 
@@ -164,6 +167,10 @@ export const ChatProvider = defineComponent({
         },
         historyFilter: {
             type: Object as PropType<any>,
+            default: undefined,
+        },
+        debounceTime: {
+            type: Number as PropType<number>,
             default: undefined,
         },
     },

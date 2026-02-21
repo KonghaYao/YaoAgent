@@ -61,6 +61,8 @@ interface ChatStoreContext {
     autoRestoreLastSession?: boolean;
     /** 历史记录筛选的默认参数 */
     historyFilter?: Partial<HistoryFilter>;
+    /** UI 更新的防抖时间（毫秒，默认 10） */
+    debounceTime?: number;
 }
 
 // 分页状态类型
@@ -153,7 +155,7 @@ export const createChatStore = (initClientName: string, config: Partial<LangGrap
         currentNodeName.set(lastMessage?.node_name || lastMessage?.name || "__start__");
         renderMessages.set(messages);
         currentStatus.set(newClient.status);
-    }, 10);
+    }, context.debounceTime ?? 10);
     // ============ 工具和图表辅助函数 ============
 
     const refreshTools = async () => {
