@@ -13,6 +13,7 @@ export class ToolRenderData<I, D> {
         public message: RenderMessage,
         public client: LangGraphClient
     ) {}
+    /** 这个 id 需要联系到 tool call id, 但是很悲哀langgraph 的 hitl interrupt 没有传递任何 id,非常蠢 */
     private getToolActionRequestID() {
         return createActionRequestID({
             name: this.message.name!,
@@ -48,7 +49,7 @@ export class ToolRenderData<I, D> {
             response.editedAction = response.edited_action;
         }
 
-        return this.client.doneHumanInTheLoopWaiting(this.message.id!, this.getToolActionRequestID(), response);
+        return this.client.doneHumanInTheLoopWaiting(this.message.id || this.message.tool_call_id!, this.getToolActionRequestID(), response);
     }
 
     get state() {

@@ -443,7 +443,13 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
                 this.processStreamChunk(chunk, command);
             }
         }
-        const data = await this.runFETool();
+        const data = (await Promise.race([
+            this.runFETool(),
+            new Promise((res) => {
+                this.forceSkipToolLock = () => res(null);
+            }),
+        ])) as any[] | null;
+        this.forceSkipToolLock = undefined;
         await this.responseHumanInTheLoop();
         if (data) streamRecord.push(...data);
         this._status = "idle";
@@ -538,7 +544,7 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
                 // json 校验
                 return this.callFETool(toolMessage, tool.args).catch((e) => console.warn(e));
             });
-            console.log("batch call tools", result.length);
+
             // 只有当卡住流程时，才改变状态为 interrupted
             this._status = "interrupted";
             this.currentThread!.status = "interrupted"; // 修复某些机制下，状态不为 interrupted 与后端有差异
@@ -632,6 +638,8 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
         }
     }
 
+    /** 尝试强制跳过工具调用 */
+    private forceSkipToolLock?: () => void;
     /**
      * @zh 标记人机交互等待已完成。
      * @en Marks the human in the loop waiting as completed.
@@ -641,6 +649,14 @@ export class LangGraphClient<TStateType = unknown> extends EventEmitter<LangGrap
         this.tools.doneWaiting(tool_id, result);
         if (this.humanInTheLoop) {
             this.humanInTheLoop.result[action_request_id] = result;
+            if (Object.keys(this.humanInTheLoop.result).length === this.humanInTheLoop.interruptData?.[0]?.value?.actionRequests?.length) {
+                setTimeout(() => {
+                    if (this.forceSkipToolLock) {
+                        console.warn("force kill tool lock");
+                        this.forceSkipToolLock();
+                    }
+                }, 100);
+            }
         }
     }
 
