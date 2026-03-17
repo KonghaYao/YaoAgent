@@ -151,10 +151,10 @@ export class History {
      * @en Deletes the specified session
      */
     async deleteSession(sessionId: string): Promise<boolean> {
-        const session = this.sessions.get(sessionId);
-        if (!session) {
-            return false;
-        }
+        // 注意：不要在此处检查 this.sessions.has(sessionId)！
+        // this.sessions 只记录本次运行中创建/激活过的会话，
+        // 而历史列表中的 thread 是直接从远端拉取的，并不在本地 Map 里。
+        // 如果加了提前 return，历史列表中未被激活过的 thread 将永远无法删除。
 
         // 如果删除的是当前活跃会话，清空活跃会话
         if (this.activeSessionId === sessionId) {

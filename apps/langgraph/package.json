@@ -11,14 +11,14 @@
     "license": "ISC",
     "packageManager": "pnpm@10.11.0",
     "dependencies": {
-        "@langchain/core": "^1.1.8",
+        "@langchain/core": "^1.1.31",
         "@langchain/langgraph": "^1.0.7",
-        "@langchain/openai": "^1.1.2",
+        "@langchain/openai": "^1.2.12",
         "@langgraph-js/pro": "workspace:^*",
-        "@langgraph-js/pure-graph": "^3",
+        "@langgraph-js/pure-graph": "^3.3.3",
         "hono": "^4.10.6",
-        "langchain": "1.1.1",
-        "openai": "^6.9.1",
+        "langchain": "^1.2.30",
+        "openai": "^6.27.0",
         "zod": "^4.2.1"
     }
 }
